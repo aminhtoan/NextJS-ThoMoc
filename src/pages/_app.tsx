@@ -36,6 +36,8 @@ import AclGuard from 'src/components/auth/AclGuard'
 import ReactHotToast from 'src/components/react-hot-toast'
 import { useSettings } from 'src/hooks/useSettings'
 import ThemeComponent from 'src/theme/ThemeComponent'
+import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer } from 'react-toastify'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -104,7 +106,7 @@ export default function App(props: ExtendedAppProps) {
 
   return (
     <Provider store={store}>
-      <Head>
+      {/* <Head>
         <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
         <meta
           name='description'
@@ -112,8 +114,19 @@ export default function App(props: ExtendedAppProps) {
         />
         <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
-      </Head>
-
+      </Head> */}
+      <ToastContainer
+        position='top-right'
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='light'
+      />
       <AuthProvider>
         <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
           <SettingsConsumer>

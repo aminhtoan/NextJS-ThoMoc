@@ -30,7 +30,11 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin): Palette => {
       bodyBg: mode === 'light' ? '#F8F7FA' : '#25293C', // Same as palette.background.default but doesn't consider bordered skin
       trackBg: mode === 'light' ? '#F1F0F2' : '#363B54',
       avatarBg: mode === 'light' ? '#DBDADE' : '#4A5072',
-      tableHeaderBg: mode === 'light' ? '#F6F6F7' : '#4A5072'
+      tableHeaderBg: mode === 'light' ? '#F6F6F7' : '#4A5072',
+      morningSky:
+        mode === 'light'
+          ? 'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))'
+          : 'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))'
     },
     mode: mode,
     common: {

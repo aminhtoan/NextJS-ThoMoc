@@ -10,6 +10,7 @@ declare module '@mui/material/styles' {
       darkPaperBg: string
       lightPaperBg: string
       tableHeaderBg: string
+      morningSky: string
     }
   }
 
@@ -27,6 +28,7 @@ declare module '@mui/material/styles' {
       mainGrey?: string
       lightGrey?: string
       disabledGrey?: string
+      morningSky?: string
     }
     customGrey?: PaletteOptions
     customBlack?: PaletteOptions
