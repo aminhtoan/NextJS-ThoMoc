@@ -1,12 +1,9 @@
 'use client'
+import { Box } from '@mui/material'
 import Head from 'next/head'
-import Button from '@mui/material/Button'
-import { useTheme } from '@emotion/react'
-import { Box, Typography } from '@mui/material'
-import CustomTextField from 'src/components/text-field'
 
 export default function Home() {
-  const theme = useTheme()
+  // const theme = useTheme()
 
   return (
     <>
@@ -16,9 +13,7 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Box sx={{ margin: 6, width: '200px' }}>
-        <CustomTextField id='outlined-multiline-flexible' label='Name' />
-      </Box>
+      <Box sx={{ margin: 6, width: '200px' }}>Toan</Box>
     </>
   )
 }

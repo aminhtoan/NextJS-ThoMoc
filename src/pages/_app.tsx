@@ -2,10 +2,9 @@
 import { ReactNode } from 'react'
 
 // ** Next Imports
-import Head from 'next/head'
-import { Router } from 'next/router'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
+import { Router } from 'next/router'
 
 // ** Store Imports
 import { Provider } from 'react-redux'
@@ -14,8 +13,8 @@ import { Provider } from 'react-redux'
 import NProgress from 'nprogress'
 
 // ** Config Imports
-import 'src/configs/i18n'
 import { defaultACLObj } from 'src/configs/acl'
+import 'src/configs/i18n'
 import themeConfig from 'src/configs/themeConfig'
 
 // ** Third Party Import
@@ -27,17 +26,15 @@ import { AuthProvider } from 'src/contexts/AuthContext'
 // ** Global css styles
 import 'src/styles/globals.scss'
 
-import { store } from 'src/stores'
-import GuestGuard from 'src/components/auth/GuestGuard'
-import AuthGuard from 'src/components/auth/AuthGuard'
-import FallbackSpinner from 'src/components/fall-back'
-import { SettingsConsumer, SettingsProvider } from 'src/contexts/SettingsContext'
 import AclGuard from 'src/components/auth/AclGuard'
+import AuthGuard from 'src/components/auth/AuthGuard'
+import GuestGuard from 'src/components/auth/GuestGuard'
+import FallbackSpinner from 'src/components/fall-back'
 import ReactHotToast from 'src/components/react-hot-toast'
+import { SettingsConsumer, SettingsProvider } from 'src/contexts/SettingsContext'
 import { useSettings } from 'src/hooks/useSettings'
+import { store } from 'src/stores'
 import ThemeComponent from 'src/theme/ThemeComponent'
-import 'react-toastify/dist/ReactToastify.css'
-import { ToastContainer } from 'react-toastify'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -115,18 +112,7 @@ export default function App(props: ExtendedAppProps) {
         <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head> */}
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='light'
-      />
+
       <AuthProvider>
         <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
           <SettingsConsumer>

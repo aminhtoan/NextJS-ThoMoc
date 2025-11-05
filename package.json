@@ -38,12 +38,14 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "html-to-draftjs": "^1.5.0",
+    "i": "^0.3.7",
     "i18next": "^23.7.8",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-http-backend": "^2.4.2",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "next": "14.0.4",
+    "npm": "^11.6.2",
     "nprogress": "^0.2.0",
     "prettier": "^3.1.1",
     "react": "^18",
@@ -58,7 +60,6 @@
     "react-i18next": "^13.5.0",
     "react-perfect-scrollbar": "^1.5.8",
     "react-redux": "^9.0.2",
-    "react-toastify": "^11.0.5",
     "sass": "^1.69.5",
     "styled-components": "^6.1.1",
     "ts-node": "^10.9.2",
@@ -71,6 +72,6 @@
     "eslint": "^8.55.0",
     "eslint-config-next": "14.0.4",
     "prisma-json-types-generator": "^3.6.2",
-    "typescript": "^5"
+    "typescript": "^5.3.3"
   }
 }

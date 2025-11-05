@@ -1,3 +1,6 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
   Box,
   Button,
@@ -13,20 +16,18 @@ import {
   Typography
 } from '@mui/material'
 import { NextPage } from 'next'
-import { FacebookIcon, GoogleIcon } from 'src/components/CustomIcons/SitemarkIcon'
-import CarCustomCard from '../../../components/card/index'
-import SignInContainer from 'src/components/containers/SignInContainer'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import React from 'react'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import ForgotPassword from 'src/components/auth/ForgotPassword'
-import handleAPI from 'src/apis/handleAPI'
-import { toast } from 'react-toastify'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import handleAPI from 'src/apis/handleAPI'
+import ForgotPassword from 'src/components/auth/ForgotPassword'
+import GoogleLogin from 'src/components/auth/GoogleLogin'
+import { FacebookIcon } from 'src/components/Icon/SitemarkIcon'
+import SignInContainer from 'src/components/sign-in/SignInContainer'
 import { LoginFormData, LoginSchema } from 'src/models/auth.model'
+import CarCustomCard from '../../../components/sign-in/CustomCard'
 
 type TProps = {}
 
@@ -43,7 +44,6 @@ const PageLogin: NextPage<TProps> = () => {
   const [openFPassword, setOpenFPassword] = React.useState(false)
   const [isRemmember, setIsRemmember] = React.useState(false)
   const router = useRouter()
-
   const {
     handleSubmit,
     control,
@@ -60,6 +60,7 @@ const PageLogin: NextPage<TProps> = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const res = await handleAPI('/auth/login', data, 'post')
+
       if (isRemmember) {
         localStorage.setItem('accessToken', res.data.accessToken)
       }
@@ -106,7 +107,7 @@ const PageLogin: NextPage<TProps> = () => {
             <Box>
               <Controller
                 control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({ field: { onChange, value } }) => (
                   <>
                     <FormLabel htmlFor='email'>Email</FormLabel>
                     <TextField
@@ -198,14 +199,7 @@ const PageLogin: NextPage<TProps> = () => {
 
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant='outlined'
-              onClick={() => alert('Sign in with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
+            <GoogleLogin />
             <Button
               fullWidth
               variant='outlined'

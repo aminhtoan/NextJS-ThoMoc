@@ -1,5 +1,4 @@
 import { NextPage } from 'next'
-import PageLogin from 'src/views/pages/login'
 import PageRegister from 'src/views/pages/register'
 
 type TProps = {}

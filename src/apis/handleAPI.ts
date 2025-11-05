@@ -14,7 +14,8 @@ const handleAPI = async (
     if (response.status == 401) {
       console.log("check ccc");
     }
-    return response; // Trả về dữ liệu từ API
+    
+return response; // Trả về dữ liệu từ API
   } catch (error: any) {
     throw error; // Quản lý lỗi nếu có
   }

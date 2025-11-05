@@ -12,6 +12,7 @@ const OTPInput = ({ length = 5, onChange }: OTPInputProps) => {
 
   const focusInput = (index: number) => {
     const input = inputsRef.current[index]
+
     // console.log(input)
     if (input) {
       // select để dễ xóa khi người dùng gõ tiếp
@@ -26,6 +27,7 @@ const OTPInput = ({ length = 5, onChange }: OTPInputProps) => {
       const newOtp = [...prev]
       newOtp[index] = value
       onChange?.(newOtp.join(''))
+
       // if (value && index < length - 1) setTimeout(() => focusInput(index + 1), 0)
       return newOtp
     })
@@ -34,7 +36,8 @@ const OTPInput = ({ length = 5, onChange }: OTPInputProps) => {
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>) => {
     if (e.repeat) {
       e.preventDefault()
-      return
+      
+return
     }
 
     if (/^[0-9]$/.test(e.key)) {
@@ -43,7 +46,8 @@ const OTPInput = ({ length = 5, onChange }: OTPInputProps) => {
       if (otp[index] === '') {
         handleChange(index, e.key)
       }
-      return
+      
+return
     }
 
     // 2. XỬ LÝ XÓA LÙI 

@@ -1,10 +1,8 @@
 import {
   Box,
   Button,
-  Checkbox,
   CssBaseline,
   Divider,
-  FormControlLabel,
   FormLabel,
   IconButton,
   InputAdornment,
@@ -14,8 +12,8 @@ import {
   useTheme
 } from '@mui/material'
 import { NextPage } from 'next'
-import { FacebookIcon, GoogleIcon } from 'src/components/CustomIcons/SitemarkIcon'
-import CarCustomCard from '../../../components/card/index'
+import { FacebookIcon, GoogleIcon } from 'src/components/Icon/SitemarkIcon'
+import CarCustomCard from '../../../components/sign-in/CustomCard'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -23,9 +21,10 @@ import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
 import React from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import SignInContainer from '../../../components/containers/SignInContainer'
+import SignInContainer from '../../../components/sign-in/SignInContainer'
 import OTP from 'src/components/auth/OTP'
 import Head from 'next/head'
+
 type TProps = {}
 
 const helperTextStyle = {
@@ -42,6 +41,7 @@ type TDefaultValue = {
   confirmPassword: string
   name: string
   phoneNumber: string
+
   // code: string
 }
 
@@ -65,6 +65,7 @@ const PageRegister: NextPage<TProps> = () => {
         .string()
         .required('Vui lòng nhập số điện thoại ')
         .min(10, 'Số diện thoại phải có ít nhất 10 ký tự')
+
       // code: yup.string().required()
     })
     .required()
@@ -79,6 +80,7 @@ const PageRegister: NextPage<TProps> = () => {
     confirmPassword: '',
     name: '',
     phoneNumber: ''
+
     // code: ''
   }
 

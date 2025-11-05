@@ -1,6 +1,6 @@
 // src/components/auth/OTP.tsx
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Box } from '@mui/material'
-import React, { useCallback, useState } from 'react'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
+import { useState } from 'react'
 import OTPInput from './OTPInput'
 
 interface OTPProps {
@@ -13,10 +13,10 @@ const OTP = (props: OTPProps) => {
   const { open, handleClose, data } = props
   const [otp, setOtp] = useState('')
 
-
   const handleVerify = () => {
     if (otp.length === 6) {
       console.log('OTP Code:', otp)
+
       // Gọi API verify OTP ở đây
       handleClose()
     }
@@ -24,6 +24,7 @@ const OTP = (props: OTPProps) => {
 
   const handleResend = () => {
     console.log('Resend OTP to:', data.email)
+
     // Gọi API resend OTP ở đây
   }
 
