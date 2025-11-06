@@ -1,13 +1,12 @@
 import { Button, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import handleAPI from 'src/apis/handleAPI'
 import { GoogleIcon } from '../Icon/SitemarkIcon'
 
 const GoogleLogin = () => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)

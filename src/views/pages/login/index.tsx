@@ -136,7 +136,7 @@ const PageLogin: NextPage<TProps> = () => {
             <Box sx={{ mt: 2 }}>
               <Controller
                 control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({ field: { onChange, value } }) => (
                   <>
                     <FormLabel htmlFor='password'>Password</FormLabel>
                     <TextField
