@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   CssBaseline,
   Divider,
   FormControlLabel,
@@ -17,13 +18,14 @@ import {
 } from '@mui/material'
 import { NextPage } from 'next'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import ForgotPassword from 'src/components/auth/ForgotPassword'
 import GoogleLogin from 'src/components/auth/GoogleLogin'
+import OTP from 'src/components/auth/OTP'
+import TOTP from 'src/components/auth/TOTP'
 import { FacebookIcon } from 'src/components/Icon/SitemarkIcon'
 import SignInContainer from 'src/components/sign-in/SignInContainer'
 import { LoginFormData, LoginSchema } from 'src/models/auth.model'
@@ -39,11 +41,21 @@ const helperTextStyle = {
   fontFamily: 'Poppins'
 }
 
+interface Datainit {
+  email: string
+  tempToken: string
+  isRemmember: boolean
+}
+
 const PageLogin: NextPage<TProps> = () => {
+  const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [openFPassword, setOpenFPassword] = React.useState(false)
   const [isRemmember, setIsRemmember] = React.useState(false)
-  const router = useRouter()
+  const [dataInit, setDataInit] = React.useState<Datainit>()
+  const [showOTP, setShowOTP] = React.useState(false)
+  const [showTOTP, setShowTOTP] = React.useState(false)
+
   const {
     handleSubmit,
     control,
@@ -59,16 +71,31 @@ const PageLogin: NextPage<TProps> = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await handleAPI('/auth/login', data, 'post')
-
-      if (isRemmember) {
-        localStorage.setItem('accessToken', res.data.accessToken)
+      setIsLoading(true)
+      const res = await handleAPI('/auth/login/verify', data, 'post')
+      console.log(res)
+      if (res && res.data) {
+        if (res.data.needOTP) {
+          setDataInit({
+            email: data.email,
+            tempToken: res.data.tempToken,
+            isRemmember: isRemmember
+          })
+          setShowOTP(res.data.needOTP)
+        } else if (res.data.needTOTP) {
+          setDataInit({
+            email: data.email,
+            tempToken: res.data.tempToken,
+            isRemmember: isRemmember
+          })
+          setShowTOTP(res.data.needTOTP)
+        }
       }
-      toast.success('Đăng nhập thành công')
-      router.push('/')
     } catch (error: any) {
       console.log('Error Login: ', error)
       toast.error(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -81,7 +108,6 @@ const PageLogin: NextPage<TProps> = () => {
         <title>Đăng nhập - Thổ Mộc</title>
         <meta name='description' content='Đăng nhập tài khoản ' />
       </Head>
-
       <CssBaseline enableColorScheme />
       <SignInContainer direction='column' justifyContent='space-between'>
         <CarCustomCard variant='outlined' elevation={0}>
@@ -127,6 +153,7 @@ const PageLogin: NextPage<TProps> = () => {
                       FormHelperTextProps={{
                         sx: helperTextStyle
                       }}
+                      disabled={isLoading}
                     />
                   </>
                 )}
@@ -156,6 +183,7 @@ const PageLogin: NextPage<TProps> = () => {
                       FormHelperTextProps={{
                         sx: helperTextStyle
                       }}
+                      disabled={isLoading}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position='end'>
@@ -163,6 +191,7 @@ const PageLogin: NextPage<TProps> = () => {
                               aria-label={showPassword ? 'hide the password' : 'display the password'}
                               onClick={handleClickShowPassword}
                               edge='end'
+                              disabled={isLoading}
                             >
                               {showPassword ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
@@ -182,8 +211,29 @@ const PageLogin: NextPage<TProps> = () => {
               label='Remember me'
             />
 
-            <Button type='submit' fullWidth variant='contained'>
-              Sign in
+            <Button
+              type='submit'
+              fullWidth
+              variant='contained'
+              disabled={isLoading}
+              sx={{
+                position: 'relative',
+                minHeight: '48px'
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      color: 'white'
+                    }}
+                  />
+                  <Typography sx={{ ml: 1, opacity: 0.8 }}>Signing in...</Typography>
+                </>
+              ) : (
+                'Sign in'
+              )}
             </Button>
 
             <Link
@@ -192,6 +242,7 @@ const PageLogin: NextPage<TProps> = () => {
               onClick={handleClickShowFPassword}
               variant='body2'
               sx={{ alignSelf: 'center' }}
+              disabled={isLoading}
             >
               Forgot your password?
             </Link>
@@ -217,7 +268,9 @@ const PageLogin: NextPage<TProps> = () => {
           </Box>
         </CarCustomCard>
       </SignInContainer>
+      {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />}
 
+      {showTOTP && dataInit && <TOTP open={showTOTP} data={dataInit} handClose={() => setShowTOTP(false)} />}
       <ForgotPassword open={openFPassword} handleClose={handleClickShowFPassword} />
     </Box>
   )

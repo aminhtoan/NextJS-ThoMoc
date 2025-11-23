@@ -1,10 +1,9 @@
 // src/components/auth/OTP.tsx
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import { TypeofVerificationCode } from 'src/constants/auth'
 import OTPInput from './OTPInput'
 
 interface Datainit {
@@ -19,72 +18,21 @@ interface OTPProps {
   handClose: () => void
 }
 
-const OTP = (props: OTPProps) => {
+const TOTP = (props: OTPProps) => {
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
-  const [minutes, setMinutes] = useState(1)
-  const [seconds, setSeconds] = useState(59)
-  const [isActive, setIsActive] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
 
   const router = useRouter()
 
-  const otpdata = {
-    email: data.email,
-    type: TypeofVerificationCode.LOGIN
-  }
-  useEffect(() => {
-    if (open) {
-      setIsActive(true)
-      setMinutes(1)
-      setSeconds(59)
-    } else {
-      setIsActive(false)
-      setOtp('') // Reset OTP khi đóng dialog
-    }
-  }, [open])
-
-  useEffect(() => {
-    const sendOTP = async () => {
-      await handleAPI('auth/otp', otpdata, 'post')
-    }
-    sendOTP()
-  }, [])
-
-  useEffect(() => {
-    if (!isActive) return
-
-    const interval = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds(seconds - 1)
-      } else if (minutes > 0) {
-        setMinutes(minutes - 1)
-        setSeconds(59)
-      } else {
-        setIsActive(false)
-        setMinutes(0)
-        setSeconds(0)
-        clearInterval(interval)
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [isActive, minutes, seconds])
-
-  const formatTime = (time: number) => {
-    return time < 10 ? `0${time}` : time
-  }
-
   const handleVerify = async () => {
     try {
       if (isLoading) return
-
       setIsLoading(true)
-
       const dataLogin = {
         tempToken: data.tempToken,
-        code: otp
+        totpCode: otp
       }
 
       const user = await handleAPI('/auth/login', dataLogin, 'post')
@@ -95,28 +43,15 @@ const OTP = (props: OTPProps) => {
       toast.success('Đăng nhập thành công')
       router.push('/')
     } catch (error: any) {
-      console.log('Error Login OTP: ', error)
       setError(
         error?.response?.data?.message?.[0]?.message ||
           error?.response?.data?.error ||
           error?.response?.data.message ||
           'Đã xảy ra lỗi'
       )
+      console.log('Error Login TOTP: ', error)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleResend = async () => {
-    try {
-      await handleAPI('auth/otp', otpdata, 'post')
-      setMinutes(1)
-      setSeconds(59)
-      setIsActive(true)
-      setOtp('')
-    } catch (error: any) {
-      console.log('Error Resend OTP: ', error)
-      toast.error(error)
     }
   }
 
@@ -131,15 +66,16 @@ const OTP = (props: OTPProps) => {
           overflowY: 'unset'
         }
       }}
+      disablePortal
     >
       <DialogTitle sx={{ m: 0 }}>
         <Box>
           <Typography variant='h6' component='h2' fontWeight={550} textAlign='center' sx={{ fontSize: 25 }}>
-            We've sent a code
+            Xác minh đăng nhập
           </Typography>
 
           <Typography variant='body2' color='text.secondary' textAlign='center' sx={{ mb: 3, fontSize: 15 }}>
-            Enter it below
+            Nhập bên dưới
           </Typography>
         </Box>
       </DialogTitle>
@@ -153,36 +89,13 @@ const OTP = (props: OTPProps) => {
 
         <Box sx={{ mb: 3 }}>
           <OTPInput length={6} onChange={val => setOtp(val)} value={otp} disabled={isLoading} />
+
           {error && (
             <Typography color='error' sx={{ mt: 4, fontSize: '0.875rem', textAlign: 'center' }}>
               {error}
             </Typography>
           )}
         </Box>
-
-        <Stack sx={{ paddingLeft: 4 }} direction='row' justifyContent='space-between' alignItems='center' width='335px'>
-          <Typography>
-            Time Remaining:{' '}
-            <b>
-              {' '}
-              {formatTime(minutes)}:{formatTime(seconds)}
-            </b>
-          </Typography>
-          <Button
-            variant='text'
-            onClick={handleResend}
-            disabled={isActive}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-              minWidth: 'auto',
-              p: 0,
-              opacity: isActive ? 0.5 : 1
-            }}
-          >
-            Send again
-          </Button>
-        </Stack>
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
@@ -202,4 +115,4 @@ const OTP = (props: OTPProps) => {
   )
 }
 
-export default OTP
+export default TOTP

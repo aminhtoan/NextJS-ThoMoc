@@ -1,81 +1,101 @@
 import { Box, TextField } from '@mui/material'
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface OTPInputProps {
   length?: number
   onChange?: (otp: string) => void
+  value: string
+  disabled: boolean
 }
 
-const OTPInput = ({ length = 5, onChange }: OTPInputProps) => {
+const OTPInput = ({ length = 5, onChange, value, disabled }: OTPInputProps) => {
   const [otp, setOtp] = useState<string[]>(Array(length).fill(''))
   const inputsRef = useRef<(HTMLInputElement | null)[]>([])
 
+  useEffect(() => {
+    if (value.length === 0) {
+      setOtp(Array(length).fill(''))
+    }
+  }, [value, length])
+
   const focusInput = (index: number) => {
     const input = inputsRef.current[index]
-
-    // console.log(input)
-    if (input) {
-      // select để dễ xóa khi người dùng gõ tiếp
-      input.focus()
-    }
+    if (input) input.focus()
   }
-  const handleChange = (index: number, value: string) => {
-    if (!/^[0-9]?$/.test(value)) return // chỉ cho nhập số hoặc xóa
 
-    // Cập nhật state an toàn
+  const handleChange = (
+    index: number,
+    rawValue: string,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> // Updated type to match MUI's signature
+  ) => {
+    // Skip during IME composition to prevent duplication
+    if ((e.nativeEvent as any).isComposing) return
+
+    // Lấy đúng 1 ký tự số cuối cùng để tránh nhân đôi/IME
+    const digit = rawValue.replace(/\D/g, '').slice(-1)
+
     setOtp(prev => {
-      const newOtp = [...prev]
-      newOtp[index] = value
-      onChange?.(newOtp.join(''))
+      const next = [...prev]
+      next[index] = digit || ''
+      onChange?.(next.join(''))
 
-      // if (value && index < length - 1) setTimeout(() => focusInput(index + 1), 0)
-      return newOtp
+      // Auto-advance nếu có số và chưa ở ô cuối
+      if (digit && index < length - 1) {
+        setTimeout(() => focusInput(index + 1), 0)
+      }
+      return next
     })
   }
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>) => {
+    // Tránh xử lý khi đang composition (bộ gõ tiếng Việt)
+    if ((e.nativeEvent as any)?.isComposing) return
+
     if (e.repeat) {
       e.preventDefault()
-      
-return
+      return
     }
 
-    if (/^[0-9]$/.test(e.key)) {
+    // Chỉ xử lý Backspace & Arrow
+    if (e.key === 'Backspace') {
       e.preventDefault()
-
-      if (otp[index] === '') {
-        handleChange(index, e.key)
-      }
-      
-return
+      setOtp(prev => {
+        const next = [...prev]
+        if (next[index]) {
+          next[index] = ''
+          onChange?.(next.join(''))
+        } else if (index > 0) {
+          focusInput(index - 1)
+        }
+        return next
+      })
+      return
     }
 
-    // 2. XỬ LÝ XÓA LÙI 
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      focusInput(index - 1)
-    }
-
-    // 3. XỬ LÝ PHÍM ĐIỀU HƯỚNG
     if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault()
       focusInput(index - 1)
+      return
     }
+
     if (e.key === 'ArrowRight' && index < length - 1) {
+      e.preventDefault()
       focusInput(index + 1)
+      return
     }
   }
-  
+
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault()
-    const pastedData = e.clipboardData.getData('Text').slice(0, length)
-    if (!/^\d+$/.test(pastedData)) return
+    const pastedData = e.clipboardData.getData('Text').replace(/\D/g, '').slice(0, length)
+    if (!pastedData) return
 
-    const newOtp = pastedData.split('')
-    for (let i = 0; i < length; i++) {
-      newOtp[i] = newOtp[i] || ''
-    }
+    const newOtp = Array.from({ length }, (_, i) => pastedData[i] || '')
     setOtp(newOtp)
     onChange?.(newOtp.join(''))
-    focusInput(newOtp.findIndex(v => v === '') || length - 1)
+
+    const nextIndex = newOtp.findIndex(v => v === '')
+    focusInput(nextIndex === -1 ? length - 1 : nextIndex)
   }
 
   return (
@@ -85,19 +105,25 @@ return
           key={index}
           inputRef={el => (inputsRef.current[index] = el)}
           value={digit}
-          onChange={e => handleChange(index, e.target.value)}
+          onChange={e => handleChange(index, e.target.value, e)}
           onKeyDown={e => handleKeyDown(index, e)}
           onPaste={handlePaste}
+          type='text'
           inputProps={{
             maxLength: 1,
             inputMode: 'numeric',
-            style: { textAlign: 'center', fontSize: '1.25rem', padding: '12px 8px' }
+            pattern: '[0-9]*',
+            style: { textAlign: 'center', fontSize: '1.25rem', padding: '12px 8px' },
+            autoComplete: 'off',
+            autoCorrect: 'off',
+            autoCapitalize: 'off',
+            spellCheck: false
           }}
+          disabled={disabled}
           sx={{
             width: 50,
             '& .MuiOutlinedInput-root': {
               height: 56,
-              borderRadius: 2,
               '& fieldset': { borderColor: '#bdbdbd' },
               '&:hover fieldset': { borderColor: '#1976d2' },
               '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: 2 }
