@@ -34,6 +34,7 @@ const OTP = (props: OTPProps) => {
     email: data.email,
     type: TypeofVerificationCode.LOGIN
   }
+
   useEffect(() => {
     if (open) {
       setIsActive(true)
@@ -50,7 +51,7 @@ const OTP = (props: OTPProps) => {
       await handleAPI('auth/otp', otpdata, 'post')
     }
     sendOTP()
-  }, [])
+  }, [otpdata])
 
   useEffect(() => {
     if (!isActive) return
