@@ -30,6 +30,7 @@ import { FacebookIcon } from 'src/components/Icon/SitemarkIcon'
 import SignInContainer from 'src/components/sign-in/SignInContainer'
 import { LoginFormData, LoginSchema } from 'src/models/auth.model'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
+import FacebookLogin from 'src/components/auth/FacebookLogin'
 
 type TProps = {}
 
@@ -251,14 +252,7 @@ const PageLogin: NextPage<TProps> = () => {
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <GoogleLogin />
-            <Button
-              fullWidth
-              variant='outlined'
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
-            </Button>
+            <FacebookLogin />
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <Link href='/register' variant='body2' sx={{ alignSelf: 'center' }}>
@@ -268,8 +262,8 @@ const PageLogin: NextPage<TProps> = () => {
           </Box>
         </CarCustomCard>
       </SignInContainer>
-      {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />}
 
+      {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />}
       {showTOTP && dataInit && <TOTP open={showTOTP} data={dataInit} handClose={() => setShowTOTP(false)} />}
       <ForgotPassword open={openFPassword} handleClose={handleClickShowFPassword} />
     </Box>

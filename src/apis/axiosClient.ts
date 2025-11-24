@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // Tạo instance Axios chung
 const api = axios.create({
-  baseURL: 'http://localhost:8888', // URL backend NestJS của bạn,
+  baseURL: 'http://localhost:8888/api/', // URL backend NestJS của bạn,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -17,8 +17,8 @@ api.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
-    
-return config
+
+    return config
   },
   error => Promise.reject(error)
 )
