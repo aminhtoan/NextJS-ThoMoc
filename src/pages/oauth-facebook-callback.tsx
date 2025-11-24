@@ -37,7 +37,7 @@ const FacebookCallback = () => {
           <p>{error}</p>
         </>
       ) : (
-        <h2>Đang xử lý đăng nhập Google...</h2>
+        <h2>Đang xử lý đăng nhập FaceBook...</h2>
       )}
     </div>
   )
