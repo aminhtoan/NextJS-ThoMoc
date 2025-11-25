@@ -1,7 +1,7 @@
 // src/components/auth/OTP.tsx
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import { TypeofVerificationCode } from 'src/constants/auth'
@@ -30,10 +30,13 @@ const OTP = (props: OTPProps) => {
 
   const router = useRouter()
 
-  const otpdata = {
-    email: data.email,
-    type: TypeofVerificationCode.LOGIN
-  }
+  const otpdata = useMemo(
+    () => ({
+      email: data.email,
+      type: TypeofVerificationCode.LOGIN
+    }),
+    [data.email]
+  )
 
   useEffect(() => {
     if (open) {

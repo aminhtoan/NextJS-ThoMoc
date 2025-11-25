@@ -43,6 +43,7 @@ const OTPInput = ({ length = 5, onChange, value, disabled }: OTPInputProps) => {
       if (digit && index < length - 1) {
         setTimeout(() => focusInput(index + 1), 0)
       }
+
       return next
     })
   }
@@ -53,6 +54,7 @@ const OTPInput = ({ length = 5, onChange, value, disabled }: OTPInputProps) => {
 
     if (e.repeat) {
       e.preventDefault()
+
       return
     }
 
@@ -67,20 +69,24 @@ const OTPInput = ({ length = 5, onChange, value, disabled }: OTPInputProps) => {
         } else if (index > 0) {
           focusInput(index - 1)
         }
+
         return next
       })
+
       return
     }
 
     if (e.key === 'ArrowLeft' && index > 0) {
       e.preventDefault()
       focusInput(index - 1)
+
       return
     }
 
     if (e.key === 'ArrowRight' && index < length - 1) {
       e.preventDefault()
       focusInput(index + 1)
+
       return
     }
   }
