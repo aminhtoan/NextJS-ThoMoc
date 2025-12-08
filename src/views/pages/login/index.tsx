@@ -72,7 +72,7 @@ const PageLogin: NextPage<TProps> = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true)
-      const res = await handleAPI('/auth/login/verify', data, 'post')
+      const res = await handleAPI('/auth/login', data, 'post')
       console.log(res)
       if (res && res.data) {
         if (res.data.needOTP) {
@@ -93,7 +93,7 @@ const PageLogin: NextPage<TProps> = () => {
       }
     } catch (error: any) {
       console.log('Error Login: ', error)
-      toast.error(error)
+      toast.error(error?.response?.data?.message?.[0]?.error || 'Đã xảy ra lỗi')
     } finally {
       setIsLoading(false)
     }
