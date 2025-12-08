@@ -22,7 +22,6 @@ import React from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import SignInContainer from '../../../components/sign-in/SignInContainer'
-import OTP from 'src/components/auth/OTP'
 import Head from 'next/head'
 
 type TProps = {}
@@ -73,7 +72,9 @@ const PageRegister: NextPage<TProps> = () => {
   const [showPassword, setShowPassword] = React.useState(false)
   const [showCPassword, setShowCPassword] = React.useState(false)
   const [dataInit, setDataInit] = React.useState<TDefaultValue>()
-  const [showOTP, setShowOTP] = React.useState(false)
+
+  // const [showOTP, setShowOTP] = React.useState(false)
+
   const defaultValues: TDefaultValue = {
     email: '',
     password: '',
@@ -102,11 +103,11 @@ const PageRegister: NextPage<TProps> = () => {
   const handleClickShowPassword = () => setShowPassword(show => !show)
   const handleClickShowCPassword = () => setShowCPassword(show => !show)
 
-  const handleClickShowOTP = () => {
-    if (dataInit) {
-      setShowOTP(show => !show)
-    }
-  }
+  // const handleClickShowOTP = () => {
+  //   if (dataInit) {
+  //     setShowOTP(show => !show)
+  //   }
+  // }
 
   return (
     <Box>
@@ -323,7 +324,7 @@ const PageRegister: NextPage<TProps> = () => {
               />
             </Box>
 
-            <Button type='submit' fullWidth variant='contained' onClick={handleClickShowOTP}>
+            <Button type='submit' fullWidth variant='contained'>
               Sign up
             </Button>
           </Box>
@@ -355,7 +356,7 @@ const PageRegister: NextPage<TProps> = () => {
           </Box>
         </CarCustomCard>
       </SignInContainer>
-      <OTP open={showOTP} handleClose={handleClickShowOTP} data={dataInit} />
+      {/* {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />} */}
     </Box>
   )
 }

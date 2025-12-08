@@ -35,7 +35,7 @@ const TOTP = (props: OTPProps) => {
         totpCode: otp
       }
 
-      const user = await handleAPI('/auth/login', dataLogin, 'post')
+      const user = await handleAPI('/auth/login/verify', dataLogin, 'post')
 
       if (data.isRemmember) {
         localStorage.setItem('accessToken', user.data.accessToken)
