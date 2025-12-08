@@ -4,25 +4,14 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import { ForgotPasswordFormData, ForgotPasswordSchema } from 'src/models/auth.model'
+import { ForgotPasswordFormData, ForgotPasswordSchema, ResetPasswordData } from 'src/models/auth.model'
 import VerifyResetCode from './VerifyResetCode'
 
 interface Props {
   open: boolean
   handleClose: () => void
 }
-const helperTextStyle = {
-  color: 'error.main',
-  fontSize: '0.8rem',
-  fontWeight: 500,
-  mt: 0.5,
-  fontFamily: 'Poppins'
-}
 
-interface ResetPasswordData {
-  email: string
-  tempToken: string
-}
 const ForgotPassword = (props: Props) => {
   const { open, handleClose } = props
   const [isLoading, setIsLoading] = useState(false)
@@ -45,7 +34,6 @@ const ForgotPassword = (props: Props) => {
     try {
       setIsLoading(true)
       const res = await handleAPI('/auth/forgot-password', data, 'post')
-      console.log(res.data)
       if (res && res.data) {
         setIsShowVerify(true)
         setData({
@@ -53,17 +41,15 @@ const ForgotPassword = (props: Props) => {
           email: data.email
         })
       }
-      console.log(res)
     } catch (error: any) {
-      console.log(error)
       toast.error(error?.response?.data?.message || 'Xảy ra lỗi')
     } finally {
       setIsLoading(false)
     }
   }
-  console.log(data)
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
       <Box onSubmit={handleSubmit(onSubmit)} component='form'>
         <DialogTitle sx={{ fontSize: '30px' }}>Quên mật khẩu</DialogTitle>
         <DialogContent>
@@ -90,7 +76,7 @@ const ForgotPassword = (props: Props) => {
                     error={Boolean(errors?.email)}
                     helperText={errors?.email?.message}
                     FormHelperTextProps={{
-                      sx: helperTextStyle
+                      className: 'helper-text'
                     }}
                     disabled={isLoading}
                   />
@@ -101,7 +87,9 @@ const ForgotPassword = (props: Props) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Đóng</Button>
+          <Button onClick={handleClose} disabled={isShowVerify}>
+            Đóng
+          </Button>
           <Button variant='contained' type='submit'>
             Gửi yêu cầu
           </Button>

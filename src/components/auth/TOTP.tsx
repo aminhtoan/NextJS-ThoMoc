@@ -5,16 +5,11 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import OTPInput from './OTPInput'
-
-interface Datainit {
-  email: string
-  tempToken: string
-  isRemmember: boolean
-}
+import { OTPFormData } from 'src/models/auth.model'
 
 interface OTPProps {
   open: boolean
-  data: Datainit
+  data: OTPFormData
   handClose: () => void
 }
 

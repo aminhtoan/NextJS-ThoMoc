@@ -33,14 +33,6 @@ import FacebookLogin from 'src/components/auth/FacebookLogin'
 
 type TProps = {}
 
-const helperTextStyle = {
-  color: 'error.main',
-  fontSize: '0.8rem',
-  fontWeight: 500,
-  mt: 0.5,
-  fontFamily: 'Poppins'
-}
-
 interface Datainit {
   email: string
   tempToken: string
@@ -150,7 +142,7 @@ const PageLogin: NextPage<TProps> = () => {
                       error={Boolean(errors?.email)}
                       helperText={errors?.email?.message}
                       FormHelperTextProps={{
-                        sx: helperTextStyle
+                        className: 'helper-text'
                       }}
                       disabled={isLoading}
                     />
@@ -180,7 +172,7 @@ const PageLogin: NextPage<TProps> = () => {
                       error={Boolean(errors?.password)}
                       helperText={errors?.password?.message}
                       FormHelperTextProps={{
-                        sx: helperTextStyle
+                        className: 'helper-text'
                       }}
                       disabled={isLoading}
                       InputProps={{

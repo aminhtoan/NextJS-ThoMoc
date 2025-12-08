@@ -18,3 +18,12 @@ body {
 #__next {
   height: 100%;
 }
+
+
+.helper-text {
+  color      : var(--mui-palette-error-main);
+  font-size  : 0.8rem;
+  font-weight: 500;
+  margin-top : 0.5rem;
+  font-family: 'Poppins', sans-serif;
+}

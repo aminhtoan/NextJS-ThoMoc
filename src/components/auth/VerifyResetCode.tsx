@@ -5,11 +5,13 @@ import handleAPI from 'src/apis/handleAPI'
 import OTPInput from './OTPInput'
 import ResetPassword from './ResetPassword'
 import { TypeofVerificationCode } from 'src/constants/auth'
+import { ResetPasswordData } from 'src/models/auth.model'
+import OTPCountdown from './OTPCountdown'
 
 interface Props {
   open: boolean
   handleClose: () => void
-  data: any
+  data: ResetPasswordData
   handleCloseForgotPassword: () => void
 }
 
@@ -21,7 +23,6 @@ const VerifyResetCode = (props: Props) => {
   const [otp, setOtp] = useState('')
 
   useEffect(() => {
-    console.log(data)
     const sendOTP = async () => {
       const otpdata = {
         email: data.email,
@@ -36,7 +37,6 @@ const VerifyResetCode = (props: Props) => {
     try {
       setIsLoading(true)
       const info = { ...data, code: otp }
-
       if (!data.tempToken) return toast.error('Xảy ra lỗi mạng!!!')
 
       const res = await handleAPI('/auth/verify-reset-code', info, 'post')
@@ -49,29 +49,58 @@ const VerifyResetCode = (props: Props) => {
         })
       }
     } catch (error: any) {
-      console.log(error)
-      toast.error(error?.response?.data?.message || 'Xảy ra lỗi')
+      toast.error(error?.response?.data?.message?.[0]?.message || error?.response?.data?.message || 'Xảy ra lỗi')
     } finally {
       setIsLoading(false)
     }
   }
+
+  const handleResend = async () => {
+    try {
+      const otpdata = {
+        email: data.email,
+        type: TypeofVerificationCode.FORGOT_PASSWORD
+      }
+
+      // Gửi lại OTP qua API
+      await handleAPI('auth/otp', otpdata, 'post')
+
+      // Reset ô nhập OTP
+      setOtp('')
+
+      toast.success('OTP đã được gửi lại')
+    } catch (error: any) {
+      console.log('Error Resend OTP: ', error)
+      toast.error(
+        error?.response?.data?.message?.[0]?.message || error?.response?.data?.message || 'Gửi lại OTP thất bại'
+      )
+    }
+  }
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
       <DialogTitle sx={{ fontSize: '30px' }}>Quên mật khẩu</DialogTitle>
       <DialogContent>
-        <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+        <Typography
+          variant='body2'
+          color='text.secondary'
+          sx={{ mb: 2, display: 'flex', justifyContent: 'center', fontSize: '20px' }}
+        >
           Nhập mã OTP để đặt lại mật khẩu
         </Typography>
-        <Box>
+        <Box sx={{ mb: 2 }}>
           <OTPInput length={6} onChange={val => setOtp(val)} value={otp} disabled={isLoading} />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <OTPCountdown initialMinutes={1} initialSeconds={59} onResend={handleResend} />
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isLoading}>
-          Đóng
+          Quay lại
         </Button>
         <Button variant='contained' onClick={onSubmit} disabled={isLoading}>
-          Gửi yêu cầu
+          Xác nhận
         </Button>
       </DialogActions>
       <ResetPassword

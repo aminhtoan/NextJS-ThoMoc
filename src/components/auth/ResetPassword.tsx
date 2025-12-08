@@ -1,12 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import VerifyResetCode from './VerifyResetCode'
 import { ResetPasswordFormData, ResetPasswordSchema } from 'src/models/auth.model'
-import { useRouter } from 'next/router'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 
 interface Props {
   open: boolean
@@ -15,16 +26,13 @@ interface Props {
   handleCloseVerifyResetCode: () => void
   handleCloseForgotPassword: () => void
 }
-const helperTextStyle = {
-  color: 'error.main',
-  fontSize: '0.8rem',
-  fontWeight: 500,
-  mt: 0.5,
-  fontFamily: 'Poppins'
-}
+
 const ResetPassword = (props: Props) => {
   const { open, handleClose, data, handleCloseVerifyResetCode, handleCloseForgotPassword } = props
   const [isLoading, setIsLoading] = useState(false)
+  const [isShowNewPassword, setIsShowNewPassword] = useState(false)
+  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
+
   const {
     handleSubmit,
     control,
@@ -50,25 +58,33 @@ const ResetPassword = (props: Props) => {
     })
   }, [data, reset])
 
+  const handleCloseAll = () => {
+    handleClose()
+    handleCloseForgotPassword()
+    handleCloseVerifyResetCode()
+  }
+
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
+      setIsLoading(true)
       const res = await handleAPI('/auth/reset-password', data, 'post')
       res && res.data && toast.success(res.data.message)
-      console.log(res)
-      handleClose()
-      handleCloseForgotPassword()
-      handleCloseVerifyResetCode()
+      handleCloseAll()
     } catch (error: any) {
       console.log(error)
+      toast.error(error?.response?.data?.message?.[0]?.message || 'Xảy ra lỗi mạng')
+    } finally {
+      setIsLoading(false)
     }
   }
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
       <Box onSubmit={handleSubmit(onSubmit)} component='form'>
         <DialogTitle sx={{ fontSize: '30px' }}>Quên mật khẩu</DialogTitle>
         <DialogContent>
           <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Nhập password
+            Nhập New Password
           </Typography>
           <Box sx={{ mb: 2 }}>
             <Controller
@@ -79,6 +95,7 @@ const ResetPassword = (props: Props) => {
                     id='newPassword'
                     label='New Password'
                     name='newPassword'
+                    type={isShowNewPassword ? 'text' : 'password'}
                     placeholder='*******'
                     autoFocus
                     required
@@ -89,9 +106,23 @@ const ResetPassword = (props: Props) => {
                     error={Boolean(errors?.newPassword)}
                     helperText={errors?.newPassword?.message}
                     FormHelperTextProps={{
-                      sx: helperTextStyle
+                      className: 'helper-text'
                     }}
                     disabled={isLoading}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            aria-label={isShowNewPassword ? 'hide the password' : 'display the password'}
+                            onClick={() => setIsShowNewPassword(show => !show)}
+                            edge='end'
+                            disabled={isLoading}
+                          >
+                            {isShowNewPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                 </>
               )}
@@ -99,6 +130,9 @@ const ResetPassword = (props: Props) => {
             />
           </Box>
 
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+            Nhập Confirm Password
+          </Typography>
           <Box>
             <Controller
               control={control}
@@ -109,6 +143,7 @@ const ResetPassword = (props: Props) => {
                     label='Confirm Password'
                     name='confirmNewPassword'
                     placeholder='*******'
+                    type={isShowConfirmPassword ? 'text' : 'password'}
                     autoFocus
                     required
                     fullWidth
@@ -118,9 +153,23 @@ const ResetPassword = (props: Props) => {
                     error={Boolean(errors?.confirmNewPassword)}
                     helperText={errors?.confirmNewPassword?.message}
                     FormHelperTextProps={{
-                      sx: helperTextStyle
+                      className: 'helper-text'
                     }}
                     disabled={isLoading}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            aria-label={isShowConfirmPassword ? 'hide the password' : 'display the password'}
+                            onClick={() => setIsShowConfirmPassword(show => !show)}
+                            edge='end'
+                            disabled={isLoading}
+                          >
+                            {isShowConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                 </>
               )}
@@ -129,7 +178,9 @@ const ResetPassword = (props: Props) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Đóng</Button>
+          <Button onClick={handleClose} disabled={isLoading}>
+            Đóng
+          </Button>
           <Button variant='contained' type='submit'>
             Gửi yêu cầu
           </Button>

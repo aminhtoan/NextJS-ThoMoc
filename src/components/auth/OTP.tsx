@@ -5,27 +5,18 @@ import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import { TypeofVerificationCode } from 'src/constants/auth'
-import OTPInput from './OTPInput'
-
-interface Datainit {
-  email: string
-  tempToken: string
-  isRemmember: boolean
-}
+import { OTPFormData } from 'src/models/auth.model'
+import OTPCountdown from './OTPCountdown'
 
 interface OTPProps {
   open: boolean
-  data: Datainit
+  data: OTPFormData
   handClose: () => void
 }
 
 const OTP = (props: OTPProps) => {
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
-  const [minutes, setMinutes] = useState(1)
-  const [seconds, setSeconds] = useState(59)
-  const [isActive, setIsActive] = useState(false)
-  const [error, setError] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
 
   const router = useRouter()
@@ -39,46 +30,11 @@ const OTP = (props: OTPProps) => {
   )
 
   useEffect(() => {
-    if (open) {
-      setIsActive(true)
-      setMinutes(1)
-      setSeconds(59)
-    } else {
-      setIsActive(false)
-      setOtp('') // Reset OTP khi đóng dialog
-    }
-  }, [open])
-
-  useEffect(() => {
     const sendOTP = async () => {
       await handleAPI('auth/otp', otpdata, 'post')
     }
     sendOTP()
   }, [otpdata])
-
-  useEffect(() => {
-    if (!isActive) return
-
-    const interval = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds(seconds - 1)
-      } else if (minutes > 0) {
-        setMinutes(minutes - 1)
-        setSeconds(59)
-      } else {
-        setIsActive(false)
-        setMinutes(0)
-        setSeconds(0)
-        clearInterval(interval)
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [isActive, minutes, seconds])
-
-  const formatTime = (time: number) => {
-    return time < 10 ? `0${time}` : time
-  }
 
   const handleVerify = async () => {
     try {
@@ -100,7 +56,7 @@ const OTP = (props: OTPProps) => {
       router.push('/')
     } catch (error: any) {
       console.log('Error Login OTP: ', error)
-      setError(
+      toast.error(
         error?.response?.data?.message?.[0]?.message ||
           error?.response?.data?.error ||
           error?.response?.data.message ||
@@ -111,20 +67,27 @@ const OTP = (props: OTPProps) => {
     }
   }
 
+  const isOtpComplete = otp.length === 6 && /^\d{6}$/.test(otp)
+
   const handleResend = async () => {
     try {
+      const otpdata = {
+        email: data.email,
+        type: TypeofVerificationCode.FORGOT_PASSWORD
+      }
+
       await handleAPI('auth/otp', otpdata, 'post')
-      setMinutes(1)
-      setSeconds(59)
-      setIsActive(true)
+
       setOtp('')
+
+      toast.success('OTP đã được gửi lại')
     } catch (error: any) {
       console.log('Error Resend OTP: ', error)
-      toast.error(error)
+      toast.error(
+        error?.response?.data?.message?.[0]?.message || error?.response?.data?.message || 'Gửi lại OTP thất bại'
+      )
     }
   }
-
-  const isOtpComplete = otp.length === 6 && /^\d{6}$/.test(otp)
 
   return (
     <Dialog
@@ -155,37 +118,8 @@ const OTP = (props: OTPProps) => {
           </Typography>
         </Box>
 
-        <Box sx={{ mb: 3 }}>
-          <OTPInput length={6} onChange={val => setOtp(val)} value={otp} disabled={isLoading} />
-          {error && (
-            <Typography color='error' sx={{ mt: 4, fontSize: '0.875rem', textAlign: 'center' }}>
-              {error}
-            </Typography>
-          )}
-        </Box>
-
         <Stack sx={{ paddingLeft: 4 }} direction='row' justifyContent='space-between' alignItems='center' width='335px'>
-          <Typography>
-            Time Remaining:{' '}
-            <b>
-              {' '}
-              {formatTime(minutes)}:{formatTime(seconds)}
-            </b>
-          </Typography>
-          <Button
-            variant='text'
-            onClick={handleResend}
-            disabled={isActive}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-              minWidth: 'auto',
-              p: 0,
-              opacity: isActive ? 0.5 : 1
-            }}
-          >
-            Send again
-          </Button>
+          <OTPCountdown initialMinutes={1} initialSeconds={59} onResend={handleResend} />
         </Stack>
       </DialogContent>
 

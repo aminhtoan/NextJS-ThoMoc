@@ -35,3 +35,16 @@ export const ResetPasswordSchema = ForgotPasswordSchema.shape({
 export type LoginFormData = yup.InferType<typeof LoginSchema>
 export type ForgotPasswordFormData = yup.InferType<typeof ForgotPasswordSchema>
 export type ResetPasswordFormData = yup.InferType<typeof ResetPasswordSchema>
+
+export const ResetPasswordData = ForgotPasswordSchema.shape({
+  tempToken: yup.string().required()
+})
+
+export const OTPSChema = yup.object({
+  email: yup.string(),
+  tempToken: yup.string(),
+  isRemmember: yup.boolean()
+})
+
+export type ResetPasswordData = yup.InferType<typeof ResetPasswordData>
+export type OTPFormData = yup.InferType<typeof OTPSChema>
