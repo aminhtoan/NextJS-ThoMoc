@@ -2,7 +2,7 @@ import { Button, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import handleAPI from 'src/apis/handleAPI'
-import { GoogleIcon } from '../Icon/SitemarkIcon'
+import { GoogleIcon } from 'src/components/Icon/SitemarkIcon'
 
 const GoogleLogin = () => {
   const router = useRouter()

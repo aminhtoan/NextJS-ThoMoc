@@ -30,7 +30,7 @@ import AclGuard from 'src/components/auth/AclGuard'
 import AuthGuard from 'src/components/auth/AuthGuard'
 import GuestGuard from 'src/components/auth/GuestGuard'
 import FallbackSpinner from 'src/components/fall-back'
-import ReactHotToast from 'src/components/react-hot-toast'
+// import ReactHotToast from 'src/components/react-hot-toast'
 import { SettingsConsumer, SettingsProvider } from 'src/contexts/SettingsContext'
 import { useSettings } from 'src/hooks/useSettings'
 import { store } from 'src/stores'
@@ -124,9 +124,9 @@ export default function App(props: ExtendedAppProps) {
                       {getLayout(<Component {...pageProps} />)}
                     </AclGuard>
                   </Guard>
-                  <ReactHotToast>
-                    <Toaster position={settings.toastPosition} toastOptions={toastOptions} />
-                  </ReactHotToast>
+                  {/* <ReactHotToast> */}
+                  <Toaster position={settings.toastPosition} toastOptions={toastOptions} />
+                  {/* </ReactHotToast> */}
                 </ThemeComponent>
               )
             }}

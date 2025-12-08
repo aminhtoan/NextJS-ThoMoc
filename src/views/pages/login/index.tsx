@@ -73,7 +73,6 @@ const PageLogin: NextPage<TProps> = () => {
     try {
       setIsLoading(true)
       const res = await handleAPI('/auth/login', data, 'post')
-      console.log(res)
       if (res && res.data) {
         if (res.data.needOTP) {
           setDataInit({

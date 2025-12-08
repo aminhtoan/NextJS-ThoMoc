@@ -1,7 +1,7 @@
 import { Button } from '@mui/material'
 import { useState } from 'react'
 import handleAPI from 'src/apis/handleAPI'
-import { FacebookIcon } from '../Icon/SitemarkIcon'
+import { FacebookIcon } from 'src/components/Icon/SitemarkIcon'
 import { useRouter } from 'next/router'
 
 const FacebookLogin = () => {
