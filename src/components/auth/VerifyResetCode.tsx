@@ -5,8 +5,8 @@ import handleAPI from 'src/apis/handleAPI'
 import OTPInput from './OTPInput'
 import ResetPassword from './ResetPassword'
 import { TypeofVerificationCode } from 'src/constants/auth'
-import { ResetPasswordData } from 'src/models/auth.model'
 import OTPCountdown from './OTPCountdown'
+import { ResetPasswordData } from 'src/types/auth'
 
 interface Props {
   open: boolean

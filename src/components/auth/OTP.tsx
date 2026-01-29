@@ -5,8 +5,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import { TypeofVerificationCode } from 'src/constants/auth'
-import { OTPFormData } from 'src/models/auth.model'
 import OTPCountdown from './OTPCountdown'
+import OTPInput from './OTPInput'
+import { loginVerify } from 'src/service/auth'
+import { OTPFormData } from 'src/types/auth'
 
 interface OTPProps {
   open: boolean
@@ -18,6 +20,7 @@ const OTP = (props: OTPProps) => {
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = useState('')
 
   const router = useRouter()
 
@@ -43,14 +46,15 @@ const OTP = (props: OTPProps) => {
       setIsLoading(true)
 
       const dataLogin = {
-        tempToken: data.tempToken,
+        tempToken: data.tempToken || '',
         code: otp
       }
 
-      const user = await handleAPI('/auth/login/verify', dataLogin, 'post')
+      const user = await loginVerify(dataLogin)
 
       if (data.isRemmember) {
         localStorage.setItem('accessToken', user.data.accessToken)
+        localStorage.setItem('refreshToken', user.data.refreshToken)
       }
       toast.success('Đăng nhập thành công')
       router.push('/')
@@ -117,7 +121,15 @@ const OTP = (props: OTPProps) => {
             Code *
           </Typography>
         </Box>
+        <Box sx={{ mb: 3 }}>
+          <OTPInput length={6} onChange={val => setOtp(val)} value={otp} disabled={isLoading} />
 
+          {error && (
+            <Typography color='error' sx={{ mt: 4, fontSize: '0.875rem', textAlign: 'center' }}>
+              {error}
+            </Typography>
+          )}
+        </Box>
         <Stack sx={{ paddingLeft: 4 }} direction='row' justifyContent='space-between' alignItems='center' width='335px'>
           <OTPCountdown initialMinutes={1} initialSeconds={59} onResend={handleResend} />
         </Stack>

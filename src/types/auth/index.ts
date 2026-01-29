@@ -32,10 +32,6 @@ export const ResetPasswordSchema = ForgotPasswordSchema.shape({
     .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
 }).required()
 
-export type LoginFormData = yup.InferType<typeof LoginSchema>
-export type ForgotPasswordFormData = yup.InferType<typeof ForgotPasswordSchema>
-export type ResetPasswordFormData = yup.InferType<typeof ResetPasswordSchema>
-
 export const ResetPasswordData = ForgotPasswordSchema.shape({
   tempToken: yup.string().required()
 })
@@ -46,5 +42,13 @@ export const OTPSChema = yup.object({
   isRemmember: yup.boolean()
 })
 
+export const loginVerify = yup.object({
+  tempToken: yup.string().required(),
+  code: yup.string().required()
+})
 export type ResetPasswordData = yup.InferType<typeof ResetPasswordData>
 export type OTPFormData = yup.InferType<typeof OTPSChema>
+export type LoginFormData = yup.InferType<typeof LoginSchema>
+export type ForgotPasswordFormData = yup.InferType<typeof ForgotPasswordSchema>
+export type ResetPasswordFormData = yup.InferType<typeof ResetPasswordSchema>
+export type LoginVerifyFormData = yup.InferType<typeof loginVerify>

@@ -21,15 +21,15 @@ import Head from 'next/head'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import handleAPI from 'src/apis/handleAPI'
+import FacebookLogin from 'src/components/auth/FacebookLogin'
 import ForgotPassword from 'src/components/auth/ForgotPassword'
 import GoogleLogin from 'src/components/auth/GoogleLogin'
 import OTP from 'src/components/auth/OTP'
 import TOTP from 'src/components/auth/TOTP'
 import SignInContainer from 'src/components/sign-in/SignInContainer'
-import { LoginFormData, LoginSchema } from 'src/models/auth.model'
+import { loginAuth } from 'src/service/auth'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
-import FacebookLogin from 'src/components/auth/FacebookLogin'
+import { LoginFormData, LoginSchema } from 'src/types/auth'
 
 type TProps = {}
 
@@ -64,7 +64,8 @@ const PageLogin: NextPage<TProps> = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true)
-      const res = await handleAPI('/auth/login', data, 'post')
+      const res = await loginAuth(data)
+
       if (res && res.data) {
         if (res.data.needOTP) {
           setDataInit({

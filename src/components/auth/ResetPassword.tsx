@@ -15,9 +15,9 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import { ResetPasswordFormData, ResetPasswordSchema } from 'src/models/auth.model'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import { ResetPasswordFormData, ResetPasswordSchema } from 'src/types/auth'
 
 interface Props {
   open: boolean

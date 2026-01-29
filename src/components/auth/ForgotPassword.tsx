@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import { ForgotPasswordFormData, ForgotPasswordSchema, ResetPasswordData } from 'src/models/auth.model'
 import VerifyResetCode from './VerifyResetCode'
+import { ForgotPasswordFormData, ForgotPasswordSchema, ResetPasswordData } from 'src/types/auth'
 
 interface Props {
   open: boolean
