@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { NextPage } from 'next'
-import { AppBar, Toolbar, Typography, CssBaseline, Box, Container, IconButton, Badge } from '@mui/material'
+import { AppBar, Badge, IconButton, Toolbar, Typography } from '@mui/material'
 
 // type Props = {
 //   children: React.ReactNode

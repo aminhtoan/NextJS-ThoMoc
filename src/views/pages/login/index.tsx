@@ -30,6 +30,7 @@ import SignInContainer from 'src/components/sign-in/SignInContainer'
 import { loginAuth } from 'src/service/auth'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
 import { LoginFormData, LoginSchema } from 'src/types/auth'
+import BlankLayout from 'src/views/layouts/BlankLayout'
 
 type TProps = {}
 
@@ -260,5 +261,7 @@ const PageLogin: NextPage<TProps> = () => {
     </Box>
   )
 }
+
+PageLogin.getLayout = page => <BlankLayout>{page}</BlankLayout>
 
 export default PageLogin

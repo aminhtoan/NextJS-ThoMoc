@@ -9,6 +9,7 @@ import OTPCountdown from './OTPCountdown'
 import OTPInput from './OTPInput'
 import { loginVerify } from 'src/service/auth'
 import { OTPFormData } from 'src/types/auth'
+import { useLocalStorage } from 'src/hooks/useLocalStorage'
 
 interface OTPProps {
   open: boolean
@@ -20,8 +21,8 @@ const OTP = (props: OTPProps) => {
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = useState('')
-
+  const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
+  const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
   const router = useRouter()
 
   const otpdata = useMemo(
@@ -53,8 +54,8 @@ const OTP = (props: OTPProps) => {
       const user = await loginVerify(dataLogin)
 
       if (data.isRemmember) {
-        localStorage.setItem('accessToken', user.data.accessToken)
-        localStorage.setItem('refreshToken', user.data.refreshToken)
+        setAccessToken(user.data.accessToken)
+        setRefreshToken(user.data.refreshToken)
       }
       toast.success('Đăng nhập thành công')
       router.push('/')
@@ -123,12 +124,6 @@ const OTP = (props: OTPProps) => {
         </Box>
         <Box sx={{ mb: 3 }}>
           <OTPInput length={6} onChange={val => setOtp(val)} value={otp} disabled={isLoading} />
-
-          {error && (
-            <Typography color='error' sx={{ mt: 4, fontSize: '0.875rem', textAlign: 'center' }}>
-              {error}
-            </Typography>
-          )}
         </Box>
         <Stack sx={{ paddingLeft: 4 }} direction='row' justifyContent='space-between' alignItems='center' width='335px'>
           <OTPCountdown initialMinutes={1} initialSeconds={59} onResend={handleResend} />

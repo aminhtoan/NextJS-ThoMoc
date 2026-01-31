@@ -5,7 +5,8 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import OTPInput from './OTPInput'
-import { OTPFormData } from 'src/models/auth.model'
+import { OTPFormData } from 'src/types/auth'
+import { useLocalStorage } from 'src/hooks/useLocalStorage'
 
 interface OTPProps {
   open: boolean
@@ -18,7 +19,8 @@ const TOTP = (props: OTPProps) => {
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
-
+  const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
+  const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
   const router = useRouter()
 
   const handleVerify = async () => {
@@ -33,7 +35,8 @@ const TOTP = (props: OTPProps) => {
       const user = await handleAPI('/auth/login/verify', dataLogin, 'post')
 
       if (data.isRemmember) {
-        localStorage.setItem('accessToken', user.data.accessToken)
+        setAccessToken(user.data.accessToken)
+        setRefreshToken(user.data.refreshToken)
       }
       toast.success('Đăng nhập thành công')
       router.push('/')

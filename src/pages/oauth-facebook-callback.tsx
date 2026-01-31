@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useLocalStorage } from 'src/hooks/useLocalStorage'
 
 const FacebookCallback = () => {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
+  const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
 
   useEffect(() => {
     if (!router.isReady) return
     const { accessToken, refreshToken, errorMessage } = router.query
 
     if (accessToken && refreshToken) {
-      localStorage.setItem('accessToken', String(accessToken))
-      localStorage.setItem('refreshToken', String(refreshToken))
+      setAccessToken(String(accessToken))
+      setRefreshToken(String(refreshToken))
       router.replace('/') // chuyển về trang chủ
     } else if (errorMessage) {
       setError(String(errorMessage))
@@ -19,7 +22,7 @@ const FacebookCallback = () => {
       router.replace('/login')
       setError('Something went wrong with FaceBook authentication.')
     }
-  }, [router])
+  }, [router, setAccessToken, setRefreshToken])
 
   return (
     <div
