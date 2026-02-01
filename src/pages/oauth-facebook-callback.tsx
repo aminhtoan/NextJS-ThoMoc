@@ -8,18 +8,17 @@ const FacebookCallback = () => {
   const [error, setError] = useState<string | null>(null)
   const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
   const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
-  const [, setUserData] = useLocalStorage<string | null>('userData', null)
   useEffect(() => {
     if (!router.isReady) return
     const run = async () => {
       const { accessToken, refreshToken, errorMessage } = router.query
-      const userData = await handleAPI('auth/me')
       if (accessToken && refreshToken && !errorMessage) {
-        setAccessToken(String(accessToken))
-        setRefreshToken(String(refreshToken))
-        setUserData(userData.data)
-        await handleAPI('auth/me')
-        router.replace('/')
+        await setAccessToken(accessToken as string)
+        await setRefreshToken(refreshToken as string)
+        // Wait for localStorage to be updated before redirecting
+        setTimeout(() => {
+          router.replace('/')
+        }, 100)
       } else if (errorMessage) {
         setError(String(errorMessage))
       } else {

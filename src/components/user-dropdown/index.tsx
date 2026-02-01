@@ -78,6 +78,10 @@ const UserDropDown = () => {
               }
             }
           }}
+          MenuListProps={{
+            onMouseEnter: () => setAnchorEl(anchorEl),
+            onMouseLeave: handleClose
+          }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
