@@ -38,7 +38,5 @@ const SellerPage: NextPage = () => {
 }
 
 SellerPage.getLayout = page => <SellerLayout>{page}</SellerLayout>
-SellerPage.authGuard = true
-SellerPage.guestGuard = false
 
 export default SellerPage

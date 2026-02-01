@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
-import handleAPI from 'src/apis/handleAPI'
 
 const GoogleCallback = () => {
   const router = useRouter()
@@ -16,7 +15,7 @@ const GoogleCallback = () => {
       if (accessToken && refreshToken && !errorMessage) {
         setAccessToken(String(accessToken))
         setRefreshToken(String(refreshToken))
-        // Wait for localStorage to be updated before redirecting
+
         setTimeout(() => {
           router.replace('/')
         }, 100)

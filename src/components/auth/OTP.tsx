@@ -5,11 +5,11 @@ import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import { TypeofVerificationCode } from 'src/constants/auth'
+import { useLocalStorage } from 'src/hooks/useLocalStorage'
+import { authMe, loginVerify } from 'src/service/auth'
+import { OTPFormData } from 'src/types/auth'
 import OTPCountdown from './OTPCountdown'
 import OTPInput from './OTPInput'
-import { loginVerify } from 'src/service/auth'
-import { OTPFormData } from 'src/types/auth'
-import { useLocalStorage } from 'src/hooks/useLocalStorage'
 
 interface OTPProps {
   open: boolean
@@ -21,11 +21,13 @@ const OTP = (props: OTPProps) => {
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
-  const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
+  const [accessToken, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
   const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
   const [, setUserData] = useLocalStorage<string | null>('userData', null)
+  const [authReady, setAuthReady] = useState(false)
 
   const router = useRouter()
+  const { returnUrl } = router.query
 
   const otpdata = useMemo(
     () => ({
@@ -34,13 +36,42 @@ const OTP = (props: OTPProps) => {
     }),
     [data.email]
   )
+  useEffect(() => {
+    if (!authReady) return
+
+    if (returnUrl) {
+      router.replace(returnUrl as string)
+    } else {
+      router.replace('/')
+    }
+  }, [authReady])
+
+  useEffect(() => {
+    if (!accessToken) return
+
+    const bootstrapAuth = async () => {
+      try {
+        const res = await authMe()
+        setUserData(res.data)
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('authDataUpdated', { detail: res.data }))
+        }
+        setAuthReady(true)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    bootstrapAuth()
+  }, [accessToken, setUserData])
 
   useEffect(() => {
     const sendOTP = async () => {
       await handleAPI('auth/otp', otpdata, 'post')
     }
     sendOTP()
-  }, [otpdata])
+  }, [open, otpdata])
 
   const handleVerify = async () => {
     try {
@@ -54,14 +85,12 @@ const OTP = (props: OTPProps) => {
       }
 
       const user = await loginVerify(dataLogin)
-
       if (data.isRemmember) {
         setAccessToken(user.data.accessToken)
         setRefreshToken(user.data.refreshToken)
-        setUserData(JSON.stringify(user.data))
       }
+
       toast.success('Đăng nhập thành công')
-      router.push('/')
     } catch (error: any) {
       console.log('Error Login OTP: ', error)
       toast.error(
@@ -81,7 +110,7 @@ const OTP = (props: OTPProps) => {
     try {
       const otpdata = {
         email: data.email,
-        type: TypeofVerificationCode.FORGOT_PASSWORD
+        type: TypeofVerificationCode.LOGIN
       }
 
       await handleAPI('auth/otp', otpdata, 'post')

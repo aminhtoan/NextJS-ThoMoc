@@ -1,5 +1,3 @@
-import { LoginVerifyFormData } from 'src/types/auth'
-
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
 export type LoginParams = {
@@ -27,5 +25,4 @@ export type AuthValuesType = {
   user: UserDataType | null
   setLoading: (value: boolean) => void
   setUser: (value: UserDataType | null) => void
-  // login: (params: LoginVerifyFormData, errorCallback?: ErrCallbackType) => void
 }

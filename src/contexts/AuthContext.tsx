@@ -12,6 +12,7 @@ import authConfig from 'src/configs/auth'
 // ** Types
 import handleAPI from 'src/apis/handleAPI'
 import { AuthValuesType, UserDataType } from './types'
+import { logoutAuth } from 'src/service/auth'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -63,10 +64,29 @@ const AuthProvider = ({ children }: Props) => {
     }
 
     initAuth()
+
+    // Listen to authDataUpdated event từ OTP hoặc components khác để update user state ngay
+    const handleAuthDataUpdated = (event: any) => {
+      const userData = event.detail
+      if (userData) {
+        setUser(userData)
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('authDataUpdated', handleAuthDataUpdated)
+      
+      return () => {
+        window.removeEventListener('authDataUpdated', handleAuthDataUpdated)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleLogout = () => {
+    logoutAuth({ refreshToken: window.localStorage.getItem('refreshToken') || '' }).catch(error => {
+      console.error('Logout Error:', error)
+    })
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)

@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
-import handleAPI from 'src/apis/handleAPI'
 
 const FacebookCallback = () => {
   const router = useRouter()
@@ -15,7 +14,7 @@ const FacebookCallback = () => {
       if (accessToken && refreshToken && !errorMessage) {
         await setAccessToken(accessToken as string)
         await setRefreshToken(refreshToken as string)
-        // Wait for localStorage to be updated before redirecting
+
         setTimeout(() => {
           router.replace('/')
         }, 100)

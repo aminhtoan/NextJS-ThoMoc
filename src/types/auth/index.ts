@@ -46,6 +46,12 @@ export const loginVerify = yup.object({
   tempToken: yup.string().required(),
   code: yup.string().required()
 })
+
+export const RefreshTokenBodyDTO = yup.object({
+  refreshToken: yup.string().required()
+})
+
+export type RefreshTokenBodyData = yup.InferType<typeof RefreshTokenBodyDTO>
 export type ResetPasswordData = yup.InferType<typeof ResetPasswordData>
 export type OTPFormData = yup.InferType<typeof OTPSChema>
 export type LoginFormData = yup.InferType<typeof LoginSchema>

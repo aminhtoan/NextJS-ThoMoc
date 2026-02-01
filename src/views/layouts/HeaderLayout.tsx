@@ -6,12 +6,15 @@ import InputBase from '@mui/material/InputBase'
 import { useRouter } from 'next/router'
 import UserDropDown from 'src/components/user-dropdown'
 import { useAuth } from 'src/hooks/useAuth'
+
 // type Props = {
 //   children: React.ReactNode
 // }
+
 const HeaderLayout = () => {
   const { user } = useAuth()
   const router = useRouter()
+  
   return (
     <AppBar
       position='fixed'

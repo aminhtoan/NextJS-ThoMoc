@@ -6,8 +6,8 @@ import Paper from '@mui/material/Paper'
 import { NextPage } from 'next'
 import * as React from 'react'
 
-import AdminSidebar, { drawerWidth, miniDrawerWidth } from './AdminSidebar'
 import AdminHeader from './AdminHeader'
+import AdminSidebar, { drawerWidth, miniDrawerWidth } from './AdminSidebar'
 
 type Props = {
   children: React.ReactNode
@@ -17,8 +17,7 @@ const AdminLayout: NextPage<Props> = ({ children }) => {
   // pinned = false: sidebar thu nhỏ, hover vào thì mở, hover ra thì thu nhỏ
   const [pinned, setPinned] = React.useState(true)
   const [hovered, setHovered] = React.useState(false)
-  const [isloading, setIsLoading] = React.useState(false)
-  
+
   const togglePin = () => {
     setPinned(!pinned)
   }
