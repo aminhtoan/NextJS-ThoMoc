@@ -21,6 +21,7 @@ const TOTP = (props: OTPProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
   const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
+  const [, setUserData] = useLocalStorage<string | null>('userData', null)
   const router = useRouter()
 
   const handleVerify = async () => {
@@ -33,10 +34,12 @@ const TOTP = (props: OTPProps) => {
       }
 
       const user = await handleAPI('/auth/login/verify', dataLogin, 'post')
+      const userData = await handleAPI('auth/me')
 
       if (data.isRemmember) {
         setAccessToken(user.data.accessToken)
         setRefreshToken(user.data.refreshToken)
+        setUserData(JSON.stringify(userData.data))
       }
       toast.success('Đăng nhập thành công')
       router.push('/')

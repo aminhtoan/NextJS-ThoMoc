@@ -17,7 +17,8 @@ const AdminLayout: NextPage<Props> = ({ children }) => {
   // pinned = false: sidebar thu nhỏ, hover vào thì mở, hover ra thì thu nhỏ
   const [pinned, setPinned] = React.useState(true)
   const [hovered, setHovered] = React.useState(false)
-
+  const [isloading, setIsLoading] = React.useState(false)
+  
   const togglePin = () => {
     setPinned(!pinned)
   }

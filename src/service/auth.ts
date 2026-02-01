@@ -8,3 +8,7 @@ export const loginAuth = async (data: LoginFormData) => {
 export const loginVerify = async (data: LoginVerifyFormData) => {
   return await handleAPI('/auth/login/verify', data, 'post')
 }
+
+export const authMe = async () => {
+  return await handleAPI('/auth/me')
+}

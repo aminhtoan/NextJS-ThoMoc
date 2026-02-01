@@ -13,7 +13,8 @@ const api = axios.create({
 api.interceptors.request.use(
   config => {
     // Ví dụ nếu bạn có token lưu ở localStorage
-    const accessToken = localStorage.getItem('accessToken')
+    const accessToken = JSON.parse(localStorage.getItem('accessToken') || 'null')
+    
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
