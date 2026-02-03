@@ -72,14 +72,14 @@ export const RefreshTokenBodyDTO = yup.object({
   refreshToken: yup.string().required()
 })
 
-export  const VerifyOTP = yup.object({
+export const VerifyOTP = yup.object({
   email: yup.string().required('Vui lòng nhập email').matches(EMAIL_REG, `Địa chỉ email không hợp lệ`),
   code: yup.string().required('Vui lòng nhập mã OTP').length(6, 'Mã OTP gồm 6 chữ số').max(6, 'Mã OTP gồm 6 chữ số')
 })
 
 export type VerifyOTPType = yup.InferType<typeof VerifyOTP>
 export type RegisterBodyType = yup.InferType<typeof RegisterBodySchema>
-export type RefreshTokenBodyData = yup.InferType<typeof RefreshTokenBodyDTO>
+export type RefreshTokenBodyType = yup.InferType<typeof RefreshTokenBodyDTO>
 export type ResetPasswordData = yup.InferType<typeof ResetPasswordData>
 export type OTPFormData = yup.InferType<typeof OTPSChema>
 export type LoginFormData = yup.InferType<typeof LoginSchema>

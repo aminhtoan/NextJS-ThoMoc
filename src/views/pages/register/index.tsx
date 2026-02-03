@@ -20,12 +20,11 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import api from 'src/apis/axiosClient'
 import { FacebookIcon, GoogleIcon } from 'src/components/Icon/SitemarkIcon'
+import { registerAuth, sentOTP, verifyOTP } from 'src/service/auth'
+import { RegisterBodySchema, RegisterBodyType, VerifyOTPType } from 'src/types/auth'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
 import SignInContainer from '../../../components/sign-in/SignInContainer'
-import { RegisterBodySchema, RegisterBodyType, VerifyOTPType } from 'src/types/auth'
-import { registerAuth, sentOTP, verifyOTP } from 'src/service/auth'
 
 type TProps = {}
 

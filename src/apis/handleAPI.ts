@@ -3,9 +3,9 @@ import axiosClient from './axiosClient'
 const handleAPI = async (url: string, data?: any, method?: 'post' | 'put' | 'get' | 'delete') => {
   try {
     const response = await axiosClient({
-      url, 
+      url,
       method: method ?? 'get',
-      data 
+      data
     })
     if (response.status == 401) {
       console.log('check ccc')
