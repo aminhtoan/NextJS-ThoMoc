@@ -6,6 +6,7 @@ import InputBase from '@mui/material/InputBase'
 import { useRouter } from 'next/router'
 import UserDropDown from 'src/components/user-dropdown'
 import { useAuth } from 'src/hooks/useAuth'
+import ModeToggle from './components/mode-toggle'
 
 // type Props = {
 //   children: React.ReactNode
@@ -14,7 +15,7 @@ import { useAuth } from 'src/hooks/useAuth'
 const HeaderLayout = () => {
   const { user } = useAuth()
   const router = useRouter()
-  
+
   return (
     <AppBar
       position='fixed'
@@ -134,6 +135,7 @@ const HeaderLayout = () => {
               }}
             />
           )}
+          <ModeToggle />
         </Box>
       </Toolbar>
     </AppBar>

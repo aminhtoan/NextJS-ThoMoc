@@ -144,7 +144,7 @@ const PageRegister: NextPage<TProps> = () => {
   const handleClickShowCPassword = () => setShowCPassword(show => !show)
 
   return (
-    <Box>
+    <Box >
       <Head>
         <title>Đăng Ký - Thổ Mộc</title>
         <meta name='description' content='Đăng ký tài khoản mới' />
@@ -155,8 +155,7 @@ const PageRegister: NextPage<TProps> = () => {
         direction='column'
         justifyContent='flex-start'
         sx={{
-          height: 'auto',
-          background: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.default
+          height: 'auto'
         }}
       >
         <CarCustomCard variant='outlined' elevation={0}>
