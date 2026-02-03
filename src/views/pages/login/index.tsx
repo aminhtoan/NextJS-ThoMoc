@@ -135,7 +135,6 @@ const PageLogin: NextPage<TProps> = () => {
                       name='email'
                       placeholder='your@email.com'
                       autoComplete='email'
-                      autoFocus
                       required
                       fullWidth
                       variant='outlined'
@@ -165,7 +164,6 @@ const PageLogin: NextPage<TProps> = () => {
                       type={showPassword ? 'text' : 'password'}
                       id='password'
                       autoComplete='current-password'
-                      autoFocus
                       required
                       fullWidth
                       variant='outlined'

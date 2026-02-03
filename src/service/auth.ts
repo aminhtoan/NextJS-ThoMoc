@@ -1,5 +1,11 @@
 import handleAPI from 'src/apis/handleAPI'
-import { LoginFormData, LoginVerifyFormData, RefreshTokenBodyData } from 'src/types/auth'
+import {
+  LoginFormData,
+  LoginVerifyFormData,
+  RefreshTokenBodyData,
+  RegisterBodyType,
+  VerifyOTPType
+} from 'src/types/auth'
 
 export const loginAuth = async (data: LoginFormData) => {
   return await handleAPI('/auth/login', data, 'post')
@@ -15,4 +21,16 @@ export const authMe = async () => {
 
 export const logoutAuth = async (data: RefreshTokenBodyData) => {
   return await handleAPI('/auth/logout', data.refreshToken, 'post')
+}
+
+export const sentOTP = async (email: string, type: string) => {
+  return await handleAPI('/auth/otp', { email, type }, 'post')
+}
+
+export const verifyOTP = async (data: VerifyOTPType) => {
+  return await handleAPI('/auth/otp/verify', data, 'post')
+}
+
+export const registerAuth = async (data: RegisterBodyType) => {
+  return await handleAPI('/auth/register', data, 'post')
 }

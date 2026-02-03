@@ -1,3 +1,6 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
   Box,
   Button,
@@ -12,17 +15,17 @@ import {
   useTheme
 } from '@mui/material'
 import { NextPage } from 'next'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import api from 'src/apis/axiosClient'
 import { FacebookIcon, GoogleIcon } from 'src/components/Icon/SitemarkIcon'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
-import React from 'react'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import SignInContainer from '../../../components/sign-in/SignInContainer'
-import Head from 'next/head'
+import { RegisterBodySchema, RegisterBodyType, VerifyOTPType } from 'src/types/auth'
+import { registerAuth, sentOTP, verifyOTP } from 'src/service/auth'
 
 type TProps = {}
 
@@ -34,80 +37,112 @@ const helperTextStyle = {
   fontFamily: 'Poppins'
 }
 
-type TDefaultValue = {
-  email: string
-  password: string
-  confirmPassword: string
-  name: string
-  phoneNumber: string
-
-  // code: string
-}
-
 const PageRegister: NextPage<TProps> = () => {
   const theme = useTheme()
-
-  const schema = yup
-    .object({
-      email: yup.string().required('Vui lòng nhập email').matches(EMAIL_REG, `Địa chỉ email không hợp lệ`),
-      password: yup
-        .string()
-        .required('Vui lòng nhập mật khẩu')
-        .matches(PASSWORD_REG, `Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt`)
-        .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-      name: yup.string().required('Vui lòng nhập tên'),
-      confirmPassword: yup
-        .string()
-        .required('Vui lòng xác nhận mật khẩu')
-        .oneOf([yup.ref('password')], 'Mật khẩu xác nhận không khớp'),
-      phoneNumber: yup
-        .string()
-        .required('Vui lòng nhập số điện thoại ')
-        .min(10, 'Số diện thoại phải có ít nhất 10 ký tự')
-
-      // code: yup.string().required()
-    })
-    .required()
-
   const [showPassword, setShowPassword] = React.useState(false)
   const [showCPassword, setShowCPassword] = React.useState(false)
-  const [dataInit, setDataInit] = React.useState<TDefaultValue>()
+  const [dataInit, setDataInit] = React.useState<RegisterBodyType>()
+  const [step, setStep] = React.useState(1) // 1: Gửi OTP, 2: Xác thực OTP, 3: Hoàn tất đăng ký
+  const [loading, setLoading] = React.useState(false)
+  const [, setOtpSent] = React.useState(false)
+  const [otp, setOtp] = React.useState('')
+  const route = useRouter()
 
-  // const [showOTP, setShowOTP] = React.useState(false)
-
-  const defaultValues: TDefaultValue = {
+  const defaultValues: RegisterBodyType = {
     email: '',
     password: '',
     confirmPassword: '',
     name: '',
-    phoneNumber: ''
-
-    // code: ''
+    phoneNumber: '',
+    code: ''
   }
 
   const {
     handleSubmit,
     control,
-    formState: { errors }
-  } = useForm<TDefaultValue>({
+    formState: { errors },
+    setValue,
+    reset
+  } = useForm<RegisterBodyType>({
     defaultValues: defaultValues,
     mode: 'onBlur',
-    resolver: yupResolver(schema)
+    resolver: yupResolver(RegisterBodySchema)
   })
 
   const onSubmit = (data: any) => {
     setDataInit(data)
-    console.log(dataInit)
+
+    if (step === 1) {
+      handleSendOTP(data)
+    } else if (step === 2) {
+      handleVerifyOTP(data)
+    } else if (step === 3) {
+      handleRegister(data)
+    }
+  }
+
+  // Gửi OTP
+  const handleSendOTP = async (data: RegisterBodyType) => {
+    setLoading(true)
+    setOtp('')
+
+    try {
+      await sentOTP(data.email, 'REGISTER')
+      toast.success('OTP đã được gửi tới email của bạn')
+      setOtpSent(true)
+      setStep(2)
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message[0].message || 'Gửi OTP thất bại'
+      toast.error(errorMsg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Xác thực OTP
+  const handleVerifyOTP = async (data: VerifyOTPType) => {
+    setLoading(true)
+    try {
+      setOtp(data.code || '')
+      await verifyOTP(data)
+      toast.success('OTP hợp lệ, tiếp tục đăng ký')
+      setValue('code', '')
+
+      setStep(3)
+    } catch (err: any) {
+      console.log(err)
+      const errorMsg = err.response?.data?.message[0].message || 'OTP không hợp lệ'
+      toast.error(errorMsg)
+    }
+    setLoading(false)
+  }
+
+  // Đăng ký
+  const handleRegister = async (data: RegisterBodyType) => {
+    setLoading(true)
+    try {
+      await registerAuth({
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        code: otp
+      })
+      toast.success('Đăng ký thành công! Chuyển hướng...')
+      setOtp('')
+      setDataInit(undefined)
+      reset()
+      route.push('/login')
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message[0].message || 'Đăng ký thất bại'
+      toast.error(errorMsg)
+    }
+    setLoading(false)
   }
 
   const handleClickShowPassword = () => setShowPassword(show => !show)
   const handleClickShowCPassword = () => setShowCPassword(show => !show)
-
-  // const handleClickShowOTP = () => {
-  //   if (dataInit) {
-  //     setShowOTP(show => !show)
-  //   }
-  // }
 
   return (
     <Box>
@@ -122,7 +157,7 @@ const PageRegister: NextPage<TProps> = () => {
         justifyContent='flex-start'
         sx={{
           height: 'auto',
-          background: theme.palette.customColors.morningSky
+          background: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.default
         }}
       >
         <CarCustomCard variant='outlined' elevation={0}>
@@ -131,8 +166,17 @@ const PageRegister: NextPage<TProps> = () => {
             variant='h4'
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: 'center' }}
           >
-            Sign up
+            Sign Up
           </Typography>
+          <Typography
+            component='h1'
+            variant='h4'
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: 'center' }}
+          >
+            {step === 2 && 'OTP Authentication'}
+            {step === 3 && 'Complete Registration'}
+          </Typography>
+
           <Box
             component='form'
             onSubmit={handleSubmit(onSubmit)}
@@ -145,188 +189,314 @@ const PageRegister: NextPage<TProps> = () => {
             }}
             autoComplete='off'
           >
-            <Box>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <FormLabel htmlFor='name'>Name</FormLabel>
-                    <TextField
-                      id='name'
-                      name='name'
-                      placeholder='Nguyễn Văn A'
-                      autoComplete='name'
-                      autoFocus
-                      required
-                      fullWidth
-                      variant='outlined'
-                      onChange={item => onChange(item)}
-                      value={value}
-                      error={Boolean(errors?.name)}
-                      onBlur={onBlur}
-                      helperText={errors?.name?.message}
-                      FormHelperTextProps={{
-                        sx: helperTextStyle
-                      }}
-                    />
-                  </>
-                )}
-                name='name'
-              />
-            </Box>
+            {step === 1 && (
+              <>
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='name'>Name</FormLabel>
+                        <TextField
+                          id='name'
+                          name='name'
+                          placeholder='Nguyễn Văn A'
+                          autoComplete='name'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={item => onChange(item)}
+                          value={value}
+                          error={Boolean(errors?.name)}
+                          onBlur={onBlur}
+                          helperText={errors?.name?.message}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          disabled={loading} // Disable input when loading
+                        />
+                      </>
+                    )}
+                    name='name'
+                  />
+                </Box>
 
-            <Box>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <FormLabel htmlFor='email'>Email</FormLabel>
-                    <TextField
-                      id='email'
-                      type='email'
-                      name='email'
-                      placeholder='your@email.com'
-                      autoComplete='email'
-                      autoFocus
-                      required
-                      fullWidth
-                      variant='outlined'
-                      onChange={item => onChange(item)}
-                      value={value}
-                      error={Boolean(errors?.email)}
-                      helperText={errors?.email?.message}
-                      onBlur={onBlur}
-                      FormHelperTextProps={{
-                        sx: helperTextStyle
-                      }}
-                    />
-                  </>
-                )}
-                name='email'
-              />
-            </Box>
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='email'>Email</FormLabel>
+                        <TextField
+                          id='email'
+                          type='email'
+                          name='email'
+                          placeholder='your@email.com'
+                          autoComplete='email'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={item => onChange(item)}
+                          value={value}
+                          error={Boolean(errors?.email)}
+                          helperText={errors?.email?.message}
+                          onBlur={onBlur}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          disabled={loading} // Disable input when loading
+                        />
+                      </>
+                    )}
+                    name='email'
+                  />
+                </Box>
 
-            <Box>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <FormLabel htmlFor='password'>Password</FormLabel>
-                    <TextField
-                      name='password'
-                      placeholder='••••••'
-                      type={showPassword ? 'text' : 'password'}
-                      id='password'
-                      autoComplete='current-password'
-                      autoFocus
-                      required
-                      fullWidth
-                      variant='outlined'
-                      onChange={item => onChange(item)}
-                      value={value}
-                      error={Boolean(errors?.password)}
-                      helperText={errors?.password?.message}
-                      onBlur={onBlur}
-                      FormHelperTextProps={{
-                        sx: helperTextStyle
-                      }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              aria-label={showPassword ? 'hide the password' : 'display the password'}
-                              onClick={handleClickShowPassword}
-                              edge='end'
-                            >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }}
-                    />
-                  </>
-                )}
-                name='password'
-              />
-            </Box>
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='password'>Password</FormLabel>
+                        <TextField
+                          name='password'
+                          placeholder='••••••'
+                          type={showPassword ? 'text' : 'password'}
+                          id='password'
+                          autoComplete='current-password'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={item => onChange(item)}
+                          value={value}
+                          error={Boolean(errors?.password)}
+                          helperText={errors?.password?.message}
+                          onBlur={onBlur}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <IconButton
+                                  aria-label={showPassword ? 'hide the password' : 'display the password'}
+                                  onClick={handleClickShowPassword}
+                                  edge='end'
+                                  disabled={loading} // Disable button when loading
+                                >
+                                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                              </InputAdornment>
+                            )
+                          }}
+                          disabled={loading} // Disable input when loading
+                        />
+                      </>
+                    )}
+                    name='password'
+                  />
+                </Box>
 
-            <Box>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <FormLabel htmlFor='confirmPassword'>Confirm Password</FormLabel>
-                    <TextField
-                      name='confirmPassword'
-                      placeholder='••••••'
-                      type={showCPassword ? 'text' : 'password'}
-                      id='confirmPassword'
-                      autoComplete='current-password'
-                      autoFocus
-                      required
-                      fullWidth
-                      variant='outlined'
-                      onChange={item => onChange(item)}
-                      value={value}
-                      error={Boolean(errors?.confirmPassword)}
-                      onBlur={onBlur}
-                      helperText={errors?.confirmPassword?.message}
-                      FormHelperTextProps={{
-                        sx: helperTextStyle
-                      }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              aria-label={showCPassword ? 'hide the password' : 'display the password'}
-                              onClick={handleClickShowCPassword}
-                              edge='end'
-                            >
-                              {showCPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }}
-                    />
-                  </>
-                )}
-                name='confirmPassword'
-              />
-            </Box>
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='confirmPassword'>Confirm Password</FormLabel>
+                        <TextField
+                          name='confirmPassword'
+                          placeholder='••••••'
+                          type={showCPassword ? 'text' : 'password'}
+                          id='confirmPassword'
+                          autoComplete='current-password'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={item => onChange(item)}
+                          value={value}
+                          error={Boolean(errors?.confirmPassword)}
+                          onBlur={onBlur}
+                          helperText={errors?.confirmPassword?.message}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <IconButton
+                                  aria-label={showCPassword ? 'hide the password' : 'display the password'}
+                                  onClick={handleClickShowCPassword}
+                                  edge='end'
+                                  disabled={loading} // Disable button when loading
+                                >
+                                  {showCPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                              </InputAdornment>
+                            )
+                          }}
+                          disabled={loading} // Disable input when loading
+                        />
+                      </>
+                    )}
+                    name='confirmPassword'
+                  />
+                </Box>
 
-            <Box>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <FormLabel htmlFor='phone'>Phone</FormLabel>
-                    <TextField
-                      id='phone'
-                      name='phone'
-                      placeholder='Nguyễn Văn A'
-                      autoComplete='phone'
-                      autoFocus
-                      required
-                      fullWidth
-                      variant='outlined'
-                      onChange={item => onChange(item)}
-                      value={value}
-                      error={Boolean(errors?.phoneNumber)}
-                      helperText={errors?.phoneNumber?.message}
-                      onBlur={onBlur}
-                      FormHelperTextProps={{
-                        sx: helperTextStyle
-                      }}
-                    />
-                  </>
-                )}
-                name='phoneNumber'
-              />
-            </Box>
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='phone'>Phone</FormLabel>
+                        <TextField
+                          id='phone'
+                          name='phone'
+                          placeholder='0123456789'
+                          autoComplete='phone'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={item => onChange(item)}
+                          value={value}
+                          error={Boolean(errors?.phoneNumber)}
+                          helperText={errors?.phoneNumber?.message}
+                          onBlur={onBlur}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          disabled={loading} // Disable button when loading
+                        />
+                      </>
+                    )}
+                    name='phoneNumber'
+                  />
+                </Box>
 
-            <Button type='submit' fullWidth variant='contained'>
-              Sign up
-            </Button>
+                <Button type='submit' fullWidth variant='contained' disabled={loading}>
+                  Đăng ký
+                </Button>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <Typography variant='body2' sx={{ textAlign: 'center', color: 'textSecondary' }}>
+                  Vui lòng nhập mã OTP được gửi tới email: <strong>{dataInit?.email}</strong>
+                </Typography>
+
+                <Box>
+                  <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <FormLabel htmlFor='code'>Mã OTP</FormLabel>
+                        <TextField
+                          id='code'
+                          name='code'
+                          placeholder='000000'
+                          required
+                          fullWidth
+                          variant='outlined'
+                          onChange={e => {
+                            const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 6)
+                            onChange(val)
+                          }}
+                          value={value}
+                          error={Boolean(errors?.code)}
+                          helperText={errors?.code?.message}
+                          onBlur={onBlur}
+                          FormHelperTextProps={{
+                            sx: helperTextStyle
+                          }}
+                          inputProps={{
+                            maxLength: 6,
+                            style: { textAlign: 'center', fontSize: '1.5rem', letterSpacing: '0.5rem' }
+                          }}
+                          type='text'
+                          inputMode='numeric'
+                          disabled={loading} // Disable input when loading
+                        />
+                      </>
+                    )}
+                    name='code'
+                  />
+                </Box>
+
+                <Button type='submit' fullWidth variant='contained' disabled={loading}>
+                  Xác thực OTP
+                </Button>
+
+                <Button
+                  type='button'
+                  fullWidth
+                  variant='text'
+                  disabled={loading}
+                  onClick={() => {
+                    setStep(1)
+                    setOtpSent(false)
+                    setOtp('') // reset state
+                    setValue('code', '') // reset form field
+                  }}
+                >
+                  Quay lại
+                </Button>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <Typography variant='h6' sx={{ textAlign: 'center', color: 'primary.main', mb: 2, fontWeight: 'bold' }}>
+                  Hoàn tất thông tin đăng ký của bạn
+                </Typography>
+
+                <Box
+                  sx={{
+                    p: 3,
+                    bgcolor: 'background.paper',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    alignItems: 'flex-start'
+                  }}
+                >
+                  <Typography variant='body1' sx={{ fontWeight: 'medium' }}>
+                    Email: <strong>{dataInit?.email}</strong>
+                  </Typography>
+                  <Typography variant='body1' sx={{ fontWeight: 'medium' }}>
+                    Tên: <strong>{dataInit?.name}</strong>
+                  </Typography>
+                  <Typography variant='body1' sx={{ fontWeight: 'medium' }}>
+                    Số điện thoại: <strong>{dataInit?.phoneNumber}</strong>
+                  </Typography>
+                </Box>
+
+                <Button
+                  type='submit'
+                  fullWidth
+                  variant='contained'
+                  disabled={loading}
+                  sx={{ mt: 3, py: 1.5, fontSize: '1rem', fontWeight: 'bold' }}
+                >
+                  {loading ? 'Đang đăng ký...' : 'Hoàn tất đăng ký'}
+                </Button>
+
+                <Button
+                  type='button'
+                  fullWidth
+                  variant='outlined'
+                  disabled={loading}
+                  onClick={() => {
+                    setStep(1)
+                    setOtpSent(false)
+                  }}
+                  sx={{ mt: 2, py: 1.5, fontSize: '1rem' }}
+                >
+                  Quay lại
+                </Button>
+              </>
+            )}
           </Box>
 
           <Divider>or</Divider>
@@ -337,7 +507,7 @@ const PageRegister: NextPage<TProps> = () => {
               onClick={() => alert('Sign in with Google')}
               startIcon={<GoogleIcon />}
             >
-              Sign up with Google
+              Sign in with Google
             </Button>
             <Button
               fullWidth
@@ -345,18 +515,17 @@ const PageRegister: NextPage<TProps> = () => {
               onClick={() => alert('Sign in with Facebook')}
               startIcon={<FacebookIcon />}
             >
-              Sign up with Facebook
+              Sign in with Facebook
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+              Already have an account?{' '}
               <Link href='/login' variant='body2' sx={{ alignSelf: 'center' }}>
-                Sign up
+                Sign In
               </Link>
             </Typography>
           </Box>
         </CarCustomCard>
       </SignInContainer>
-      {/* {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />} */}
     </Box>
   )
 }
