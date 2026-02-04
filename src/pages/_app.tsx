@@ -135,10 +135,8 @@ export default function App(props: ExtendedAppProps) {
                 <ThemeComponent settings={settings}>
                   <Guard authGuard={authGuard} guestGuard={guestGuard}>
                     {skipAclCheck ? (
-                      // Bỏ qua AclGuard cho trang OAuth callback hoặc vừa login
                       getLayout(<Component {...pageProps} />)
                     ) : (
-                      // Áp dụng AclGuard cho các trang khác
                       <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
                         {getLayout(<Component {...pageProps} />)}
                       </AclGuard>
