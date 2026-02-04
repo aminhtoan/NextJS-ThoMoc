@@ -11,8 +11,7 @@ import {
   InputAdornment,
   Link,
   TextField,
-  Typography,
-  useTheme
+  Typography
 } from '@mui/material'
 import { NextPage } from 'next'
 import Head from 'next/head'
@@ -37,7 +36,6 @@ const helperTextStyle = {
 }
 
 const PageRegister: NextPage<TProps> = () => {
-  const theme = useTheme()
   const [showPassword, setShowPassword] = React.useState(false)
   const [showCPassword, setShowCPassword] = React.useState(false)
   const [dataInit, setDataInit] = React.useState<RegisterBodyType>()
@@ -144,7 +142,7 @@ const PageRegister: NextPage<TProps> = () => {
   const handleClickShowCPassword = () => setShowCPassword(show => !show)
 
   return (
-    <Box >
+    <Box>
       <Head>
         <title>Đăng Ký - Thổ Mộc</title>
         <meta name='description' content='Đăng ký tài khoản mới' />

@@ -9,9 +9,11 @@ import Image from 'next/image'
 import * as React from 'react'
 import { useAuth } from 'src/hooks/useAuth'
 import IconifyIcon from '../Icon'
+import { useTranslation } from 'react-i18next'
 
 const UserDropDown = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const { t } = useTranslation()
   const { user, logout } = useAuth()
   const open = Boolean(anchorEl)
   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
@@ -28,7 +30,7 @@ const UserDropDown = () => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleClose}
       >
-        <Tooltip title='Account'>
+        <Tooltip title={t('My Account')}>
           <IconButton
             size='small'
             sx={{ ml: 2 }}
@@ -85,12 +87,12 @@ const UserDropDown = () => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleClose}>Tài khoản của tôi</MenuItem>
+          <MenuItem onClick={handleClose}>{t('My Account')}</MenuItem>
 
           <Divider />
-          <MenuItem onClick={handleClose}>Đơn mua</MenuItem>
+          <MenuItem onClick={handleClose}>{t('Orders')}</MenuItem>
 
-          <MenuItem onClick={logout}>Đăng xuất</MenuItem>
+          <MenuItem onClick={logout}>{t('Logout')}</MenuItem>
         </Menu>
       </Box>
     </React.Fragment>

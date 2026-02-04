@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import UserDropDown from 'src/components/user-dropdown'
 import { useAuth } from 'src/hooks/useAuth'
 import ModeToggle from './components/mode-toggle'
+import LanguageDropDown from './components/language-dropdown'
 
 // type Props = {
 //   children: React.ReactNode
@@ -136,6 +137,7 @@ const HeaderLayout = () => {
             />
           )}
           <ModeToggle />
+          <LanguageDropDown />
         </Box>
       </Toolbar>
     </AppBar>
