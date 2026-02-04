@@ -17,6 +17,10 @@ export type UserDataType = {
   createdAt: string
   createdById: number | null
   updatedAt: string
+  role: {
+    id: number
+    name: string
+  }
 }
 
 export type AuthValuesType = {
