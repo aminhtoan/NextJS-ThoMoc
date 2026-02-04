@@ -24,6 +24,7 @@ const defineRulesFor = (permission: string, subject: string) => {
   } else if (permission === 'CLIENT') {
     // can(['read'], 'acl-page')
     can('manage', 'all')
+
     // can(['read', 'create', 'update', 'delete'], subject)
   } else if (permission === 'SELLER') {
     can(['read', 'create', 'update', 'delete'], subject)

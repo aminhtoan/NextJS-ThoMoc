@@ -92,6 +92,14 @@ export default function App(props: ExtendedAppProps) {
 
   const aclAbilities = Component.acl ?? defaultACLObj
 
+  // Kiểm tra xem có phải trang OAuth callback hoặc vừa login (có token trong localStorage)
+  // Nếu vừa login thì bỏ qua ACL check tạm thời, chờ user context load xong
+  const hasAccessToken = typeof window !== 'undefined' && localStorage.getItem('accessToken')
+  const isOAuthCallback =
+    typeof window !== 'undefined' &&
+    (window.location.pathname === '/oauth-google-callback' || window.location.pathname === '/oauth-facebook-callback')
+  const skipAclCheck = isOAuthCallback || hasAccessToken
+
   const toastOptions = {
     success: {
       className: 'react-hot-toast',
@@ -126,9 +134,15 @@ export default function App(props: ExtendedAppProps) {
               return (
                 <ThemeComponent settings={settings}>
                   <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                    <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
-                      {getLayout(<Component {...pageProps} />)}
-                    </AclGuard>
+                    {skipAclCheck ? (
+                      // Bỏ qua AclGuard cho trang OAuth callback hoặc vừa login
+                      getLayout(<Component {...pageProps} />)
+                    ) : (
+                      // Áp dụng AclGuard cho các trang khác
+                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
+                        {getLayout(<Component {...pageProps} />)}
+                      </AclGuard>
+                    )}
                   </Guard>
                   {/* <ReactHotToast> */}
                   <Toaster position={settings.toastPosition} toastOptions={toastOptions} />

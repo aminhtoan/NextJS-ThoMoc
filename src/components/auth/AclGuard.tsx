@@ -58,6 +58,7 @@ const AclGuard = (props: AclGuardProps) => {
       return <AbilityContext.Provider value={ability!}>{children}</AbilityContext.Provider>
     } else {
       // Nếu không thì render children bình thường
+
       return <>{children}</>
     }
   }
@@ -66,6 +67,7 @@ const AclGuard = (props: AclGuardProps) => {
   if (ability && auth.user && ability.can(aclAbilities.action, aclAbilities.subject)) {
     return <AbilityContext.Provider value={ability!}>{children}</AbilityContext.Provider>
   }
+  
   // Nếu không đủ quyền thì render trang 401 trong layout trắng
   return (
     <BlankLayout>
