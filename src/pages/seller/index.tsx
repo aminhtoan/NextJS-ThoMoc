@@ -2,7 +2,7 @@ import { getAccessToken, decodeAccessToken } from 'src/service/token'
 import { useEffect, useState } from 'react'
 import { AccessTokenPayLoad } from 'src/types/jwt'
 import Error404 from '../404'
-import SellerLayout from 'src/views/layouts/SellerLayout'
+import SellerLayout from 'src/views/layouts/SellerrLayout/SellerLayout'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 

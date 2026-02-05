@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import AdminLayout from 'src/views/layouts/AdminLayout'
+import AdminLayout from 'src/views/layouts/AdminLayout/AdminLayout'
 
 const AdminPage: NextPage = () => {
   const router = useRouter()
