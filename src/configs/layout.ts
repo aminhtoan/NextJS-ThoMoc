@@ -18,21 +18,21 @@ export const VerticalItems = [
       },
       {
         title: 'Pending Orders',
-        text: 'Pending Orders',
         icon: 'ic:baseline-hourglass-empty',
-        path: '/admin/orders/pending'
+        text: 'Pending Orders',
+        path: '/admin/orders?status=pending'
       },
       {
         title: 'Completed Orders',
-        text: 'Completed Orders',
         icon: 'ic:baseline-check-circle',
-        path: '/admin/orders/completed'
+        text: 'Completed Orders',
+        path: '/admin/orders?status=completed'
       },
       {
         title: 'Cancelled Orders',
-        text: 'Cancelled Orders',
         icon: 'ic:baseline-cancel',
-        path: '/admin/orders/cancelled'
+        text: 'Cancelled Orders',
+        path: '/admin/orders?status=cancelled'
       }
     ]
   },

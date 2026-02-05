@@ -10,7 +10,7 @@ const OrdersPage: NextPage<TProps> = () => {
   ]
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, height: 'auto' }}>
       <Typography variant='h5' fontWeight={700} mb={3}>
         Quản Lý Đơn Hàng
       </Typography>

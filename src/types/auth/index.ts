@@ -77,6 +77,63 @@ export const VerifyOTP = yup.object({
   code: yup.string().required('Vui lòng nhập mã OTP').length(6, 'Mã OTP gồm 6 chữ số').max(6, 'Mã OTP gồm 6 chữ số')
 })
 
+export const UpdateMyProfileBodySchema = yup.object({
+  email: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('email-or-empty', 'Vui lòng nhập email', value => {
+      // Nếu có giá trị thì validate, không thì bỏ qua
+      if (value && value !== '') {
+        return EMAIL_REG.test(value)
+      }
+
+      return true
+    })
+    .matches(EMAIL_REG, 'Địa chỉ email không hợp lệ'),
+
+  name: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('name-or-empty', 'Vui lòng nhập tên', value => {
+      if (value && value !== '') {
+        return value.length > 0
+      }
+
+      return true
+    }),
+
+  phoneNumber: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('phone-or-empty', 'Vui lòng nhập số điện thoại', value => {
+      if (value && value !== '') {
+        return PHONE_REG.test(value)
+      }
+
+      return true
+    })
+    .matches(PHONE_REG, 'Số điện thoại phải bắt đầu bằng 0 hoặc +84 và có 10 số'),
+
+  avatar: yup.string().nullable().optional(),
+
+  password: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('password-or-empty', 'Vui lòng nhập mật khẩu', value => {
+      if (value && value !== '' && value !== '**********') {
+        return PASSWORD_REG.test(value) && value.length >= 6
+      }
+
+      return true
+    })
+    .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+})
+export type UpdateMyProfileBodyType = yup.InferType<typeof UpdateMyProfileBodySchema>
 export type VerifyOTPType = yup.InferType<typeof VerifyOTP>
 export type RegisterBodyType = yup.InferType<typeof RegisterBodySchema>
 export type RefreshTokenBodyType = yup.InferType<typeof RefreshTokenBodyDTO>

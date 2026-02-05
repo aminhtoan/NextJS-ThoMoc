@@ -15,5 +15,6 @@
       "SelectImage": "Select Image",
       "ChangeImage": "Change Image",
       "FileSize": "File size: maximum 1 MB",
-      "FileExtension": "File extension: .JPEG, .PNG"
+      "FileExtension": "File extension: .JPEG, .PNG",
+      "Role": "Role"
  }

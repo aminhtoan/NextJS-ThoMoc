@@ -15,5 +15,6 @@
     "SelectImage": "Chọn ảnh",
     "ChangeImage": "Thay đổi ảnh",
     "FileSize": "Kích thước tệp: tối đa 1 MB",
-    "FileExtension": "Định dạng tệp: .JPEG, .PNG"
+    "FileExtension": "Định dạng tệp: .JPEG, .PNG",
+    "Role": "Vai trò"
 }

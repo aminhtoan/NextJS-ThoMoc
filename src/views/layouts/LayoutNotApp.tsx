@@ -5,11 +5,10 @@ import React from 'react'
 import { NextPage } from 'next'
 
 // ** MUI
-import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
-import Toolbar from '@mui/material/Toolbar'
 import Container from '@mui/material/Container'
-import HeaderLayout from './HeaderLayout'
+import CssBaseline from '@mui/material/CssBaseline'
+import Toolbar from '@mui/material/Toolbar'
 
 // ** Views
 

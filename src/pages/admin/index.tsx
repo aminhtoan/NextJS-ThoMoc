@@ -1,18 +1,23 @@
-import { NextPage } from 'next'
 import { Box, Typography } from '@mui/material'
-import AdminLayout from 'src/views/layouts/AdminLayout'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import PageOrder from './orders'
+import AdminLayout from 'src/views/layouts/AdminLayout'
 
 const AdminPage: NextPage = () => {
   const router = useRouter()
-  const page = (router.query.page as string) || 'dashboard'
+  const page = (router.query.page as string) || router.pathname
 
   const renderContent = () => {
     switch (page) {
-      case 'orders':
-        return <PageOrder />
+      case '/admin/orders':
+        return (
+          <Box sx={{ p: 3 }}>
+            <Typography variant='h4'>Quản lý sản phẩm</Typography>
+            {/* Thêm nội dung products page ở đây */}
+          </Box>
+        )
       case 'brands':
+
       // return <BrandsPage />
       default:
         return (

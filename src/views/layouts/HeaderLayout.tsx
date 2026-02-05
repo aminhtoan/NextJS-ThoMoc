@@ -24,7 +24,7 @@ const HeaderLayout = () => {
   const router = useRouter()
 
   // Total header heights (dùng để đẩy nội dung tránh bị che khi AppBar fixed)
-  const TOP_BAR_HEIGHT = 20
+  const TOP_BAR_HEIGHT = 25
   const MAIN_BAR_HEIGHT = 80
 
   return (

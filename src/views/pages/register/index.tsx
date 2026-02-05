@@ -19,8 +19,11 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
 import { FacebookIcon, GoogleIcon } from 'src/components/Icon/SitemarkIcon'
-import { registerAuth, sentOTP, verifyOTP } from 'src/service/auth'
+import { sentOTP, verifyOTP } from 'src/service/auth'
+import { AppDispatch } from 'src/stores'
+import { registerAuthAsync } from 'src/stores/apps/auth/actions'
 import { RegisterBodySchema, RegisterBodyType, VerifyOTPType } from 'src/types/auth'
 import CarCustomCard from '../../../components/sign-in/CustomCard'
 import SignInContainer from '../../../components/sign-in/SignInContainer'
@@ -44,6 +47,7 @@ const PageRegister: NextPage<TProps> = () => {
   const [, setOtpSent] = React.useState(false)
   const [otp, setOtp] = React.useState('')
   const route = useRouter()
+  const dispatch: AppDispatch = useDispatch()
 
   const defaultValues: RegisterBodyType = {
     email: '',
@@ -118,14 +122,16 @@ const PageRegister: NextPage<TProps> = () => {
   const handleRegister = async (data: RegisterBodyType) => {
     setLoading(true)
     try {
-      await registerAuth({
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-        name: data.name,
-        phoneNumber: data.phoneNumber,
-        code: otp
-      })
+      dispatch(
+        registerAuthAsync({
+          email: data.email,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+          name: data.name,
+          phoneNumber: data.phoneNumber,
+          code: otp
+        })
+      )
       toast.success('Đăng ký thành công! Chuyển hướng...')
       setOtp('')
       setDataInit(undefined)

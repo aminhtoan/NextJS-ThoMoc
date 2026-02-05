@@ -1,4 +1,4 @@
-import { AbilityBuilder, Ability } from '@casl/ability'
+import { Ability, AbilityBuilder } from '@casl/ability'
 
 export type Subjects = string
 export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete'
@@ -16,17 +16,20 @@ export type ACLObj = {
  * We have just shown Admin and Client rules for demo purpose where
  * admin can manage everything and client can just visit ACL page
  */
+
 const defineRulesFor = (permission: string, subject: string) => {
   const { can, rules } = new AbilityBuilder(AppAbility)
   console.log('defineRulesFor permission', permission)
   if (permission === 'ADMIN') {
     can('manage', 'all')
   }
+
   // else if (permission === 'CLIENT') {
   //   // can(['read'], 'acl-page')
   //   can('manage', 'all')
 
-  //   // can(['read', 'create', 'update', 'delete'], subject)
+  can(['read', 'create', 'update', 'delete'], subject)
+
   // } else if (permission === 'SELLER') {
   //   can(['read', 'create', 'update', 'delete'], subject)
   // }
