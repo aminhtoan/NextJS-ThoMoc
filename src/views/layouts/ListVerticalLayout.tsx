@@ -2,6 +2,7 @@ import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import Tooltip from '@mui/material/Tooltip'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -30,21 +31,34 @@ type MenuItemProps = {
 }
 
 const MenuItemComponent: React.FC<MenuItemProps> = ({ item, level, openItems, handleClick, mini = false }) => {
+  const router = useRouter()
   const hasChildren = item.children && item.children.length > 0
+
+  const handleItemClick = () => {
+    if (hasChildren) {
+      handleClick(item.title)
+    } else if (item.path) {
+      // Thay đổi path để navigate trong cùng trang admin
+      // /admin/orders -> /admin?page=orders
+      const pathName = item.path.split('/').pop()
+      router.push(`/admin/${pathName}`)
+    }
+  }
 
   const menuItem = (
     <ListItemButton
-      onClick={() => hasChildren && handleClick(item.title)}
+      onClick={handleItemClick}
       sx={{
         px: mini && level === 0 ? 0 : 2,
         py: 1,
         my: mini && level === 0 ? 0.5 : 0,
         justifyContent: mini && level === 0 ? 'center' : 'flex-start',
         pl: !mini ? (level > 0 ? 8 + level * 2 : 4) : 0,
-        mb: 2
+        mb: 2,
+        cursor: item.path ? 'pointer' : 'default'
       }}
     >
-      {level === 0 && (
+      {level === 0 && item.icon && (
         <ListItemIcon
           sx={{
             minWidth: mini ? 'auto' : 40,
@@ -135,7 +149,7 @@ const ListVerticalLayout: NextPage<Props> = ({ mini = false }) => {
         {VerticalItems?.map((item, index) => (
           <MenuItemComponent
             key={index}
-            item={item}
+            item={item!}
             level={0}
             openItems={openItems}
             handleClick={handleClick}

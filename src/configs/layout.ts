@@ -9,27 +9,30 @@ export const VerticalItems = [
     title: 'Orders',
     icon: 'ic:baseline-shopping-cart',
     text: 'Orders',
-    path: '/admin/orders',
     children: [
       {
         title: 'All Orders',
         icon: 'ic:baseline-list',
-        text: 'All Orders'
+        text: 'All Orders',
+        path: '/admin/orders'
       },
       {
         title: 'Pending Orders',
+        text: 'Pending Orders',
         icon: 'ic:baseline-hourglass-empty',
-        text: 'Pending Orders'
+        path: '/admin/orders/pending'
       },
       {
         title: 'Completed Orders',
+        text: 'Completed Orders',
         icon: 'ic:baseline-check-circle',
-        text: 'Completed Orders'
+        path: '/admin/orders/completed'
       },
       {
         title: 'Cancelled Orders',
+        text: 'Cancelled Orders',
         icon: 'ic:baseline-cancel',
-        text: 'Cancelled Orders'
+        path: '/admin/orders/cancelled'
       }
     ]
   },

@@ -1,5 +1,19 @@
  {
-    "My Account": "My Account",
-    "Orders": "Orders",
-    "Logout": "Logout"
+      "My Account": "My Account",
+      "Orders": "Orders",
+      "Logout": "Logout",
+      "Login": "Login",
+      "Register": "Register",
+      "Profile": "Profile",
+      "My Profile": "My Profile",
+      "Email": "Email",
+      "Name": "Name",
+      "Phone": "Phone",
+      "Save": "Save",
+      "ManageInfo": "Manage profile information to secure your account",
+      "Password": "Password",
+      "SelectImage": "Select Image",
+      "ChangeImage": "Change Image",
+      "FileSize": "File size: maximum 1 MB",
+      "FileExtension": "File extension: .JPEG, .PNG"
  }

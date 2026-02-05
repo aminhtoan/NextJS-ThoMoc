@@ -17,3 +17,7 @@ export default function Home() {
     </>
   )
 }
+
+// Home.getLayout = (page: React.ReactNode) => <>{page}</>
+Home.guestGuard = true
+Home.authGuard = true

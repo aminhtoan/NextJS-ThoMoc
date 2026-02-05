@@ -1,5 +1,19 @@
 {
     "My Account": "Tài khoản của tôi",
     "Orders": "Đơn mua",
-    "Logout": "Đăng xuất"
+    "Logout": "Đăng xuất",
+    "Login": "Đăng nhập",
+    "Register": "Đăng ký",
+    "Profile": "Hồ sơ",
+    "My Profile": "Hồ sơ của tôi",
+    "Email": "Email",
+    "Name": "Tên",
+    "Phone": "Số điện thoại",
+    "Save": "Lưu",
+    "ManageInfo": "Quản lý thông tin hồ sơ để bảo mật tài khoản",
+    "Password": "Mật khẩu",
+    "SelectImage": "Chọn ảnh",
+    "ChangeImage": "Thay đổi ảnh",
+    "FileSize": "Kích thước tệp: tối đa 1 MB",
+    "FileExtension": "Định dạng tệp: .JPEG, .PNG"
 }

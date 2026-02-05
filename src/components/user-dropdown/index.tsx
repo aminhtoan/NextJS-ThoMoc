@@ -1,17 +1,28 @@
-import Avatar from '@mui/material/Avatar'
-import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
-import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Tooltip from '@mui/material/Tooltip'
+// ** MUI
+import { Avatar, Box, Divider, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/'
+
+// ** Next Import
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+
+// ** React Imports
 import * as React from 'react'
+
+// ** Hooks
 import { useAuth } from 'src/hooks/useAuth'
+
+// ** Configs
+import { ROUTE_CONFIG } from 'src/configs/route'
+
+// ** Iconify Imports
 import IconifyIcon from '../Icon'
+
+// ** Translation Imports
 import { useTranslation } from 'react-i18next'
 
+const imgeSize = 20
 const UserDropDown = () => {
+  const router = useRouter()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const { t } = useTranslation()
   const { user, logout } = useAuth()
@@ -21,6 +32,10 @@ const UserDropDown = () => {
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleNavigate = (path: string) => {
+    router.push(path)
   }
 
   return (
@@ -38,13 +53,23 @@ const UserDropDown = () => {
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 28, height: 28 }}>
-              {user?.avatar ? (
-                <Image src={user.avatar} alt='Avatar' width={28} height={28} style={{ borderRadius: '50%' }} />
-              ) : (
-                <IconifyIcon icon='mdi:user-circle-outline' width={20} height={20} />
-              )}
-            </Avatar>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Typography sx={{ fontSize: '0.85rem', color: '#fff' }}>{user?.name}</Typography>
+
+              <Avatar sx={{ width: imgeSize, height: imgeSize }}>
+                {user?.avatar ? (
+                  <Image
+                    src={user.avatar}
+                    alt='Avatar'
+                    width={imgeSize}
+                    height={imgeSize}
+                    style={{ borderRadius: '50%' }}
+                  />
+                ) : (
+                  <IconifyIcon icon='mdi:user-circle-outline' width={imgeSize} height={imgeSize} />
+                )}
+              </Avatar>
+            </Box>
           </IconButton>
         </Tooltip>
         <Menu
@@ -87,7 +112,7 @@ const UserDropDown = () => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleClose}>{t('My Account')}</MenuItem>
+          <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.MY_PROFILE)}>{t('My Account')}</MenuItem>
 
           <Divider />
           <MenuItem onClick={handleClose}>{t('Orders')}</MenuItem>

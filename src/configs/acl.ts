@@ -21,14 +21,15 @@ const defineRulesFor = (permission: string, subject: string) => {
   console.log('defineRulesFor permission', permission)
   if (permission === 'ADMIN') {
     can('manage', 'all')
-  } else if (permission === 'CLIENT') {
-    // can(['read'], 'acl-page')
-    can('manage', 'all')
-
-    // can(['read', 'create', 'update', 'delete'], subject)
-  } else if (permission === 'SELLER') {
-    can(['read', 'create', 'update', 'delete'], subject)
   }
+  // else if (permission === 'CLIENT') {
+  //   // can(['read'], 'acl-page')
+  //   can('manage', 'all')
+
+  //   // can(['read', 'create', 'update', 'delete'], subject)
+  // } else if (permission === 'SELLER') {
+  //   can(['read', 'create', 'update', 'delete'], subject)
+  // }
 
   return rules
 }

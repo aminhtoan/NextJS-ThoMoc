@@ -1,33 +1,34 @@
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { decodeAccessToken, getAccessToken } from 'src/service/token'
+import { Box, Typography } from '@mui/material'
 import AdminLayout from 'src/views/layouts/AdminLayout'
+import { useRouter } from 'next/router'
+import PageOrder from './orders'
 
 const AdminPage: NextPage = () => {
   const router = useRouter()
-  useEffect(() => {
-    const token = getAccessToken()
+  const page = (router.query.page as string) || 'dashboard'
 
-    if (!token) {
-      return
+  const renderContent = () => {
+    switch (page) {
+      case 'orders':
+        return <PageOrder />
+      case 'brands':
+      // return <BrandsPage />
+      default:
+        return (
+          <Box sx={{ p: 3 }}>
+            <Typography variant='h4' fontWeight={700}>
+              Admin Dashboard
+            </Typography>
+            <Typography variant='body1' color='textSecondary' mt={1}>
+              Chào mừng đến trang quản trị. Vui lòng chọn mục trong menu bên trái.
+            </Typography>
+          </Box>
+        )
     }
+  }
 
-    try {
-      const info = decodeAccessToken(token)
-      if (!info || info.roleName !== 'ADMIN') {
-        router.replace('/')
-      }
-    } catch {
-      router.replace('/')
-    }
-  }, [router])
-
-  return (
-    <div style={{ padding: 24 }}>
-      <h1>Welcome to Admin Dashboard</h1>
-    </div>
-  )
+  return <Box>{renderContent()}</Box>
 }
 
 AdminPage.getLayout = page => <AdminLayout>{page}</AdminLayout>
