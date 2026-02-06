@@ -1,13 +1,15 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Avatar, Box, Button, Divider, Grid, Paper, TextField, Typography, useTheme } from '@mui/material'
+import { Avatar, Box, Button, Divider, Grid, TextField, Typography, useTheme } from '@mui/material'
 import { useRouter } from 'next/router'
 import { NextPage } from 'next/types'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import api from 'src/apis/axiosClient'
 import handleAPI from 'src/apis/handleAPI'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
+import { UserDataType } from 'src/contexts/types'
 import { useAuth } from 'src/hooks/useAuth'
 import { UpdateMyProfileBodySchema, UpdateMyProfileBodyType } from 'src/types/auth'
 
@@ -32,10 +34,13 @@ const FormRow = ({ label, children }: { label: string; children: React.ReactNode
 
 const PageMyProfile: NextPage<TProps> = () => {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
+  const { t } = useTranslation()
   const theme = useTheme()
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(user?.avatar || null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
   const [initialValues, setInitialValues] = useState<UpdateMyProfileBodyType>({
     avatar: null,
     email: '',
@@ -43,8 +48,6 @@ const PageMyProfile: NextPage<TProps> = () => {
     name: '',
     phoneNumber: ''
   })
-
-  const { t } = useTranslation()
 
   const defaultValues: UpdateMyProfileBodyType = {
     avatar: null,
@@ -58,26 +61,20 @@ const PageMyProfile: NextPage<TProps> = () => {
     control,
     formState: { errors, isDirty },
     handleSubmit,
-    reset,
-    watch
+    reset
   } = useForm<UpdateMyProfileBodyType>({
     defaultValues,
     resolver: yupResolver(UpdateMyProfileBodySchema)
   })
 
-  // Theo dõi các trường để biết khi nào có thay đổi
-  const currentValues = watch()
-  console.log('Current form values:', currentValues)
-
   useEffect(() => {
     if (!user) return
 
     const initialData: UpdateMyProfileBodyType = {
-      email: user.email || '',
-      // password: 'Matkhau@111', // Placeholder cho mật khẩu
-      name: user.name || '',
-      phoneNumber: user.phoneNumber || '',
-      avatar: null
+      email: user.email,
+      name: user.name,
+      phoneNumber: user.phoneNumber,
+      avatar: user.avatar
     }
 
     reset(initialData)
@@ -85,7 +82,9 @@ const PageMyProfile: NextPage<TProps> = () => {
     setPreviewAvatar(user.avatar || null)
   }, [user, reset])
 
-  const handleSubmitForm = (data: UpdateMyProfileBodyType) => {
+  const handleSubmitForm = async (data: UpdateMyProfileBodyType) => {
+    setIsLoading(true)
+
     // Tạo object chỉ chứa dữ liệu thay đổi
     const changedData: Partial<UpdateMyProfileBodyType> & { avatarFile?: File } = {}
 
@@ -97,11 +96,6 @@ const PageMyProfile: NextPage<TProps> = () => {
 
       // Bỏ qua trường nếu không thay đổi
       if (currentValue !== initialValue) {
-        // Xử lý đặc biệt cho password (nếu vẫn là placeholder)
-        if (fieldKey === 'password' && currentValue === '**********') {
-          return // Bỏ qua, không thêm vào changedData
-        }
-
         // Xử lý đặc biệt cho avatar
         if (fieldKey === 'avatar') {
           if (avatarFile) {
@@ -119,32 +113,82 @@ const PageMyProfile: NextPage<TProps> = () => {
 
     // Kiểm tra nếu không có gì thay đổi
     if (Object.keys(changedData).length === 0) {
-      console.log('Không có thông tin nào thay đổi')
-
       // Có thể hiển thị thông báo cho người dùng
       toast(t('No changes detected'), { icon: '⚠️' })
+      setIsLoading(false)
 
       return
     }
 
-    console.log('Chỉ gửi dữ liệu thay đổi:', changedData)
+    try {
+      // Gọi API với changedData
+      if (changedData.avatarFile) {
+        const formData = new FormData()
+        formData.append('file', changedData.avatarFile) // key phải là 'file'
+        formData.append('folder', 'avatars')
 
-    // Gọi API với changedData
-    // updateProfile(changedData)
+        const url = await api.post('/media/image/cloudinary', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
 
-    // Sau khi submit thành công, cập nhật initialValues
-    // để lần submit tiếp theo chỉ gửi những thay đổi mới
-    const newInitialValues = {
-      ...initialValues,
-      ...changedData,
-      password: '**********' // Reset password placeholder
-    }
-    setInitialValues(newInitialValues)
-    handleAPI('/auth/myProfile', changedData, 'put')
+        changedData.avatar = url.data.url
 
-    // Nếu có avatar mới, cập nhật preview
-    if (avatarFile) {
-      setAvatarFile(null)
+        if (user && url.data.url) {
+          setUser({ ...user, avatar: url.data.url })
+        }
+        
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { avatarFile, ...profileData } = changedData
+
+        await handleAPI('/auth/myProfile', profileData, 'put')
+
+        toast.success(t('Updated successfully'))
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { avatarFile: _, ...cleanChangedData } = changedData
+
+        const newInitialValues = {
+          ...initialValues,
+          ...cleanChangedData
+        }
+
+        setInitialValues(newInitialValues)
+
+        reset({ ...data, avatar: changedData.avatar })
+        setIsLoading(false)
+
+        return
+      }
+
+      await handleAPI('/auth/myProfile', changedData, 'put')
+      if (user) {
+        setUser({
+          ...user,
+          ...changedData
+        } as UserDataType)
+      }
+
+      // Sau khi submit thành công, cập nhật initialValues
+      // để lần submit tiếp theo chỉ gửi những thay đổi mới
+      const newInitialValues = {
+        ...initialValues,
+        ...changedData
+      }
+      setInitialValues(newInitialValues)
+      reset(data)
+
+      toast.success(t('Updated successfully'))
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message?.[0]?.message ||
+          error.response?.data?.message ||
+          error.message ||
+          'Something went wrong'
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -201,6 +245,7 @@ const PageMyProfile: NextPage<TProps> = () => {
                       fullWidth
                       error={!!errors.name}
                       helperText={errors.name?.message}
+                      disabled={isLoading}
                     />
                   )}
                 />
@@ -229,8 +274,11 @@ const PageMyProfile: NextPage<TProps> = () => {
                     />
                   </Grid>
                   <Grid item xs={4} sx={{ textAlign: 'left', display: 'flex', justifyContent: 'flex-start' }}>
-                    <Button sx={{ color: '#1975D1' }} onClick={() => router.push('/my-profile/email')}>
-                      {t('Change Email')}
+                    <Button
+                      sx={{ color: '#1975D1', whiteSpace: 'nowrap' }}
+                      onClick={() => router.push('/my-profile/email')}
+                    >
+                      {t('Change')}
                     </Button>
                   </Grid>
                 </Grid>
@@ -250,7 +298,7 @@ const PageMyProfile: NextPage<TProps> = () => {
                       fullWidth
                       error={!!errors.phoneNumber}
                       helperText={errors.phoneNumber?.message}
-                      // value={maskPhoneNumber(field.value!)}
+                      disabled={isLoading}
                     />
                   )}
                 />
@@ -289,7 +337,7 @@ const PageMyProfile: NextPage<TProps> = () => {
                     <Button
                       type='submit'
                       variant='contained'
-                      disabled={!isDirty && !avatarFile} // Disable nếu không có thay đổi
+                      disabled={(!isDirty && !avatarFile) || isLoading} // Disable nếu không có thay đổi
                       sx={{
                         px: 4,
                         bgcolor: '#ee4d2d',
@@ -332,7 +380,7 @@ const PageMyProfile: NextPage<TProps> = () => {
                     uploadFunc={file => handleUploadAvatar(file, field.onChange)}
                     objectAcceptFile={{ 'image/*': ['.png', '.jpg', '.jpeg'] }}
                   >
-                    <Button variant='outlined' size='small' component='span'>
+                    <Button variant='outlined' size='small' component='span' disabled={isLoading}>
                       {t('ChangeImage')}
                     </Button>
                   </WrapperFileUpload>

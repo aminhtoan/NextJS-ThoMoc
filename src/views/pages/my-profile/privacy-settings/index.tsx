@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 const PrivacySettings = () => {
   const { t } = useTranslation()
+  
   return (
     <Grid container spacing={5}>
       <Grid item xs={12}>

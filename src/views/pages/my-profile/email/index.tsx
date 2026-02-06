@@ -1,10 +1,11 @@
-import { Button, Checkbox, Divider, Grid, Typography } from '@mui/material'
+import { Button, Checkbox, Divider, FormControlLabel, Grid, Typography } from '@mui/material'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 
 const EmailPage = () => {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const { t } = useTranslation()
+  const [isLoading] = React.useState(false)
+
+  //   const { t } = useTranslation()
+
   return (
     <Grid container spacing={5}>
       <Grid item xs={12}>
@@ -45,23 +46,28 @@ const EmailPage = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <div className='checkbox-container'>
-              <label className='custom-checkbox'>
-                <input type='checkbox' checked />
-                <span className='checkmark'></span>
-                <span className='label-text'>
-                    
-                  Tôi đồng ý với các điều khoản sử dụng và cho phép hệ thống xử lý thông tin tôi cung cấp.
-                </span>
-              </label>
-            </div>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  defaultChecked
+                  sx={{
+                    color: '#1975D1 !important',
+                    '&.Mui-checked': {
+                      color: '#1975D1 !important'
+                    }
+                  }}
+                />
+              }
+              label={
+                <Typography variant='caption' color='text.secondary'>
+                  Gửi tôi thông tin xu hướng, chương trình khuyến mãi & cập nhật mới nhất.
+                </Typography>
+              }
+            />
           </Grid>
         </Grid>
       </Grid>
     </Grid>
   )
 }
-//    ;<Grid item xs={6} sx={{ textAlign: 'right' }}>
-//      <Button sx={{ color: 'white', backgroundColor: '#1975D1' }}>{t('Delete Account')}</Button>
-//    </Grid>
 export default EmailPage

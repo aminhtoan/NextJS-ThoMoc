@@ -1,4 +1,4 @@
-import { Box, Container, CssBaseline, Toolbar } from '@mui/material'
+import { Box, Container, CssBaseline } from '@mui/material'
 import { NextPage } from 'next'
 import * as React from 'react'
 import FooterLayout from './FooterLayout'

@@ -1,12 +1,8 @@
 import { Box, Typography } from '@mui/material'
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import AdminLayout from 'src/views/layouts/AdminLayout/AdminLayout'
 
 const AdminPage: NextPage = () => {
-  const router = useRouter()
-  const page = (router.query.page as string) || router.pathname
-
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant='h4' fontWeight={700}>

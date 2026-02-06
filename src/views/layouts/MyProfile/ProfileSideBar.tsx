@@ -1,6 +1,3 @@
-import React, { useState } from 'react'
-import { useRouter } from 'next/router'
-import { useTranslation } from 'react-i18next'
 import {
   Avatar,
   Box,
@@ -12,22 +9,23 @@ import {
   Typography,
   useTheme
 } from '@mui/material'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 // Icons
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
 import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined'
-import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined'
+import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined'
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
 
 // Hooks
 import { useAuth } from 'src/hooks/useAuth'
@@ -77,6 +75,7 @@ const ProfileSideBar = () => {
           icon: <LockOutlinedIcon fontSize='small' />,
           path: '/my-profile/change-password'
         },
+
         // {
         //   key: 'notification-settings',
         //   label: t('Notification Settings'),
