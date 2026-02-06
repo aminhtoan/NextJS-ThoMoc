@@ -7,33 +7,16 @@ const AdminPage: NextPage = () => {
   const router = useRouter()
   const page = (router.query.page as string) || router.pathname
 
-  const renderContent = () => {
-    switch (page) {
-      case '/admin/orders':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant='h4'>Quản lý sản phẩm</Typography>
-            {/* Thêm nội dung products page ở đây */}
-          </Box>
-        )
-      case 'brands':
-
-      // return <BrandsPage />
-      default:
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant='h4' fontWeight={700}>
-              Admin Dashboard
-            </Typography>
-            <Typography variant='body1' color='textSecondary' mt={1}>
-              Chào mừng đến trang quản trị. Vui lòng chọn mục trong menu bên trái.
-            </Typography>
-          </Box>
-        )
-    }
-  }
-
-  return <Box>{renderContent()}</Box>
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant='h4' fontWeight={700}>
+        Admin Dashboard
+      </Typography>
+      <Typography variant='body1' color='textSecondary' mt={1}>
+        Chào mừng đến trang quản trị. Vui lòng chọn mục trong menu bên trái.
+      </Typography>
+    </Box>
+  )
 }
 
 AdminPage.getLayout = page => <AdminLayout>{page}</AdminLayout>

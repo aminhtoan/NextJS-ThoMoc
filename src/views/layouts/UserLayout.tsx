@@ -25,7 +25,6 @@ const UserLayout: NextPage<Props> = ({ children }) => {
         }}
       >
         {/* đẩy content xuống dưới AppBar */}
-        <Toolbar />
         <Container maxWidth='lg' sx={{ mt: 4 }}>
           {children}
         </Container>

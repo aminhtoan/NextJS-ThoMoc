@@ -16,5 +16,16 @@
       "ChangeImage": "Change Image",
       "FileSize": "File size: maximum 1 MB",
       "FileExtension": "File extension: .JPEG, .PNG",
-      "Role": "Role"
+      "Role": "Role",
+      "Notifications": "Notifications",
+      "Bank": "Bank",
+      "Address": "Address",
+      "Change Password": "Change Password",
+      "Notification Settings": "Notification Settings",
+      "Privacy Settings": "Privacy Settings",
+      "Vouchers": "Vouchers",
+      "Coins": "Coins",
+      "Edit Profile": "Edit Profile",
+      "Account Deletion Request": "Account Deletion Request",
+      "Delete Account": "Delete Account"
  }

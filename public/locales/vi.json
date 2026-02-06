@@ -16,5 +16,16 @@
     "ChangeImage": "Thay đổi ảnh",
     "FileSize": "Kích thước tệp: tối đa 1 MB",
     "FileExtension": "Định dạng tệp: .JPEG, .PNG",
-    "Role": "Vai trò"
+    "Role": "Vai trò",
+    "Notifications": "Thông báo",
+    "Bank": "Ngân hàng",
+    "Address": "Địa chỉ",
+    "Change Password": "Đổi mật khẩu",
+    "Notification Settings": "Cài đặt thông báo",
+    "Privacy Settings": "Những thiết lập riêng tư",
+    "Vouchers": "Kho Voucher",
+    "Coins": "Xu",
+    "Edit Profile": "Sửa hồ sơ",
+    "Account Deletion Request": "Yêu cầu xóa tài khoản",
+    "Delete Account": "Xóa bỏ"
 }

@@ -22,7 +22,6 @@ const LayoutNotApp: NextPage<Props> = ({ children }) => {
       <CssBaseline />
 
       {/* <HeaderLayout /> */}
-
       <Box
         component='main'
         sx={{
