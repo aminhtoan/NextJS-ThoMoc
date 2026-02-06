@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Avatar, Box, Button, Divider, Grid, TextField, Typography, useTheme } from '@mui/material'
+import { Avatar, Box, Button, CircularProgress, Divider, Grid, TextField, Typography, useTheme } from '@mui/material'
 import { useRouter } from 'next/router'
 import { NextPage } from 'next/types'
 import React, { useEffect, useState } from 'react'
@@ -138,7 +138,7 @@ const PageMyProfile: NextPage<TProps> = () => {
         if (user && url.data.url) {
           setUser({ ...user, avatar: url.data.url })
         }
-        
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { avatarFile, ...profileData } = changedData
 
@@ -348,7 +348,20 @@ const PageMyProfile: NextPage<TProps> = () => {
                         }
                       }}
                     >
-                      {t('Save')}
+                      {isLoading ? (
+                        <>
+                          <CircularProgress
+                            size={24}
+                            sx={{
+                              color: '#fff',
+                              position: 'absolute'
+                            }}
+                          />
+                          <span style={{ opacity: 0 }}>{t('Save')}</span>
+                        </>
+                      ) : (
+                        t('Save')
+                      )}
                     </Button>
                   </Grid>
                 </Grid>
