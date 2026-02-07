@@ -4,9 +4,9 @@ import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
 import OTPInput from './OTPInput'
 import ResetPassword from './ResetPassword'
-import { TypeofVerificationCode } from 'src/constants/auth'
 import OTPCountdown from './OTPCountdown'
 import { ResetPasswordData } from 'src/types/auth'
+import { TypeofVerificationCode } from 'src/configs/auth'
 
 interface Props {
   open: boolean

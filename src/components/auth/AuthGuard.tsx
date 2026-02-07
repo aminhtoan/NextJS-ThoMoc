@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // ** React Imports
 import { useRouter } from 'next/router'
-import { ReactNode, ReactElement, useEffect } from 'react'
+import { ReactElement, ReactNode, useEffect } from 'react'
 import { clearLocalStorage } from 'src/helpers/localstorge'
 import { useAuth } from 'src/hooks/useAuth'
 

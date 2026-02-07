@@ -4,12 +4,13 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import { TypeofVerificationCode } from 'src/constants/auth'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
 import { authMe, loginVerify } from 'src/service/auth'
 import { OTPFormData } from 'src/types/auth'
 import OTPCountdown from './OTPCountdown'
 import OTPInput from './OTPInput'
+import { TypeofVerificationCode } from 'src/configs/auth'
+import { setTemporaryToken } from 'src/helpers/localstorge'
 
 interface OTPProps {
   open: boolean
@@ -85,9 +86,12 @@ const OTP = (props: OTPProps) => {
       }
 
       const user = await loginVerify(dataLogin)
+
       if (data.isRemmember) {
         setAccessToken(user.data.accessToken)
         setRefreshToken(user.data.refreshToken)
+      } else {
+        setAccessToken(user.data.accessToken)
       }
 
       toast.success('Đăng nhập thành công')

@@ -47,7 +47,6 @@ const PageMyProfile: NextPage<TProps> = () => {
   const [initialValues, setInitialValues] = useState<UpdateMyProfileBodyType>({
     avatar: null,
     email: '',
-    password: '',
     name: '',
     phoneNumber: ''
   })
@@ -55,7 +54,6 @@ const PageMyProfile: NextPage<TProps> = () => {
   const defaultValues: UpdateMyProfileBodyType = {
     avatar: null,
     email: '',
-    password: '',
     name: '',
     phoneNumber: ''
   }
@@ -127,7 +125,7 @@ const PageMyProfile: NextPage<TProps> = () => {
       // Gọi API với changedData
       if (changedData.avatarFile) {
         const formData = new FormData()
-        formData.append('file', changedData.avatarFile) // key phải là 'file'
+        formData.append('file', changedData.avatarFile)
         formData.append('folder', 'avatars')
 
         const url = await uploadMedia(changedData.avatarFile, 'avatars')

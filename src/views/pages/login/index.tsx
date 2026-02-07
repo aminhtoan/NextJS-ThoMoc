@@ -44,7 +44,7 @@ const PageLogin: NextPage<TProps> = () => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [openFPassword, setOpenFPassword] = React.useState(false)
-  const [isRemmember, setIsRemmember] = React.useState(true)
+  const [isRemmember, setIsRemmember] = React.useState(false)
   const [dataInit, setDataInit] = React.useState<Datainit>()
   const [showOTP, setShowOTP] = React.useState(false)
   const [showTOTP, setShowTOTP] = React.useState(false)

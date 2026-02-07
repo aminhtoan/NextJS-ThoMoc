@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import handleAPI from 'src/apis/handleAPI'
 import OtpInput from 'src/components/otp-input'
+import { TypeofVerificationCode } from 'src/configs/auth'
 import { UserDataType } from 'src/contexts/types'
 import { useAuth } from 'src/hooks/useAuth'
 import { sentOTP, verifyEmailAuth, verifyOTP } from 'src/service/auth'
@@ -43,7 +44,7 @@ const EmailPage = () => {
     setIsLoading(true)
     try {
       await verifyEmailAuth(data.email)
-      await sentOTP(data.email, 'CHANGE_EMAIL')
+      await sentOTP(data.email, TypeofVerificationCode.CHANGE_EMAIL)
       setNewEmail(data.email)
       setStep(2)
       toast.success(t('OTP sent to your email'))
@@ -61,10 +62,10 @@ const EmailPage = () => {
   const handleOtpSubmit = async (data: OtpType) => {
     // Gọi API của bạn ở đây
     try {
-      const response = await verifyOTP({
+      await verifyOTP({
         email: newEmail,
         code: data.code,
-        type: 'CHANGE_EMAIL'
+        type: TypeofVerificationCode.CHANGE_EMAIL
       })
       setUser({ ...user, email: newEmail } as UserDataType)
 
