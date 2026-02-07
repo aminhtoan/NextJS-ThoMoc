@@ -105,7 +105,11 @@ const PageRegister: NextPage<TProps> = () => {
     setLoading(true)
     try {
       setOtp(data.code || '')
-      await verifyOTP(data)
+      await verifyOTP({
+        email: data.email,
+        code: data.code,
+        type: 'REGISTER'
+      })
       toast.success('OTP hợp lệ, tiếp tục đăng ký')
       setValue('code', '')
 

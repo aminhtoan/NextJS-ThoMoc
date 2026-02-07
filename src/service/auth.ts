@@ -38,3 +38,7 @@ export const registerAuth = async (data: RegisterBodyType) => {
 export const refreshTokenAuth = async (data: RefreshTokenBodyType) => {
   return await handleAPI('/auth/refresh-token', data, 'post')
 }
+
+export const verifyEmailAuth = async (email: string) => {
+  return await handleAPI('/auth/verify-email', { email }, 'post')
+}

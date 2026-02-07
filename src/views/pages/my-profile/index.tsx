@@ -8,9 +8,11 @@ import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import api from 'src/apis/axiosClient'
 import handleAPI from 'src/apis/handleAPI'
+import Spinner from 'src/components/spinner'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
 import { UserDataType } from 'src/contexts/types'
 import { useAuth } from 'src/hooks/useAuth'
+import { uploadMedia } from 'src/service/media'
 import { UpdateMyProfileBodySchema, UpdateMyProfileBodyType } from 'src/types/auth'
 
 type TProps = {}
@@ -40,6 +42,7 @@ const PageMyProfile: NextPage<TProps> = () => {
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(user?.avatar || null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const isDark = theme.palette.mode === 'dark'
 
   const [initialValues, setInitialValues] = useState<UpdateMyProfileBodyType>({
     avatar: null,
@@ -127,12 +130,7 @@ const PageMyProfile: NextPage<TProps> = () => {
         formData.append('file', changedData.avatarFile) // key phải là 'file'
         formData.append('folder', 'avatars')
 
-        const url = await api.post('/media/image/cloudinary', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-
+        const url = await uploadMedia(changedData.avatarFile, 'avatars')
         changedData.avatar = url.data.url
 
         if (user && url.data.url) {
@@ -208,6 +206,7 @@ const PageMyProfile: NextPage<TProps> = () => {
 
   return (
     <>
+      {isLoading && <Spinner />}
       {/* ===== Header ===== */}
       <Typography variant='h5' mb={1} sx={{ color: 'black' }}>
         {t('My Profile')}

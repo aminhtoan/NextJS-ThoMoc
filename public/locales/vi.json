@@ -29,5 +29,19 @@
     "Account Deletion Request": "Yêu cầu xóa tài khoản",
     "Delete Account": "Xóa bỏ",
     "Change": "Thay đổi",
-    "Updated successfully": "Cập nhật thành công"
+    "Updated successfully": "Cập nhật thành công",
+    "Input code": "Nhập mã",
+    "Back to previous step": "Quay lại bước trước",
+    "OTP sent to your email": "Mã OTP đã được gửi đến email của bạn",
+    "Invalid or existing email": "Email không hợp lệ hoặc đã tồn tại",
+    "Email updated successfully": "Địa chỉ email đã được cập nhật thành công",
+    "New email address" : "Địa chỉ email mới",
+    "Login to your email address": "Đăng nhập vào địa chỉ email của bạn",
+    "I have read and accept all terms, policies, and regulations regarding information privacy.": "Tôi đã đọc và chấp nhận mọi điều khoản, chính sách, quy định về bảo mật thông tin.",
+    "Please enter the OTP sent to your email:": "Vui lòng nhập mã OTP được gửi tới email:",
+    "Processing...": "Đang xử lý...",
+    "OTP Verification": "Xác thực OTP",
+    "Change email address": "Thay đổi địa chỉ email",
+    "Next": "Tiếp theo"
+
 }

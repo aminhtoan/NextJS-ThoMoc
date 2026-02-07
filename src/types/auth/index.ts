@@ -18,6 +18,12 @@ export const ForgotPasswordSchema = yup
   })
   .required()
 
+export const EmailSchema = yup
+  .object({
+    email: yup.string().required('Vui lòng nhập email').matches(EMAIL_REG, `Địa chỉ email không hợp lệ`)
+  })
+  .required()
+
 export const ResetPasswordSchema = ForgotPasswordSchema.shape({
   tempToken: yup.string().required(),
   newPassword: yup
@@ -74,7 +80,8 @@ export const RefreshTokenBodyDTO = yup.object({
 
 export const VerifyOTP = yup.object({
   email: yup.string().required('Vui lòng nhập email').matches(EMAIL_REG, `Địa chỉ email không hợp lệ`),
-  code: yup.string().required('Vui lòng nhập mã OTP').length(6, 'Mã OTP gồm 6 chữ số').max(6, 'Mã OTP gồm 6 chữ số')
+  code: yup.string().required('Vui lòng nhập mã OTP').length(6, 'Mã OTP gồm 6 chữ số').max(6, 'Mã OTP gồm 6 chữ số'),
+  type: yup.string().required('Vui lòng nhập loại mã OTP')
 })
 
 export const UpdateMyProfileBodySchema = yup.object({
@@ -133,6 +140,15 @@ export const UpdateMyProfileBodySchema = yup.object({
     .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
     .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
 })
+
+export const OtpSchema = yup.object({
+  code: yup
+    .string()
+    .required('Vui lòng nhập mã OTP')
+    .matches(/^\d{6}$/, 'OTP phải là 6 chữ số')
+})
+
+export type OtpType = yup.InferType<typeof OtpSchema>
 export type UpdateMyProfileBodyType = yup.InferType<typeof UpdateMyProfileBodySchema>
 export type VerifyOTPType = yup.InferType<typeof VerifyOTP>
 export type RegisterBodyType = yup.InferType<typeof RegisterBodySchema>
@@ -143,3 +159,4 @@ export type LoginFormData = yup.InferType<typeof LoginSchema>
 export type ForgotPasswordFormData = yup.InferType<typeof ForgotPasswordSchema>
 export type ResetPasswordFormData = yup.InferType<typeof ResetPasswordSchema>
 export type LoginVerifyFormData = yup.InferType<typeof loginVerify>
+export type EmailType = yup.InferType<typeof EmailSchema>
