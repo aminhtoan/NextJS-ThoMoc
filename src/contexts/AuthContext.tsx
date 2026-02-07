@@ -75,12 +75,11 @@ const AuthProvider = ({ children }: Props) => {
 
     if (typeof window !== 'undefined') {
       window.addEventListener('authDataUpdated', handleAuthDataUpdated)
-      
+
       return () => {
         window.removeEventListener('authDataUpdated', handleAuthDataUpdated)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleLogout = () => {
