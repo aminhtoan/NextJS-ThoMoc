@@ -42,3 +42,7 @@ export const refreshTokenAuth = async (data: RefreshTokenBodyType) => {
 export const verifyEmailAuth = async (email: string) => {
   return await handleAPI('/auth/verify-email', { email }, 'post')
 }
+
+export const changePasswordAuth = async (oldPassword: string, newPassword: string) => {
+  return await handleAPI('/auth/change-password', { oldPassword, newPassword }, 'put')
+}

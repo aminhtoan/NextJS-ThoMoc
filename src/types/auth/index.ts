@@ -148,6 +148,28 @@ export const OtpSchema = yup.object({
     .matches(/^\d{6}$/, 'OTP phải là 6 chữ số')
 })
 
+export const ChangePasswordSchema = yup.object({
+  oldPassword: yup
+    .string()
+    .required('Vui lòng nhập mật khẩu cũ')
+    .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+
+  newPassword: yup
+    .string()
+    .required('Vui lòng nhập mật khẩu mới')
+    .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .notOneOf([yup.ref('oldPassword')], 'Mật khẩu mới không được giống mật khẩu cũ'),
+
+  confirmNewPassword: yup
+    .string()
+    .required('Vui lòng xác nhận mật khẩu mới')
+    .oneOf([yup.ref('newPassword')], 'Mật khẩu xác nhận không khớp')
+    .notOneOf([yup.ref('oldPassword')], 'Mật khẩu mới không được giống mật khẩu cũ')
+})
+
+export type ChangePasswordBodyType = yup.InferType<typeof ChangePasswordSchema>
 export type OtpType = yup.InferType<typeof OtpSchema>
 export type UpdateMyProfileBodyType = yup.InferType<typeof UpdateMyProfileBodySchema>
 export type VerifyOTPType = yup.InferType<typeof VerifyOTP>

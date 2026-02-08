@@ -301,31 +301,6 @@ const PageMyProfile: NextPage<TProps> = () => {
                 />
               </FormRow>
 
-              {/* PASSWORD */}
-              {/* <FormRow label={t('Password')}>
-                <Controller
-                  name='password'
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      size='small'
-                      type='password'
-                      placeholder='••••••'
-                      fullWidth
-                      error={!!errors.password}
-                      helperText={errors.password?.message}
-                      onChange={e => {
-                        // Nếu người dùng bắt đầu nhập, xóa placeholder
-                        if (e.target.value !== '**********') {
-                          field.onChange(e.target.value)
-                        }
-                      }}
-                    />
-                  )}
-                />
-              </FormRow> */}
-
               {/* BUTTON */}
               <Grid item xs={12}>
                 <Grid container>
