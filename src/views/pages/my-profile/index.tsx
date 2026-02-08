@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import api from 'src/apis/axiosClient'
 import handleAPI from 'src/apis/handleAPI'
 import Spinner from 'src/components/spinner'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
@@ -42,7 +41,8 @@ const PageMyProfile: NextPage<TProps> = () => {
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(user?.avatar || null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const isDark = theme.palette.mode === 'dark'
+
+  // const isDark = theme.palette.mode === 'dark'
 
   const [initialValues, setInitialValues] = useState<UpdateMyProfileBodyType>({
     avatar: null,

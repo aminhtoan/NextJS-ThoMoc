@@ -1,44 +1,52 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from 'src/hooks/useAuth'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
 import { authMe } from 'src/service/auth'
 
 const FacebookCallback = () => {
+  const { t } = useTranslation()
   const { setUser } = useAuth()
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
-  const [accessToken, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
+  const [, setAccessToken] = useLocalStorage<string | null>('accessToken', null)
   const [, setRefreshToken] = useLocalStorage<string | null>('refreshToken', null)
+
   useEffect(() => {
     if (!router.isReady) return
     const run = async () => {
-      const { accessToken, refreshToken, errorMessage } = router.query
-      if (accessToken && refreshToken && !errorMessage) {
-        await setAccessToken(accessToken as string)
-        await setRefreshToken(refreshToken as string)
+      const { accessToken: tokenFromQuery, refreshToken: refreshTokenFromQuery, errorMessage } = router.query
+      if (tokenFromQuery && refreshTokenFromQuery && !errorMessage) {
+        // Lưu token vào localStorage trước
+        setAccessToken(String(tokenFromQuery))
+        setRefreshToken(String(refreshTokenFromQuery))
 
-        setTimeout(() => {
-          router.replace('/')
+        // Đợi localStorage được cập nhật, sau đó gọi authMe
+        setTimeout(async () => {
+          try {
+            const user = await authMe()
+            setUser(user.data)
+            if (user.data.role.name === 'ADMIN') {
+              router.replace('/admin')
+            } else {
+              router.replace('/')
+            }
+          } catch (err) {
+            setError(t('Cannot fetch user information. Please try again.'))
+          }
         }, 100)
       } else if (errorMessage) {
         setError(String(errorMessage))
       } else {
-        setError('Something went wrong with Facebook authentication.')
+        setError(t('Something went wrong with Facebook authentication. Please try again.'))
         router.replace('/login')
       }
     }
 
     run()
-  }, [router, setAccessToken, setRefreshToken])
+  }, [router, setAccessToken, setRefreshToken, setUser, t])
 
-  useEffect(() => {
-    const run = async () => {
-      const user = await authMe()
-      setUser(user.data)
-    }
-    run()
-  }, [accessToken])
   return (
     <div
       style={{
@@ -55,7 +63,7 @@ const FacebookCallback = () => {
           <p>{error}</p>
         </>
       ) : (
-        <h2>Đang xử lý đăng nhập FaceBook...</h2>
+        <h2>{t('Processing Facebook login...')}</h2>
       )}
     </div>
   )

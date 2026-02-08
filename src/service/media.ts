@@ -1,7 +1,9 @@
 import api from 'src/apis/axiosClient'
 import handleAPI from 'src/apis/handleAPI'
+import { API_CONFIG } from 'src/configs/api'
+
 export const getMediaURL = () => {
-  return handleAPI('/media/default-avatar')
+  return handleAPI(API_CONFIG.MEDIA_API.DEFAULT_AVATAR)
 }
 
 export const uploadMedia = async (file: any, folder: string) => {
@@ -10,7 +12,7 @@ export const uploadMedia = async (file: any, folder: string) => {
   formData.append('folder', folder)
 
   try {
-    const response = await api.post('/media/image/cloudinary', formData, {
+    const response = await api.post(API_CONFIG.MEDIA_API.UPLOAD_IMAGE_CLOUDINARY, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

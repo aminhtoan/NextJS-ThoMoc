@@ -3,7 +3,6 @@ import List from '@mui/material/List'
 import Tooltip from '@mui/material/Tooltip'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
@@ -13,6 +12,7 @@ import ListItemText from '@mui/material/ListItemText'
 import { Fragment, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import { VerticalItems } from 'src/configs/layout'
+import { useTranslation } from 'react-i18next'
 
 type MenuItem = {
   title: string
@@ -33,6 +33,7 @@ type MenuItemProps = {
 const MenuItemComponent: React.FC<MenuItemProps> = ({ item, level, openItems, handleClick, mini = false }) => {
   const router = useRouter()
   const hasChildren = item.children && item.children.length > 0
+  const { t } = useTranslation()
 
   const handleItemClick = () => {
     if (hasChildren) {
@@ -73,7 +74,7 @@ const MenuItemComponent: React.FC<MenuItemProps> = ({ item, level, openItems, ha
       {!mini && (
         <>
           <ListItemText
-            primary={item.text}
+            primary={t(item.text)}
             primaryTypographyProps={{
               fontSize: level === 0 ? '0.9rem' : '0.85rem',
               fontWeight: level === 0 ? 500 : 400

@@ -4,13 +4,14 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
+import { TypeofVerificationCode } from 'src/configs/auth'
+import { clearLocalStorage } from 'src/helpers/localstorge'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
-import { authMe, loginVerify } from 'src/service/auth'
+import { authMe, loginVerify, sentOTP } from 'src/service/auth'
 import { OTPFormData } from 'src/types/auth'
 import OTPCountdown from './OTPCountdown'
 import OTPInput from './OTPInput'
-import { TypeofVerificationCode } from 'src/configs/auth'
-import { setTemporaryToken } from 'src/helpers/localstorge'
+import { useTranslation } from 'react-i18next'
 
 interface OTPProps {
   open: boolean
@@ -19,6 +20,7 @@ interface OTPProps {
 }
 
 const OTP = (props: OTPProps) => {
+  const { t } = useTranslation()
   const { open, data, handClose } = props
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = React.useState(false)
@@ -37,6 +39,7 @@ const OTP = (props: OTPProps) => {
     }),
     [data.email]
   )
+
   useEffect(() => {
     if (!authReady) return
 
@@ -58,9 +61,17 @@ const OTP = (props: OTPProps) => {
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('authDataUpdated', { detail: res.data }))
         }
-        setAuthReady(true)
+
+        if (res.data.role.name === 'ADMIN') {
+          router.replace('/admin')
+        } else {
+          setAuthReady(true)
+        }
       } catch (err) {
-        console.error(err)
+        console.error('Error fetching user data:', err)
+        toast.error(t('Failed to retrieve user information. Please log in again.'))
+        clearLocalStorage()
+        handClose()
       }
     }
 
@@ -94,14 +105,13 @@ const OTP = (props: OTPProps) => {
         setAccessToken(user.data.accessToken)
       }
 
-      toast.success('Đăng nhập thành công')
+      toast.success(t('Login Successful'))
     } catch (error: any) {
-      console.log('Error Login OTP: ', error)
       toast.error(
         error?.response?.data?.message?.[0]?.message ||
           error?.response?.data?.error ||
           error?.response?.data.message ||
-          'Đã xảy ra lỗi'
+          t('An error occurred')
       )
     } finally {
       setIsLoading(false)
@@ -117,15 +127,14 @@ const OTP = (props: OTPProps) => {
         type: TypeofVerificationCode.LOGIN
       }
 
-      await handleAPI('auth/otp', otpdata, 'post')
+      await sentOTP(otpdata.email!, otpdata.type)
 
       setOtp('')
 
-      toast.success('OTP đã được gửi lại')
+      toast.success(t('OTP has been sent to your email'))
     } catch (error: any) {
-      console.log('Error Resend OTP: ', error)
       toast.error(
-        error?.response?.data?.message?.[0]?.message || error?.response?.data?.message || 'Gửi lại OTP thất bại'
+        error?.response?.data?.message?.[0]?.message || error?.response?.data?.message || t('Failed to resend OTP')
       )
     }
   }

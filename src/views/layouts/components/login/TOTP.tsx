@@ -42,7 +42,17 @@ const TOTP = (props: OTPProps) => {
         setUserData(JSON.stringify(userData.data))
       }
       toast.success('Đăng nhập thành công')
-      router.push('/')
+
+      // Redirect logic giống OTP
+      const { role } = userData.data
+      const { returnUrl } = router.query
+      if (returnUrl) {
+        router.replace(returnUrl as string)
+      } else if (role && role.name === 'ADMIN') {
+        router.replace('/admin')
+      } else {
+        router.replace('/')
+      }
     } catch (error: any) {
       setError(
         error?.response?.data?.message?.[0]?.message ||

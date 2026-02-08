@@ -59,7 +59,8 @@ const PageLogin: NextPage<TProps> = () => {
       password: ''
     },
     mode: 'onBlur',
-    resolver: yupResolver(LoginSchema)
+    resolver: yupResolver(LoginSchema),
+    shouldUnregister: true
   })
 
   const onSubmit = async (data: LoginFormData) => {
@@ -121,7 +122,6 @@ const PageLogin: NextPage<TProps> = () => {
               width: '100%',
               gap: 2
             }}
-            autoComplete='off'
           >
             <Box>
               <Controller

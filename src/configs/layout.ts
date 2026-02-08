@@ -3,7 +3,7 @@ export const VerticalItems = [
     title: 'Dashboard',
     icon: 'ic:baseline-dashboard',
     text: 'Dashboard',
-    path: '/admin/dashboard'
+    path: '/'
   },
   {
     title: 'Orders',
@@ -102,6 +102,11 @@ export const VerticalItems = [
         title: 'Product Tags',
         icon: 'ic:baseline-label',
         text: 'Product Tags'
+      },
+      {
+        title: 'Review Products',
+        icon: 'ic:baseline-rate-review',
+        text: 'Review Products'
       }
     ]
   },

@@ -1,5 +1,5 @@
+import { Box, Typography } from '@mui/material'
 import React, { useRef } from 'react'
-import { Box, Typography, Stack } from '@mui/material'
 
 interface OtpInputProps {
   value: string

@@ -1,7 +1,7 @@
-import { styled, useTheme } from '@mui/material/styles'
-import Box, { BoxProps } from '@mui/material/Box'
-import CircularProgress from '@mui/material/CircularProgress'
 import { Modal, ModalProps } from '@mui/material'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+import { styled } from '@mui/material/styles'
 
 const CustomModal = styled(Modal)<ModalProps>(({ theme }) => ({
   '&.MuiModal-root': {
@@ -14,9 +14,9 @@ const CustomModal = styled(Modal)<ModalProps>(({ theme }) => ({
   }
 }))
 
-const Spinner = ({ sx }: { sx?: BoxProps['sx'] }) => {
-  const theme = useTheme()
+// { sx }: { sx?: BoxProps['sx'] }
 
+const Spinner = () => {
   return (
     <CustomModal open={true}>
       <Box

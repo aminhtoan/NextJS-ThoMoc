@@ -37,6 +37,7 @@ const ChangePasswordPage = () => {
       console.log(error)
       if (error.response?.data?.message?.[0]?.field === 'oldPassword') {
         toast.error(t('Old password is incorrect'))
+
         return
       }
       toast.error(error.response?.data?.message?.[0]?.message || t('Network error, please try again'))
