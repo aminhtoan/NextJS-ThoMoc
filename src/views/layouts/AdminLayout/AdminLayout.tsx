@@ -72,7 +72,7 @@ const AdminLayout: NextPage<Props> = ({ children }) => {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12}>
-              <Paper
+              {/* <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -81,7 +81,8 @@ const AdminLayout: NextPage<Props> = ({ children }) => {
                 }}
               >
                 {children}
-              </Paper>
+              </Paper> */}
+              {children}
             </Grid>
           </Grid>
         </Container>

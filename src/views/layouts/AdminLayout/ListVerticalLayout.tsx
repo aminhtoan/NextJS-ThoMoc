@@ -42,7 +42,6 @@ const MenuItemComponent: React.FC<MenuItemProps> = ({ item, level, openItems, ha
       // Thay đổi path để navigate trong cùng trang admin
       // /admin/orders -> /admin?page=orders
       const pathName = item.path.split('/').pop()
-      console.log('Navigating to:', `/admin/${pathName}`)
       router.push(`/admin/${pathName}`)
     }
   }

@@ -40,12 +40,12 @@ export const VerticalItems = [
     title: 'Brands',
     icon: 'ic:baseline-label',
     text: 'Brands',
-    path: '/admin/brands',
     children: [
       {
         title: 'All Brands',
         icon: 'ic:baseline-list',
-        text: 'All Brands'
+        text: 'All Brands',
+        path: '/admin/brands'
       },
       {
         title: 'Add New Brand',
@@ -63,11 +63,11 @@ export const VerticalItems = [
     title: 'Categories',
     icon: 'ic:baseline-category',
     text: 'Categories',
-    path: '/admin/categories',
     children: [
       {
         title: 'All Categories',
         icon: 'ic:baseline-list',
+        path: '/admin/categories',
         text: 'All Categories'
       },
       {
@@ -81,12 +81,12 @@ export const VerticalItems = [
     title: 'Products',
     icon: 'ic:baseline-inventory',
     text: 'Products',
-    path: '/admin/products',
     children: [
       {
         title: 'All Products',
         icon: 'ic:baseline-list',
-        text: 'All Products'
+        text: 'All Products',
+        path: '/admin/products'
       },
       {
         title: 'Add New Product',
@@ -114,12 +114,12 @@ export const VerticalItems = [
     title: 'Users',
     icon: 'ic:baseline-people',
     text: 'Users',
-    path: '/admin/users',
     children: [
       {
         title: 'All Users',
         icon: 'ic:baseline-list',
-        text: 'All Users'
+        text: 'All Users',
+        path: '/admin/users'
       },
       {
         title: 'Add New User',
@@ -132,5 +132,11 @@ export const VerticalItems = [
         text: 'User Roles'
       }
     ]
+  },
+  {
+    title: 'All Reviews',
+    icon: 'ic:baseline-rate-review',
+    text: 'All Reviews',
+    path: '/admin/reviews'
   }
 ]
