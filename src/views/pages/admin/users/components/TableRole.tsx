@@ -1,28 +1,52 @@
+// ** MUI
 import { Box } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
+
+// ** React Imports
+import { useEffect, useState } from 'react'
+
+// ** Translation Import
+import { useTranslation } from 'react-i18next'
+
+// ** Redux Imports
+import { useDispatch, useSelector } from 'react-redux'
+
+// ** Custom Components
 import CustomTag from 'src/components/custom-tag'
 import CustomDataGrid from 'src/components/CustomDataGrid/CustomDataGrid'
+
+// ** Configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
-import { RootState } from 'src/stores'
+
+// ** Store Imports
+import { AppDispatch, RootState } from 'src/stores'
+import { getAllRolesAsync } from 'src/stores/apps/role/actions'
+import DeleteRole from './DeleteRole'
 
 const TableRole = () => {
+  const dispatch: AppDispatch = useDispatch()
   const { data, totalItems } = useSelector((state: RootState) => state.role.roles)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[0])
-  console.log('data roles:', data)
+  const { t } = useTranslation()
+  const [openDeleteRole, setOpenDeleteRole] = useState(false)
+  const [deleteData, setDeleteData] = useState<{ id: number; name: string }>({ id: 0, name: '' })
+
+  useEffect(() => {
+    dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
+  }, [dispatch, page, pageSize])
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
     {
       field: 'name',
-      headerName: 'Name',
-      width: 100,
+      headerName: t('Name'),
+      width: 150,
       editable: true
     },
     {
       field: 'isActive',
-      headerName: 'Active',
+      headerName: t('Active'),
       type: 'boolean',
       width: 110,
       editable: true,
@@ -31,13 +55,13 @@ const TableRole = () => {
           bgcolor={params.value ? 'rgba(28, 187, 140, .15)' : 'rgba(220, 53, 69, .15)'}
           color={params.value ? '#1cbb8c' : '#dc3545'}
         >
-          {params.value ? 'Active' : 'Inactive'}
+          {params.value ? t('Active') : t('Inactive')}
         </CustomTag>
       )
     },
     {
       field: 'action',
-      headerName: 'Actions',
+      headerName: t('Actions'),
       width: 160,
       sortable: false,
       filterable: false,
@@ -45,17 +69,14 @@ const TableRole = () => {
         <Box gap={1} display='flex'>
           <Box onClick={() => handleEdit(params.row.id)}>
             <CustomTag bgcolor='rgba(13, 110, 253, .15)' color='#0d6efd'>
-              Edit
+              {t('Edit')}
             </CustomTag>
           </Box>
-
-          <CustomTag bgcolor='rgba(220, 53, 69, .15)' color='#dc3545'>
-            Delete
-          </CustomTag>
-
-          <CustomTag bgcolor='rgba(28, 187, 140, .15)' color='#1cbb8c'>
-            Create
-          </CustomTag>
+          <Box onClick={() => handleDelete(params.row)}>
+            <CustomTag bgcolor='rgba(220, 53, 69, .15)' color='#dc3545'>
+              {t('Delete')}
+            </CustomTag>
+          </Box>
         </Box>
       )
     }
@@ -65,23 +86,20 @@ const TableRole = () => {
     console.log('ID cần Edit:', id)
   }
 
+  const handleDelete = (data: { id: number; name: string }) => {
+    setOpenDeleteRole(true)
+    setDeleteData({ id: data.id, name: data.name })
+  }
+
   return (
-    <Box
-      sx={{
-        overflowX: 'auto'
-      }}
-    >
+    <Box sx={{ width: '100%' }}>
       <CustomDataGrid
         rows={data}
         getRowId={row => row.id}
         columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: pageSize,
-              page: page - 1
-            }
-          }
+        paginationModel={{
+          pageSize: pageSize,
+          page: page - 1
         }}
         pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
         onPaginationModelChange={model => {
@@ -93,7 +111,13 @@ const TableRole = () => {
         disableColumnMenu
         rowCount={totalItems}
         paginationMode='server'
+        localeText={{
+          MuiTablePagination: {
+            labelRowsPerPage: t('Rows per page:')
+          }
+        }}
       />
+      <DeleteRole open={openDeleteRole} onClose={() => setOpenDeleteRole(false)} data={deleteData} />
     </Box>
   )
 }

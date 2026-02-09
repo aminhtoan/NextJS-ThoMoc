@@ -1,12 +1,12 @@
-import Box from '@mui/material/Box';
-import React from 'react';
+import Box from '@mui/material/Box'
+import React from 'react'
 
 interface CustomTagProps {
-  color?: string;
-  bgcolor?: string;
-  children: React.ReactNode;
-  fontSize?: number | string;
-  minWidth?: number | string;
+  color?: string
+  bgcolor?: string
+  children: React.ReactNode
+  fontSize?: number | string
+  minWidth?: number | string
 }
 
 const CustomTag: React.FC<CustomTagProps> = ({
@@ -14,7 +14,7 @@ const CustomTag: React.FC<CustomTagProps> = ({
   bgcolor = 'rgba(28, 187, 140, .15)',
   children,
   fontSize = 10,
-  minWidth = 'auto',
+  minWidth = 'auto'
 }) => (
   <Box
     sx={{
@@ -28,10 +28,11 @@ const CustomTag: React.FC<CustomTagProps> = ({
       color,
       minWidth,
       textAlign: 'center',
+      cursor: 'pointer'
     }}
   >
     {children}
   </Box>
-);
+)
 
-export default CustomTag;
+export default CustomTag

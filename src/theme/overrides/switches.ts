@@ -14,7 +14,8 @@ const Switch = () => {
             opacity: 1,
             borderRadius: 30,
             backgroundColor: theme.palette.background.paper,
-            border: `1px solid rgba(${theme.palette.customColors.main}, ${theme.palette.mode === 'dark' ? 0.4 : 0.2})`,
+            border:
+              theme.palette.mode === 'dark' ? '1px solid rgba(68, 51, 85, 0.4)' : '1px solid rgba(47, 43, 61, 0.2)',
             transition:
               'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out'
           }
@@ -24,15 +25,15 @@ const Switch = () => {
           left: 6,
           padding: `${theme.spacing(2.5)} !important`,
           transition: 'left 0.15s ease-in-out, transform 0.15s ease-in-out, color 0.15s ease-in-out',
-          color: `rgba(${theme.palette.customColors.main}, ${theme.palette.mode === 'dark' ? 0.4 : 0.2})`,
+          color: theme.palette.mode === 'dark' ? 'rgba(68, 51, 85, 0.4)' : 'rgba(47, 43, 61, 0.2)',
           '&:hover': {
             backgroundColor: 'transparent !important'
           },
           '&.Mui-disabled': {
-            color: `rgba(${theme.palette.customColors.main}, ${theme.palette.mode === 'dark' ? 0.8 : 0.4})`,
+            color: theme.palette.mode === 'dark' ? 'rgba(68, 51, 85, 0.8)' : 'rgba(47, 43, 61, 0.4)',
             '& + .MuiSwitch-track': {
               borderColor: 'transparent !important',
-              backgroundColor: `rgba(${theme.palette.customColors.main}, ${theme.palette.mode === 'dark' ? 0.4 : 0.2})`
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(68, 51, 85, 0.4)' : 'rgba(47, 43, 61, 0.2)'
             },
             '&, & + .MuiSwitch-track': {
               opacity: 0.5

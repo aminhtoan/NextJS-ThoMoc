@@ -4,13 +4,11 @@ import Box from '@mui/material/Box'
 
 const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
   return (
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ width: '100%' }}>
       <DataGrid
         sx={{
           border: 1,
           borderColor: 'divider',
-          display: 'inline-flex',
-
           '& .MuiDataGrid-footerContainer': {
             justifyContent: 'center'
           },
@@ -24,6 +22,7 @@ const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
           },
           ...sx
         }}
+        autoHeight
         {...props}
       />
     </Box>

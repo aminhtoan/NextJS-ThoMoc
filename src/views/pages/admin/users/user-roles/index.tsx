@@ -1,19 +1,22 @@
-import { Grid, IconButton, Paper } from '@mui/material'
+import { Box, Grid, IconButton, Paper } from '@mui/material'
 import { GridAddIcon } from '@mui/x-data-grid'
 import { NextPage } from 'next/types'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import CustomWelcome from 'src/components/CustomWelcome/CustomWelcome'
-import SearchBar from 'src/components/SearchBar'
-import { AppDispatch } from 'src/stores'
-import { getAllRolesAsync } from 'src/stores/apps/role/actions'
-import TableRole from './components/TableRole'
+import SearchBar from 'src/components/SearchBar/SearchBar'
+import CreateRole from '../components/CreateRole'
+import TableRole from '../components/TableRole'
 
 type TProps = {}
 
 const UsersRolePage: NextPage<TProps> = () => {
-  const dispatch: AppDispatch = useDispatch()
   const [searchValue, setSearchValue] = useState('')
+  const [openCreateRole, setOpenCreateRole] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const { t } = useTranslation()
+
+  // const [idRoleEdit, setIdRoleEdit] = useState<number | undefined>(undefined)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value)
@@ -23,18 +26,14 @@ const UsersRolePage: NextPage<TProps> = () => {
     setSearchValue('')
   }
 
-  useEffect(() => {
-    handleGetListRole()
-  }, [searchValue])
-
-  const handleGetListRole = () => {
-    dispatch(getAllRolesAsync({ params: { page: 1, limit: 10 } }))
+  const handleRefreshTable = () => {
+    setRefreshKey(prev => prev + 1)
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <Paper elevation={3} sx={{ p: 2 }}>
-        <CustomWelcome>Welcome to user roles</CustomWelcome>
+    <Box sx={{ p: 3, height: 'auto' }}>
+      <Paper elevation={3} sx={{ p: 5 }}>
+        <CustomWelcome>{t('Manage User Roles')}</CustomWelcome>
 
         <Grid container spacing={2}>
           {/* Search + Create */}
@@ -53,7 +52,7 @@ const UsersRolePage: NextPage<TProps> = () => {
                     backgroundColor: '#e3f2fd'
                   }}
                 >
-                  <GridAddIcon />
+                  <GridAddIcon onClick={() => setOpenCreateRole(true)} />
                 </IconButton>
               </Grid>
             </Grid>
@@ -61,7 +60,7 @@ const UsersRolePage: NextPage<TProps> = () => {
 
           {/* Table */}
           <Grid item xs={12} lg={6}>
-            <TableRole />
+            <TableRole key={refreshKey} />
           </Grid>
 
           {/* Info */}
@@ -70,7 +69,8 @@ const UsersRolePage: NextPage<TProps> = () => {
           </Grid>
         </Grid>
       </Paper>
-    </div>
+      <CreateRole open={openCreateRole} onClose={() => setOpenCreateRole(false)} onCreated={handleRefreshTable} />
+    </Box>
   )
 }
 export default UsersRolePage

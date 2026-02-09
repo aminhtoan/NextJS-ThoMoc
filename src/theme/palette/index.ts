@@ -5,8 +5,8 @@ import { Skin } from 'src/types/layouts'
 const DefaultPalette = (mode: Palette['mode'], skin: Skin): Palette => {
   // ** Vars
   const whiteColor = '#FFF'
-  const lightColor = '47, 43, 61'
-  const darkColor = '68, 51, 85'
+  const lightColor = '#2f2b3d'
+  const darkColor = '#443355'
   const darkPaperBgColor = '#eeeedd'
   const mainColor = mode === 'light' ? lightColor : darkColor
 
@@ -22,9 +22,9 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin): Palette => {
 
   return {
     customColors: {
-      dark: darkColor,
+      dark: '#443355',
       main: mainColor,
-      light: lightColor,
+      light: '#2f2b3d',
       lightPaperBg: whiteColor,
       darkPaperBg: darkPaperBgColor,
       bodyBg: mode === 'light' ? '#F8F7FA' : '#25293C', // Same as palette.background.default but doesn't consider bordered skin
@@ -94,23 +94,23 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin): Palette => {
       A700: '#616161'
     },
     text: {
-      primary: `rgba(${mainColor}, 0.78)`,
-      secondary: `rgba(${mainColor}, 0.68)`,
-      disabled: `rgba(${mainColor}, 0.42)`
+      primary: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.78)`,
+      secondary: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.68)`,
+      disabled: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.42)`
     },
-    divider: `rgba(${mainColor}, 0.16)`,
+    divider: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.16)`,
     background: {
       paper: mode === 'light' ? whiteColor : darkPaperBgColor,
       default: defaultBgColor()
     },
     action: {
-      active: `rgba(${mainColor}, 0.54)`,
-      hover: `rgba(${mainColor}, 0.04)`,
-      selected: `rgba(${mainColor}, 0.06)`,
+      active: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.54)`,
+      hover: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.04)`,
+      selected: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.06)`,
       selectedOpacity: 0.06,
-      disabled: `rgba(${mainColor}, 0.26)`,
-      disabledBackground: `rgba(${mainColor}, 0.12)`,
-      focus: `rgba(${mainColor}, 0.12)`
+      disabled: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.26)`,
+      disabledBackground: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.12)`,
+      focus: `rgba(${mode === 'light' ? '47, 43, 61' : '68, 51, 85'}, 0.12)`
     }
   } as Palette
 }

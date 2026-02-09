@@ -18,5 +18,8 @@ export const API_CONFIG = {
   MEDIA_API: {
     UPLOAD_IMAGE_CLOUDINARY: `/media/image/cloudinary`,
     DEFAULT_AVATAR: `/media/default-avatar`
-  }
+  },
+  ROLE: {
+    ROLE: `/role`
+  },
 }
