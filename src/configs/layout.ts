@@ -1,3 +1,4 @@
+
 export const VerticalItems = [
   {
     title: 'Dashboard',
@@ -129,7 +130,8 @@ export const VerticalItems = [
       {
         title: 'User Roles',
         icon: 'ic:baseline-security',
-        text: 'User Roles'
+        text: 'User Roles',
+        path: '/admin/users/user-roles'
       }
     ]
   },

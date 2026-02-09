@@ -39,7 +39,10 @@ const Drawer = styled(MuiDrawer, {
     overflowX: 'hidden',
     borderRight: '1px solid',
     borderColor: theme.palette.divider,
-    zIndex: theme.zIndex.drawer
+    zIndex: theme.zIndex.drawer,
+    '&::-webkit-scrollbar': {
+      display: 'none'
+    }
   }
 }))
 

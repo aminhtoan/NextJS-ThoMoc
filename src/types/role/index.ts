@@ -6,14 +6,6 @@ export interface Role {
   updatedAt?: string
 }
 
-export interface Role {
-  id: number
-  name: string
-  description?: string
-  createdAt?: string
-  updatedAt?: string
-}
-
 export interface RoleListQuery {
   page?: number
   limit?: number
