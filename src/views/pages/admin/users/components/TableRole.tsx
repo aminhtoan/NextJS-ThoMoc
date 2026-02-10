@@ -25,11 +25,17 @@ import { getAllRolesAsync } from 'src/stores/apps/role/actions'
 import DeleteRole from './DeleteRole'
 import EditRole from './EditRole'
 
-const TableRole = () => {
+interface TableRoleProps {
+  search?: string
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
+}
+
+const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange }: TableRoleProps) => {
   const dispatch: AppDispatch = useDispatch()
   const { data, totalItems, totalPages } = useSelector((state: RootState) => state.role.roles)
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[0])
   const { t } = useTranslation()
   const [openDeleteRole, setOpenDeleteRole] = useState(false)
   const [deleteData, setDeleteData] = useState<{ id: number; name: string }>({ id: 0, name: '' })
@@ -37,8 +43,8 @@ const TableRole = () => {
   const [editRoleId, setEditRoleId] = useState<number>(0)
 
   useEffect(() => {
-    dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
-  }, [dispatch, page, pageSize])
+    dispatch(getAllRolesAsync({ params: { page, limit: pageSize, search } }))
+  }, [dispatch, page, pageSize, search])
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
@@ -114,10 +120,10 @@ const TableRole = () => {
               totalItems={totalItems}
               totalPages={totalPages}
               pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
-              onPageChange={setPage}
+              onPageChange={onPageChange}
               onPageSizeChange={newSize => {
-                setPageSize(newSize)
-                setPage(1)
+                onPageSizeChange(newSize)
+                onPageChange(1)
               }}
             />
           )

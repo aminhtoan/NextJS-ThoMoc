@@ -85,6 +85,7 @@ const CustomPagination = ({
           siblingCount={1}
           boundaryCount={1}
           size='small'
+          shape='rounded'
         />
       </Box>
     </Box>

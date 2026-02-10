@@ -22,6 +22,7 @@ export interface Role {
 export interface RoleListQuery {
   page?: number
   limit?: number
+  search?: string
 }
 
 export interface RoleListResponse {

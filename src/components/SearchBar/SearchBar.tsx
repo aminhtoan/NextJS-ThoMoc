@@ -32,9 +32,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch, onRese
               <ClearIcon />
             </IconButton>
           )}
-          <IconButton onClick={onSearch} edge='end' size='small'>
-            <SearchIcon />
-          </IconButton>
         </InputAdornment>
       )
     }}

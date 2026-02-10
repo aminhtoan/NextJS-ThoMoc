@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 
 // ** React Imports
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // ** Toast Import
 import toast from 'react-hot-toast'
@@ -93,44 +93,58 @@ const EditRole = ({ open, onClose, idRole, page, pageSize }: EditRoleProps) => {
   const [allPermissions, setAllPermissions] = useState<Permission[]>([])
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([])
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
+  const permissionsRef = useRef<Permission[] | null>(null)
 
-  // Fetch role detail + all permissions
-  const fetchData = useCallback(async () => {
-    if (!idRole || !open) return
-    try {
-      setIsFetching(true)
-      const [roleRes, permRes] = await Promise.all([getRoleById(idRole), getPermission()])
-
-      const roleData = roleRes.data
-      setName(roleData.name || '')
-      setDescription(roleData.description || '')
-      setIsActive(roleData.isActive ?? true)
-
-      // Set selected permission IDs từ role hiện tại
-      const currentPermIds = (roleData.permissions || []).map((p: Permission) => p.id)
-      setSelectedPermissionIds(currentPermIds)
-
-      // All permissions
-      const perms = permRes.data?.data || permRes.data || []
-      setAllPermissions(perms)
-
-      // Expand tất cả module mặc định
-      const grouped = groupPermissionsByModule(perms)
-      const expanded: Record<string, boolean> = {}
-      Object.keys(grouped).forEach(mod => {
-        expanded[mod] = true
-      })
-      setExpandedModules(expanded)
-    } catch (error: any) {
-      toast.error(t('Failed to load role data'))
-    } finally {
-      setIsFetching(false)
-    }
-  }, [idRole, open, t])
-
+  // Fetch role detail + all permissions - chỉ gọi khi open hoặc idRole thay đổi
   useEffect(() => {
+    if (!idRole || !open) return
+
+    const fetchData = async () => {
+      try {
+        setIsFetching(true)
+
+        // Nếu đã có permissions, chỉ fetch role detail
+        let perms = permissionsRef.current
+        let roleRes
+
+        if (permissionsRef.current) {
+          roleRes = await getRoleById(idRole)
+        } else {
+          // Nếu chưa có permissions, fetch cả hai
+          const [newRoleRes, permRes] = await Promise.all([getRoleById(idRole), getPermission()])
+          roleRes = newRoleRes
+          perms = permRes.data?.data || permRes.data || []
+          permissionsRef.current = perms
+        }
+
+        const roleData = roleRes.data
+        setName(roleData.name || '')
+        setDescription(roleData.description || '')
+        setIsActive(roleData.isActive ?? true)
+
+        // Set selected permission IDs từ role hiện tại
+        const currentPermIds = (roleData.permissions || []).map((p: Permission) => p.id)
+        setSelectedPermissionIds(currentPermIds)
+
+        // Set all permissions
+        setAllPermissions(perms || [])
+
+        // Expand tất cả module mặc định
+        const grouped = groupPermissionsByModule(perms || [])
+        const expanded: Record<string, boolean> = {}
+        Object.keys(grouped).forEach(mod => {
+          expanded[mod] = true
+        })
+        setExpandedModules(expanded)
+      } catch (error: any) {
+        toast.error(t('Failed to load role data'))
+      } finally {
+        setIsFetching(false)
+      }
+    }
+
     fetchData()
-  }, [fetchData])
+  }, [idRole, open, t])
 
   // Toggle một permission
   const handleTogglePermission = (permId: number) => {

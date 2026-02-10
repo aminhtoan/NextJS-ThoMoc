@@ -3,35 +3,46 @@ import { GridAddIcon } from '@mui/x-data-grid'
 import { NextPage } from 'next/types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import CustomWelcome from 'src/components/CustomWelcome/CustomWelcome'
 import SearchBar from 'src/components/SearchBar/SearchBar'
+import { PAGINATION_CONFIG } from 'src/configs/pagination'
+import useDebounce from 'src/hooks/useDebounce'
+
 import CreateRole from '../components/CreateRole'
 import TableRole from '../components/TableRole'
 
 type TProps = {}
 
 const UsersRolePage: NextPage<TProps> = () => {
-  const [searchValue, setSearchValue] = useState('')
-  const [openCreateRole, setOpenCreateRole] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(0)
   const { t } = useTranslation()
 
-  // const [idRoleEdit, setIdRoleEdit] = useState<number | undefined>(undefined)
+  // UI state
+  const [searchValue, setSearchValue] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[0])
+  const [openCreateRole, setOpenCreateRole] = useState(false)
+
+  // Debounce value (chỉ dùng cho Table / API)
+  const debouncedSearch = useDebounce(searchValue, 300)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value)
+    setPage(1)
   }
 
   const handleReset = () => {
     setSearchValue('')
+    setPage(1)
   }
 
   const handleRefreshTable = () => {
-    setRefreshKey(prev => prev + 1)
+    setSearchValue('')
+    setPage(1)
   }
 
   return (
-    <Box sx={{ p: 3, height: 'auto' }}>
+    <Box sx={{ p: 3 }}>
       <Paper elevation={3} sx={{ p: 5 }}>
         <CustomWelcome>{t('Manage User Roles')}</CustomWelcome>
 
@@ -42,9 +53,11 @@ const UsersRolePage: NextPage<TProps> = () => {
               <Grid item xs={12} sm='auto'>
                 <SearchBar value={searchValue} onChange={handleSearch} onReset={handleReset} />
               </Grid>
+
               <Grid item xs='auto'>
                 <IconButton
                   color='primary'
+                  onClick={() => setOpenCreateRole(true)}
                   sx={{
                     borderRadius: '50%',
                     width: 40,
@@ -52,7 +65,7 @@ const UsersRolePage: NextPage<TProps> = () => {
                     backgroundColor: '#e3f2fd'
                   }}
                 >
-                  <GridAddIcon onClick={() => setOpenCreateRole(true)} />
+                  <GridAddIcon />
                 </IconButton>
               </Grid>
             </Grid>
@@ -60,7 +73,13 @@ const UsersRolePage: NextPage<TProps> = () => {
 
           {/* Table */}
           <Grid item xs={12} lg={6}>
-            <TableRole key={refreshKey} />
+            <TableRole
+              search={debouncedSearch}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
           </Grid>
 
           {/* Info */}
@@ -69,8 +88,10 @@ const UsersRolePage: NextPage<TProps> = () => {
           </Grid>
         </Grid>
       </Paper>
+
       <CreateRole open={openCreateRole} onClose={() => setOpenCreateRole(false)} onCreated={handleRefreshTable} />
     </Box>
   )
 }
+
 export default UsersRolePage

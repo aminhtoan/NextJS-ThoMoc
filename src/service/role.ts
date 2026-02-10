@@ -7,8 +7,8 @@ export const getRoleById = async (id: number) => {
   return await handleAPI(`${API_CONFIG.ROLE.ROLE}/${id}`)
 }
 
-export const getAllRoles = async ({ page, limit }: RoleListQuery) => {
-  return await handleAPI(`${API_CONFIG.ROLE.ROLE}?page=${page}&limit=${limit}`)
+export const getAllRoles = async ({ page, limit, search }: RoleListQuery) => {
+  return await handleAPI(`${API_CONFIG.ROLE.ROLE}?page=${page}&limit=${limit}&search=${search || ''}`)
 }
 
 export const createRole = async (data: CreateRoleBodyType) => {
