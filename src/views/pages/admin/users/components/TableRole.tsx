@@ -56,6 +56,7 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
       renderCell: params => {
         const defaultRoles = ['ADMIN', 'CLIENT', 'SELLER']
         const isDefault = defaultRoles.includes((params.value || '').toUpperCase())
+        
         return (
           <Box display='flex' alignItems='center'>
             {params.value}

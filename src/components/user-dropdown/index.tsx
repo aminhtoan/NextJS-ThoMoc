@@ -77,6 +77,7 @@ const UserDropDown = () => {
           id='account-menu'
           open={open}
           onClose={handleClose}
+          disableScrollLock
           slotProps={{
             paper: {
               elevation: 0,

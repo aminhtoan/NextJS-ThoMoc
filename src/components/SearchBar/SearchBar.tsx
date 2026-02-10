@@ -6,12 +6,11 @@ import React from 'react'
 interface SearchBarProps {
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onSearch?: () => void
   onReset?: () => void
   placeholder?: string
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch, onReset, placeholder }) => (
+const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onReset, placeholder }) => (
   <TextField
     size='small'
     variant='outlined'

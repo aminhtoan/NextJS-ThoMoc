@@ -30,7 +30,7 @@ const AuthGuard = (props: AuthGuardProps) => {
       authContext.setUser(null)
       clearLocalStorage()
     }
-  }, [router.route])
+  }, [router, authContext])
 
   // Show fallback only while auth state is loading. Returning fallback
   // when `user === null` causes an indefinite spinner for unauthenticated users.

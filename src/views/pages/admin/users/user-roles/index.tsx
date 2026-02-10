@@ -11,7 +11,7 @@ import useDebounce from 'src/hooks/useDebounce'
 
 import CreateRole from '../components/CreateRole'
 import TableRole from '../components/TableRole'
-import RoleChart from 'src/components/RoleChart'
+import PermissionMatrix from '../components/PermissionMatrix'
 
 type TProps = {}
 
@@ -21,7 +21,7 @@ const UsersRolePage: NextPage<TProps> = () => {
   // UI state
   const [searchValue, setSearchValue] = useState('')
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[0])
+  const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[1])
   const [openCreateRole, setOpenCreateRole] = useState(false)
 
   // Debounce value (chỉ dùng cho Table / API)
@@ -83,16 +83,9 @@ const UsersRolePage: NextPage<TProps> = () => {
             />
           </Grid>
 
-          {/* Info + Role Chart */}
+          {/* Info + Permission Matrix */}
           <Grid item xs={12} lg={6}>
-            <RoleChart
-              data={[
-                { name: 'Admin', value: 2 },
-                { name: 'Seller', value: 5 },
-                { name: 'Client', value: 10 },
-                { name: 'Other', value: 3 }
-              ]}
-            />
+            <PermissionMatrix page={page} pageSize={pageSize} />
           </Grid>
         </Grid>
       </Paper>
