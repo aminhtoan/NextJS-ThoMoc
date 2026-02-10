@@ -52,7 +52,21 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
       field: 'name',
       headerName: t('Name'),
       width: 150,
-      editable: true
+      editable: true,
+      renderCell: params => {
+        const defaultRoles = ['ADMIN', 'CLIENT', 'SELLER']
+        const isDefault = defaultRoles.includes((params.value || '').toUpperCase())
+        return (
+          <Box display='flex' alignItems='center'>
+            {params.value}
+            {isDefault && (
+              <Box component='span' sx={{ color: 'warning.main', fontWeight: 'bold', ml: 0.5 }}>
+                *
+              </Box>
+            )}
+          </Box>
+        )
+      }
     },
     {
       field: 'isActive',

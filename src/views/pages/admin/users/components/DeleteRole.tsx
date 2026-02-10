@@ -39,8 +39,10 @@ const DeleteRole = ({ open, onClose, onDeleted, data, page, pageSize }: DeleteRo
       if (typeof onDeleted === 'function') onDeleted()
       onClose()
     } catch (error: any) {
-      console.error('Delete role error:', error.response?.data)
-      toast.error(error?.response?.data?.message?.[0]?.error || t('An error occurred'))
+      onClose()
+      toast.error(
+        error?.response?.data?.message?.[0]?.error || error?.response?.data?.message || t('An error occurred')
+      )
     } finally {
       setIsLoading(false)
     }

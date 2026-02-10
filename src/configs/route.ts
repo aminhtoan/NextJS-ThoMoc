@@ -19,7 +19,7 @@ export const AUTH_ROUTES = {
 
 // ==================== ADMIN ROUTES ====================
 export const ADMIN_ROUTES = {
-  DASHBOARD: '/admin/dashboard',
+  DASHBOARD: '/admin',
 
   // Orders
   ORDERS: '/admin/orders',

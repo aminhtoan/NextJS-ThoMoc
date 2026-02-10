@@ -11,6 +11,7 @@ import useDebounce from 'src/hooks/useDebounce'
 
 import CreateRole from '../components/CreateRole'
 import TableRole from '../components/TableRole'
+import RoleChart from 'src/components/RoleChart'
 
 type TProps = {}
 
@@ -82,9 +83,16 @@ const UsersRolePage: NextPage<TProps> = () => {
             />
           </Grid>
 
-          {/* Info */}
+          {/* Info + Role Chart */}
           <Grid item xs={12} lg={6}>
-            <p>This is the user roles management page.</p>
+            <RoleChart
+              data={[
+                { name: 'Admin', value: 2 },
+                { name: 'Seller', value: 5 },
+                { name: 'Client', value: 10 },
+                { name: 'Other', value: 3 }
+              ]}
+            />
           </Grid>
         </Grid>
       </Paper>

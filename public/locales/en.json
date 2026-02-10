@@ -118,5 +118,8 @@
   "Deselect All": "Deselect All",
   "No permissions found": "No permissions found",
   "Update": "Update",
-  "Saving": "Saving"
+  "Saving": "Saving",
+  "You do not have permission to perform this action. Because it defaults to one of the three roles.": "You do not have permission to perform this action. Because it defaults to one of the three roles.",
+  "Home": "Home",
+  "Dashoard": "Dashboard"
 }

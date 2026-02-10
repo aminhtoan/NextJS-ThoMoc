@@ -115,5 +115,8 @@
   "Deselect All": "Bỏ chọn tất cả",
   "No permissions found": "Không tìm thấy quyền nào",
   "Update": "Cập nhật",
-  "Saving": "Đang lưu"
+  "Saving": "Đang lưu",
+  "You do not have permission to perform this action. Because it defaults to one of the three roles.": "Bạn không có quyền thực hiện hành động này. Bởi vì nó mặc định là một trong ba vai trò.",
+  "Home": "Trang chủ",
+  "Dashoard": "Bảng điều khiển"
 }

@@ -56,6 +56,7 @@ const groupPermissionsByModule = (permissions: Permission[]) => {
 
       return acc
     },
+
     {} as Record<string, Permission[]>
   )
 }
@@ -196,7 +197,17 @@ const EditRole = ({ open, onClose, idRole, page, pageSize }: EditRoleProps) => {
       dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
       onClose()
     } catch (error: any) {
-      toast.error(error?.response?.data?.message?.[0]?.error || t('An error occurred'))
+      if (error?.response?.data?.error === 'Forbidden') {
+        toast.error(
+          t('You do not have permission to perform this action. Because it defaults to one of the three roles.')
+        )
+        onClose()
+
+        return
+      }
+      toast.error(
+        error?.response?.data?.message?.[0]?.error || error?.response?.data?.message || t('An error occurred')
+      )
     } finally {
       setIsLoading(false)
     }

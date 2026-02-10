@@ -57,7 +57,12 @@ const CreateRole = ({ open, onClose, onCreated }: CreateRoleProps) => {
       onClose()
       reset()
     } catch (error: any) {
-      toast.error(error?.response?.data?.message?.[0]?.error || t('An error occurred'))
+      console.error('Create role error:', error.response?.data)
+      toast.error(
+        error?.response?.data?.message?.[0]?.error ||
+          error?.response?.data?.message?.[0]?.message ||
+          t('An error occurred')
+      )
     } finally {
       setIsLoading(false)
     }
