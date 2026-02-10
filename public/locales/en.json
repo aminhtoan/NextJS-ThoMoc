@@ -95,7 +95,7 @@
   "Create Role": "Create Role",
   "Edit": "Edit",
   "Delete": "Delete",
-  "Rows per page:": "Rows per page:",
+  "Rows per page": "Rows per page:",
   "Delete Role": "Delete Role",
   "Are you sure you want to delete this role?": "Are you sure you want to delete this role?",
   "Role deleted successfully": "Role deleted successfully", 
@@ -108,5 +108,15 @@
   "Disagree": "Disagree",
   "Deleting...": "Deleting...",
   "Agree": "Agree",
-  "Are you sure you want to delete the role?": "Are you sure you want to delete the role?"
+  "Are you sure you want to delete the role?": "Are you sure you want to delete the role?",
+  "Total: {{total}} items": "Total: {{total}} items",
+  "Role name is required": "Role name is required",
+  "Description is required": "Description is required",
+  "Update role successfully": "Update role successfully",
+  "Edit Role & Permissions": "Edit Role & Permissions",
+  "Select All": "Select All",
+  "Deselect All": "Deselect All",
+  "No permissions found": "No permissions found",
+  "Update": "Update",
+  "Saving": "Saving"
 }

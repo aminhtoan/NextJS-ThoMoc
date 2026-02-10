@@ -26,11 +26,10 @@ import { CreateRoleBodySchema, CreateRoleBodyType } from 'src/types/role'
 interface CreateRoleProps {
   open: boolean
   onClose: () => void
-  idRole?: number
   onCreated?: () => void
 }
 
-const CreateRole = ({ open, onClose, idRole, onCreated }: CreateRoleProps) => {
+const CreateRole = ({ open, onClose, onCreated }: CreateRoleProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const { t } = useTranslation()
 
@@ -65,7 +64,7 @@ const CreateRole = ({ open, onClose, idRole, onCreated }: CreateRoleProps) => {
   }
 
   return (
-    <CustomModal open={open} onClose={onClose} title={idRole ? t('Edit Role') : t('Create Role')} maxWidth={450}>
+    <CustomModal open={open} onClose={onClose} title={t('Create Role')} maxWidth={450}>
       <Box
         component='form'
         onSubmit={handleSubmit(onSubmit)}
@@ -142,7 +141,7 @@ const CreateRole = ({ open, onClose, idRole, onCreated }: CreateRoleProps) => {
           </Button>
 
           <Button type='submit' variant='contained' disabled={isLoading}>
-            {idRole ? t('Update') : t('Create')}
+            {t('Create')}
           </Button>
         </Box>
       </Box>

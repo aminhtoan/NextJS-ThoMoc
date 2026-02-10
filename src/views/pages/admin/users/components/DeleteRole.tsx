@@ -21,9 +21,11 @@ interface DeleteRoleProps {
     id: number
     name: string
   }
+  page: number
+  pageSize: number
 }
 
-const DeleteRole = ({ open, onClose, onDeleted, data }: DeleteRoleProps) => {
+const DeleteRole = ({ open, onClose, onDeleted, data, page, pageSize }: DeleteRoleProps) => {
   const dispatch: AppDispatch = useDispatch()
   const [isLoading, setIsLoading] = React.useState(false)
   const { t } = useTranslation()
@@ -33,10 +35,11 @@ const DeleteRole = ({ open, onClose, onDeleted, data }: DeleteRoleProps) => {
       setIsLoading(true)
       await deleteRole(data.id)
       toast.success(t('Delete role successfully'))
-      dispatch(getAllRolesAsync({ params: { page: 1, limit: 10 } }))
+      dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
       if (typeof onDeleted === 'function') onDeleted()
       onClose()
     } catch (error: any) {
+      console.error('Delete role error:', error.response?.data)
       toast.error(error?.response?.data?.message?.[0]?.error || t('An error occurred'))
     } finally {
       setIsLoading(false)

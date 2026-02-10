@@ -1,10 +1,10 @@
 import handleAPI from 'src/apis/handleAPI'
-import { CreateRoleBodyType, RoleListQuery } from 'src/types/role'
+import { CreateRoleBodyType, RoleListQuery, UpdateRoleBodyType } from 'src/types/role'
 import { API_CONFIG } from 'src/configs/api'
 
 // Lấy ra role theo id
 export const getRoleById = async (id: number) => {
-  return await handleAPI(`${API_CONFIG.ROLE.ROLE}/${id}`, id)
+  return await handleAPI(`${API_CONFIG.ROLE.ROLE}/${id}`)
 }
 
 export const getAllRoles = async ({ page, limit }: RoleListQuery) => {
@@ -13,6 +13,10 @@ export const getAllRoles = async ({ page, limit }: RoleListQuery) => {
 
 export const createRole = async (data: CreateRoleBodyType) => {
   return await handleAPI(`${API_CONFIG.ROLE.ROLE}`, data, 'post')
+}
+
+export const updateRole = async (id: number, data: UpdateRoleBodyType) => {
+  return await handleAPI(`${API_CONFIG.ROLE.ROLE}/${id}`, data, 'put')
 }
 
 export const deleteRole = async (id: number) => {

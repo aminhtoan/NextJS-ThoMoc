@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 // ** Custom Components
 import CustomTag from 'src/components/custom-tag'
 import CustomDataGrid from 'src/components/CustomDataGrid/CustomDataGrid'
+import CustomPagination from 'src/components/CustomPagination'
 
 // ** Configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
@@ -22,15 +23,18 @@ import { PAGINATION_CONFIG } from 'src/configs/pagination'
 import { AppDispatch, RootState } from 'src/stores'
 import { getAllRolesAsync } from 'src/stores/apps/role/actions'
 import DeleteRole from './DeleteRole'
+import EditRole from './EditRole'
 
 const TableRole = () => {
   const dispatch: AppDispatch = useDispatch()
-  const { data, totalItems } = useSelector((state: RootState) => state.role.roles)
+  const { data, totalItems, totalPages } = useSelector((state: RootState) => state.role.roles)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[0])
   const { t } = useTranslation()
   const [openDeleteRole, setOpenDeleteRole] = useState(false)
   const [deleteData, setDeleteData] = useState<{ id: number; name: string }>({ id: 0, name: '' })
+  const [openEditRole, setOpenEditRole] = useState(false)
+  const [editRoleId, setEditRoleId] = useState<number>(0)
 
   useEffect(() => {
     dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
@@ -83,7 +87,8 @@ const TableRole = () => {
   ]
 
   const handleEdit = (id: any) => {
-    console.log('ID cần Edit:', id)
+    setEditRoleId(id)
+    setOpenEditRole(true)
   }
 
   const handleDelete = (data: { id: number; name: string }) => {
@@ -97,27 +102,47 @@ const TableRole = () => {
         rows={data}
         getRowId={row => row.id}
         columns={columns}
-        paginationModel={{
-          pageSize: pageSize,
-          page: page - 1
-        }}
-        pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
-        onPaginationModelChange={model => {
-          setPage(model.page + 1)
-          setPageSize(model.pageSize)
-        }}
         checkboxSelection
         disableRowSelectionOnClick
         disableColumnMenu
         rowCount={totalItems}
-        paginationMode='server'
-        localeText={{
-          MuiTablePagination: {
-            labelRowsPerPage: t('Rows per page:')
-          }
+        slots={{
+          pagination: () => (
+            <CustomPagination
+              page={page}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
+              onPageChange={setPage}
+              onPageSizeChange={newSize => {
+                setPageSize(newSize)
+                setPage(1)
+              }}
+            />
+          )
         }}
       />
-      <DeleteRole open={openDeleteRole} onClose={() => setOpenDeleteRole(false)} data={deleteData} />
+
+      <DeleteRole
+        open={openDeleteRole}
+        onClose={() => setOpenDeleteRole(false)}
+        data={deleteData}
+        page={page}
+        pageSize={pageSize}
+      />
+      {editRoleId > 0 && (
+        <EditRole
+          open={openEditRole}
+          onClose={() => {
+            setOpenEditRole(false)
+            setEditRoleId(0)
+          }}
+          idRole={editRoleId}
+          page={page}
+          pageSize={pageSize}
+        />
+      )}
     </Box>
   )
 }

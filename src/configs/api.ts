@@ -22,4 +22,7 @@ export const API_CONFIG = {
   ROLE: {
     ROLE: `/role`
   },
+  PERMISSION: {
+    ALL: `/permission/all`
+  }
 }

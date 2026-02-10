@@ -96,7 +96,7 @@
   "Are you sure you want to delete this role?": "Bạn có chắc chắn muốn xóa vai trò này không?",
   "Role deleted successfully": "Xóa vai trò thành công",
   "Failed to delete role": "Xóa vai trò thất bại",
-  "Rows per page:": "Số dòng mỗi trang:",
+  "Rows per page": "Số dòng mỗi trang:",
   "Actions": "Hành động",
   "Active": "Kích hoạt",
   "Inactive": "Vô hiệu hóa",
@@ -105,5 +105,15 @@
   "Disagree": "Không đồng ý",
   "Deleting...": "Đang xóa...",
   "Agree": "Đồng ý",
-  "Are you sure you want to delete the role?": "Bạn có chắc chắn muốn xóa vai trò không?"
+  "Are you sure you want to delete the role?": "Bạn có chắc chắn muốn xóa vai trò không?",
+  "Total: {{total}} items": "Tổng cộng: {{total}} mục",
+  "Role name is required": "Tên vai trò là bắt buộc",
+  "Description is required": "Mô tả là bắt buộc", 
+  "Update role successfully": "Cập nhật vai trò thành công",
+  "Edit Role & Permissions": "Chỉnh sửa Vai trò & Quyền",
+  "Select All": "Chọn tất cả",
+  "Deselect All": "Bỏ chọn tất cả",
+  "No permissions found": "Không tìm thấy quyền nào",
+  "Update": "Cập nhật",
+  "Saving": "Đang lưu"
 }

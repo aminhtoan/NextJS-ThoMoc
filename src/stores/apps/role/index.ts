@@ -24,7 +24,6 @@ export const roleSlice = createSlice({
       state.isLoading = true
     })
     builder.addCase(getAllRolesAsync.fulfilled, (state, action) => {
-      console.log('action', action)
       state.isLoading = false
       state.roles.data = action.payload.data.data
       state.roles.totalItems = action.payload.data.totalItems
