@@ -16,6 +16,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import Error401 from 'src/pages/401'
 import BlankLayout from 'src/views/layouts/BlankLayout'
 import { AbilityContext } from '../acl/Can'
+import { METHOD_MAP } from 'src/configs/method'
 
 interface AclGuardProps {
   children: ReactNode
@@ -44,7 +45,24 @@ const AclGuard = (props: AclGuardProps) => {
   const userPermissions = auth.user.role.permissions || []
 
   // Build ability từ permissions thực tế
-  const ability: AppAbility = buildAbilityFor(roleName, userPermissions, permission)
+  const ability: AppAbility = buildAbilityFor(roleName, userPermissions)
+
+  // Kiểm tra role match với path root: /admin/* cần ADMIN, /seller/* cần SELLER
+  if (router.pathname.startsWith('/admin') && !roleName.includes('ADMIN')) {
+    return (
+      <BlankLayout>
+        <Error401 />
+      </BlankLayout>
+    )
+  }
+
+  if (router.pathname.startsWith('/seller') && !roleName.includes('SELLER')) {
+    return (
+      <BlankLayout>
+        <Error401 />
+      </BlankLayout>
+    )
+  }
 
   // ADMIN → có toàn quyền
   if (roleName === 'ADMIN') {
@@ -57,7 +75,7 @@ const AclGuard = (props: AclGuardProps) => {
   }
 
   // Kiểm tra user có quyền READ (GET) cho page này không
-  if (ability.can('read', permission)) {
+  if (ability.can(METHOD_MAP.GET, permission)) {
     return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
   }
 

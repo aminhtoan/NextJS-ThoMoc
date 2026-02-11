@@ -20,7 +20,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save'
 
 // ** React Imports
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from 'src/hooks/useAuth'
 import { buildAbilityFor } from 'src/configs/acl'
 
@@ -41,7 +41,7 @@ import { getRoleById, updateRole } from 'src/service/role'
 
 // ** Types
 import { Permission } from 'src/types/role'
-import { METHOD_COLUMNS, MethodKey } from 'src/configs/method'
+import { METHOD_COLUMNS, METHOD_MAP, MethodKey } from 'src/configs/method'
 import { GROUP_CONFIG } from 'src/configs/group-permission'
 import { normaliseMethod } from 'src/helpers/method'
 import MODULE_LABELS from 'src/configs/module'
@@ -157,7 +157,8 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
   const auth = useAuth()
   const ability = useMemo(() => {
     if (!auth.user) return null
-    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions, 'ROLE')
+
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth.user])
 
   // Redux: preloaded role list
@@ -174,8 +175,9 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
   useEffect(() => {
     if (!ability) return
 
-    if (!ability.can('read', 'ROLE')) {
+    if (!ability.can(METHOD_MAP.GET, 'ROLE')) {
       setAllPermissions([])
+
       return
     }
     dispatch(getAllRolesAsync({ params: { page: page, limit: pageSize } }))
@@ -184,8 +186,9 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
   // Fetch all permissions: chỉ gọi khi đã có ability và có quyền xem
   const fetchPermissions = useCallback(async () => {
     if (!ability) return
-    if (!ability.can('read', 'ROLE')) {
+    if (!ability.can(METHOD_MAP.GET, 'ROLE')) {
       setAllPermissions([])
+
       return
     }
     try {
@@ -203,8 +206,9 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
   // Chỉ gọi fetchPermissions khi đã có ability và có quyền xem
   useEffect(() => {
     if (!ability) return
-    if (!ability.can('read', 'ROLE')) {
+    if (!ability.can(METHOD_MAP.GET, 'ROLE')) {
       setAllPermissions([])
+
       return
     }
     fetchPermissions()
@@ -368,7 +372,7 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
 
             <TableBody>
               {groups.map(group => (
-                <>
+                <React.Fragment key={`group-${group.key}`}>
                   {/* ── Group header row ── */}
                   <TableRow key={`g-${group.key}`} sx={groupRowSx}>
                     <TableCell>
@@ -434,7 +438,7 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
                       })}
                     </TableRow>
                   ))}
-                </>
+                </React.Fragment>
               ))}
 
               {groups.length === 0 && (

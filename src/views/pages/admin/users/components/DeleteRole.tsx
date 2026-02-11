@@ -16,7 +16,6 @@ import { getAllRolesAsync } from 'src/stores/apps/role/actions'
 interface DeleteRoleProps {
   open: boolean
   onClose: () => void
-  onDeleted?: () => void
   data: {
     id: number
     name: string
@@ -25,7 +24,7 @@ interface DeleteRoleProps {
   pageSize: number
 }
 
-const DeleteRole = ({ open, onClose, onDeleted, data, page, pageSize }: DeleteRoleProps) => {
+const DeleteRole = ({ open, onClose, data, page, pageSize }: DeleteRoleProps) => {
   const dispatch: AppDispatch = useDispatch()
   const [isLoading, setIsLoading] = React.useState(false)
   const { t } = useTranslation()
@@ -36,7 +35,6 @@ const DeleteRole = ({ open, onClose, onDeleted, data, page, pageSize }: DeleteRo
       await deleteRole(data.id)
       toast.success(t('Delete role successfully'))
       dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
-      if (typeof onDeleted === 'function') onDeleted()
       onClose()
     } catch (error: any) {
       onClose()

@@ -119,12 +119,14 @@ const UserDropDown = () => {
           <MenuItem onClick={handleClose}>{t('Orders')}</MenuItem>
 
           <MenuItem onClick={logout}>{t('Logout')}</MenuItem>
+          {user?.role.name !== 'CLIENT' && <Divider />}
+
           {user?.role.name !== 'CLIENT' && (
-            <>
-              <Divider />
-              <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.HOME)}>{t('Home')}</MenuItem>
-              <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.ADMIN_DASHBOARD)}>{t('Dashoard')}</MenuItem>
-            </>
+            <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.HOME)}>{t('Home')}</MenuItem>
+          )}
+
+          {user?.role.name !== 'CLIENT' && (
+            <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.ADMIN_DASHBOARD)}>{t('Dashoard')}</MenuItem>
           )}
         </Menu>
       </Box>

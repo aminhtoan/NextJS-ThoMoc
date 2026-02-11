@@ -26,6 +26,7 @@ import { AppDispatch, RootState } from 'src/stores'
 import { getAllRolesAsync } from 'src/stores/apps/role/actions'
 import DeleteRole from './DeleteRole'
 import EditRole from './EditRole'
+import { METHOD_MAP } from 'src/configs/method'
 
 interface TableRoleProps {
   search?: string
@@ -49,16 +50,17 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
   const auth = useAuth()
   const ability = useMemo(() => {
     if (!auth.user) return null
-    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions, 'ROLE')
+
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth.user])
 
   useEffect(() => {
     dispatch(getAllRolesAsync({ params: { page, limit: pageSize, search } }))
   }, [dispatch, page, pageSize, search])
 
-  const canCreate = ability?.can('create', 'ROLE')
-  const canUpdate = ability?.can('update', 'ROLE')
-  const canDelete = ability?.can('delete', 'ROLE')
+  const canCreate = ability?.can(METHOD_MAP.POST, 'ROLE')
+  const canUpdate = ability?.can(METHOD_MAP.PUT, 'ROLE')
+  const canDelete = ability?.can(METHOD_MAP.DELETE, 'ROLE')
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
@@ -70,7 +72,7 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
       renderCell: params => {
         const defaultRoles = ['ADMIN', 'CLIENT', 'SELLER']
         const isDefault = defaultRoles.includes((params.value || '').toUpperCase())
-        
+
         return (
           <Box display='flex' alignItems='center'>
             {params.value}
@@ -141,9 +143,7 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
     <Box sx={{ width: '100%' }}>
       {/* Nút Thêm (Add) */}
       <Box mb={2}>
-        <Box
-          sx={{ display: 'inline-block', pointerEvents: canCreate ? 'auto' : 'none', opacity: canCreate ? 1 : 0.5 }}
-        >
+        <Box sx={{ display: 'inline-block', pointerEvents: canCreate ? 'auto' : 'none', opacity: canCreate ? 1 : 0.5 }}>
           {/* Thay thế nút Add của bạn ở đây, ví dụ: */}
           {/* <Button onClick={handleAdd}>Thêm</Button> */}
         </Box>

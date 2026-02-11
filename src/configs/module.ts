@@ -13,4 +13,21 @@ const MODULE_LABELS: Record<string, string> = {
   MEDIA: 'MEDIA',
   MESSAGE: 'MESSAGE'
 }
+
 export default MODULE_LABELS
+
+export const MODULES = {
+  MANAGE_PRODUCT: 'MANAGE-PRODUCT',
+  BRAND: 'BRAND',
+  CATEGORY: 'CATEGORY',
+  AUTH: 'AUTH',
+  PROFILE: 'PROFILE',
+  ROLE: 'ROLE',
+  PERMISSION: 'PERMISSION',
+  ORDER: 'ORDER',
+  REVIEW: 'REVIEW',
+  CART: 'CART',
+  PAYMENT: 'PAYMENT',
+  MEDIA: 'MEDIA',
+  MESSAGE: 'MESSAGE'
+} as const

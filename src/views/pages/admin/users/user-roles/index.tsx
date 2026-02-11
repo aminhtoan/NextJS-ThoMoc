@@ -14,6 +14,11 @@ import TableRole from '../components/TableRole'
 import PermissionMatrix from '../components/PermissionMatrix'
 import { useAuth } from 'src/hooks/useAuth'
 import { buildAbilityFor } from 'src/configs/acl'
+import { useDispatch } from 'react-redux'
+import { getAllRolesAsync } from 'src/stores/apps/role/actions'
+import { AppDispatch } from 'src/stores'
+import { MODULES } from 'src/configs/module'
+import { METHOD_MAP } from 'src/configs/method'
 
 type TProps = {}
 
@@ -26,13 +31,14 @@ const UsersRolePage: NextPage<TProps> = () => {
   const [pageSize, setPageSize] = useState(PAGINATION_CONFIG.pageSizeOptions[1])
   const [openCreateRole, setOpenCreateRole] = useState(false)
   const auth = useAuth()
+  const dispatch = useDispatch<AppDispatch>()
   const ability = useMemo(() => {
     if (!auth.user) return null
 
-    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions, 'ROLE')
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth])
 
-  const canCreate = ability?.can('create', 'ROLE')
+  const canCreate = ability?.can(METHOD_MAP.POST, MODULES.ROLE)
 
   // Debounce value (chỉ dùng cho Table / API)
   const debouncedSearch = useDebounce(searchValue, 300)
@@ -50,6 +56,7 @@ const UsersRolePage: NextPage<TProps> = () => {
   const handleRefreshTable = () => {
     setSearchValue('')
     setPage(1)
+    dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
   }
 
   return (

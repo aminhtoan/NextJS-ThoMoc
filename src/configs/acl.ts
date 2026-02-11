@@ -1,7 +1,7 @@
 import { AbilityBuilder, createMongoAbility, MongoAbility } from '@casl/ability'
 
 export type Subjects = string
-export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete'
+export type Actions = 'manage' | 'CREATE' | 'READ' | 'UPDATE' | 'DELETE'
 
 export type AppAbility = MongoAbility<[Actions, Subjects]>
 
@@ -23,16 +23,16 @@ export type UserPermission = {
 const mapMethodToAction = (method: string): Actions => {
   switch (method.toUpperCase()) {
     case 'GET':
-      return 'read'
+      return 'READ'
     case 'POST':
-      return 'create'
+      return 'CREATE'
     case 'PUT':
     case 'PATCH':
-      return 'update'
+      return 'UPDATE'
     case 'DELETE':
-      return 'delete'
+      return 'DELETE'
     default:
-      return 'read'
+      return 'READ'
   }
 }
 
@@ -44,15 +44,14 @@ const mapMethodToAction = (method: string): Actions => {
  *   We map method (GET/POST/PUT/DELETE) to CASL actions (read/create/update/delete)
  *   And use the permission MODULE as the CASL subject (e.g. "MANAGE-PRODUCT", "ROLE", "ORDER")
  */
-const defineRulesFor = (roleName: string, permissions: UserPermission[], pagePermission: string) => {
-  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility as any)
 
+const defineRulesFor = (roleName: string, permissions: UserPermission[]) => {
+  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility as any)
   if (roleName === 'ADMIN') {
     can('manage', 'all')
   } else if (permissions && permissions.length > 0) {
     for (const perm of permissions) {
       const action = mapMethodToAction(perm.method)
-      // Use module as subject (e.g. "MANAGE-PRODUCT", "ROLE", "ORDER")
       can(action, perm.module)
     }
   }
@@ -64,14 +63,9 @@ const defineRulesFor = (roleName: string, permissions: UserPermission[], pagePer
  * Build ability for a user
  * @param roleName - User's role name (ADMIN, CLIENT, SELLER, etc.)
  * @param permissions - User's actual permissions from role.permissions
- * @param pagePermission - The current page's required permission path (e.g. "admin/products")
  */
-export const buildAbilityFor = (
-  roleName: string,
-  permissions: UserPermission[],
-  pagePermission: string
-): AppAbility => {
-  return defineRulesFor(roleName, permissions, pagePermission)
+export const buildAbilityFor = (roleName: string, permissions: UserPermission[]): AppAbility => {
+  return defineRulesFor(roleName, permissions)
 }
 
 export const defaultACLObj: ACLObj = {

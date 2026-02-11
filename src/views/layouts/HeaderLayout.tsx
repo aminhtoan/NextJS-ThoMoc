@@ -18,6 +18,7 @@ import { AUTH_LOG } from 'src/configs/auth'
 
 // Hooks
 import { useAuth } from 'src/hooks/useAuth'
+import React from 'react'
 
 const HeaderLayout = () => {
   const { user } = useAuth()
@@ -28,7 +29,7 @@ const HeaderLayout = () => {
   const MAIN_BAR_HEIGHT = 80
 
   return (
-    <>
+    <React.Fragment>
       <AppBar
         position='fixed'
         sx={{
@@ -183,7 +184,7 @@ const HeaderLayout = () => {
 
       {/* --- IMPORTANT: tạo khoảng đẩy nội dung xuống để tránh bị AppBar fixed che --- */}
       <Box sx={{ height: TOP_BAR_HEIGHT + MAIN_BAR_HEIGHT }} />
-    </>
+    </React.Fragment>
   )
 }
 
