@@ -5,6 +5,7 @@ import CategoriesPage from 'src/views/pages/admin/categories'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageCategories: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageCategories: NextPageWithLayout = () => {
 }
 
 PageCategories.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageCategories.permission = 'CATEGORY'
 
 export default PageCategories

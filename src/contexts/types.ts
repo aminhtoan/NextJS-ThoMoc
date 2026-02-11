@@ -20,6 +20,12 @@ export type UserDataType = {
   role: {
     id: number
     name: string
+    permissions: {
+      id: number
+      path: string
+      method: string
+      module: string
+    }[]
   }
 }
 

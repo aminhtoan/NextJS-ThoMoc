@@ -5,6 +5,7 @@ import ReviewsPage from 'src/views/pages/admin/reviews'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageReviews: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageReviews: NextPageWithLayout = () => {
 }
 
 PageReviews.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageReviews.permission = 'REVIEW'
 
 export default PageReviews

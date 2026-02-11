@@ -21,6 +21,8 @@ import SaveIcon from '@mui/icons-material/Save'
 
 // ** React Imports
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useAuth } from 'src/hooks/useAuth'
+import { buildAbilityFor } from 'src/configs/acl'
 
 // ** Translation
 import { useTranslation } from 'react-i18next'
@@ -152,6 +154,11 @@ const checkboxCellSx = {
 const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }) => {
   const dispatch: AppDispatch = useDispatch()
   const { t } = useTranslation()
+  const auth = useAuth()
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions, 'ROLE')
+  }, [auth.user])
 
   // Redux: preloaded role list
   const rolesFromStore = useSelector((state: RootState) => state.role.roles.data) as any[]
@@ -163,28 +170,45 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  // Nếu không có quyền xem thì không fetch API, data rỗng
   useEffect(() => {
-    dispatch(getAllRolesAsync({ params: { page: page, limit: pageSize } }))
-  }, [dispatch, page, pageSize])
+    if (!ability) return
 
-  // Fetch all permissions
+    if (!ability.can('read', 'ROLE')) {
+      setAllPermissions([])
+      return
+    }
+    dispatch(getAllRolesAsync({ params: { page: page, limit: pageSize } }))
+  }, [dispatch, page, pageSize, ability])
+
+  // Fetch all permissions: chỉ gọi khi đã có ability và có quyền xem
   const fetchPermissions = useCallback(async () => {
+    if (!ability) return
+    if (!ability.can('read', 'ROLE')) {
+      setAllPermissions([])
+      return
+    }
     try {
       setLoading(true)
       const res = await getPermission()
       const perms: Permission[] = res.data?.data || res.data || []
       setAllPermissions(perms)
-    } catch {
-      toast.error(t('An error occurred'))
+    } catch (error: any) {
+      // toast.error(t('An error occurred'))
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, [ability, t])
 
-  // Fetch permissions on mount
+  // Chỉ gọi fetchPermissions khi đã có ability và có quyền xem
   useEffect(() => {
+    if (!ability) return
+    if (!ability.can('read', 'ROLE')) {
+      setAllPermissions([])
+      return
+    }
     fetchPermissions()
-  }, [fetchPermissions])
+  }, [ability, fetchPermissions])
 
   // When a role is selected, load its permissions
   useEffect(() => {
@@ -200,7 +224,8 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
         const role = res.data
         const ids = (role.permissions || []).map((p: Permission) => p.id)
         setSelectedIds(new Set(ids))
-      } catch {
+      } catch (error) {
+        console.log(error)
         toast.error(t('An error occurred'))
       } finally {
         setLoading(false)

@@ -5,6 +5,7 @@ import BrandsPage from 'src/views/pages/admin/brands'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageBrands: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageBrands: NextPageWithLayout = () => {
 }
 
 PageBrands.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageBrands.permission = 'BRAND'
 
 export default PageBrands

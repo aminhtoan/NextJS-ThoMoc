@@ -5,6 +5,7 @@ import UsersPage from 'src/views/pages/admin/users'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageUsers: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageUsers: NextPageWithLayout = () => {
 }
 
 PageUsers.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageUsers.permission = 'PROFILE'
 
 export default PageUsers

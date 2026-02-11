@@ -36,6 +36,7 @@ import { store } from 'src/stores'
 import ThemeComponent from 'src/theme/ThemeComponent'
 import UserLayout from 'src/views/layouts/UserLayout'
 import NoGuard from 'src/components/auth/NoGuard'
+import Head from 'next/head'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -93,13 +94,13 @@ export default function App(props: ExtendedAppProps) {
 
   const aclAbilities = Component.acl ?? defaultACLObj
 
-  // Kiểm tra xem có phải trang OAuth callback hoặc vừa login (có token trong localStorage)
-  // Nếu vừa login thì bỏ qua ACL check tạm thời, chờ user context load xong
-  const hasAccessToken = typeof window !== 'undefined' && localStorage.getItem('accessToken')
+  const permission = Component.permission ?? ''
+
+  // Chỉ bỏ qua ACL check cho trang OAuth callback (đang chờ redirect)
   const isOAuthCallback =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/oauth-google-callback' || window.location.pathname === '/oauth-facebook-callback')
-  const skipAclCheck = isOAuthCallback || hasAccessToken
+  const skipAclCheck = isOAuthCallback
 
   const toastOptions = {
     success: {
@@ -118,7 +119,7 @@ export default function App(props: ExtendedAppProps) {
 
   return (
     <Provider store={store}>
-      {/* <Head>
+      <Head>
         <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
         <meta
           name='description'
@@ -126,7 +127,7 @@ export default function App(props: ExtendedAppProps) {
         />
         <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
-      </Head> */}
+      </Head>
 
       <AuthProvider>
         <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
@@ -138,7 +139,12 @@ export default function App(props: ExtendedAppProps) {
                     {skipAclCheck ? (
                       getLayout(<Component {...pageProps} />)
                     ) : (
-                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
+                      <AclGuard
+                        permission={permission}
+                        aclAbilities={aclAbilities}
+                        guestGuard={guestGuard}
+                        authGuard={authGuard}
+                      >
                         {getLayout(<Component {...pageProps} />)}
                       </AclGuard>
                     )}

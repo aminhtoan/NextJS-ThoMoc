@@ -5,6 +5,7 @@ import OrdersPage from 'src/views/pages/admin/orders'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageOrder: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageOrder: NextPageWithLayout = () => {
 }
 
 PageOrder.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageOrder.permission = 'ORDER'
 
 export default PageOrder

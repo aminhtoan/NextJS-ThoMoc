@@ -1,10 +1,9 @@
-
 export const VerticalItems = [
   {
     title: 'Dashboard',
     icon: 'ic:baseline-dashboard',
     text: 'Dashboard',
-    path: '/'
+    path: '/admin'
   },
   {
     title: 'Orders',

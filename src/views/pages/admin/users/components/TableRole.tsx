@@ -3,7 +3,9 @@ import { Box } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
 
 // ** React Imports
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+import { useAuth } from 'src/hooks/useAuth'
+import { buildAbilityFor } from 'src/configs/acl'
 
 // ** Translation Import
 import { useTranslation } from 'react-i18next'
@@ -39,12 +41,24 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
   const { t } = useTranslation()
   const [openDeleteRole, setOpenDeleteRole] = useState(false)
   const [deleteData, setDeleteData] = useState<{ id: number; name: string }>({ id: 0, name: '' })
+
   const [openEditRole, setOpenEditRole] = useState(false)
   const [editRoleId, setEditRoleId] = useState<number>(0)
+
+  // Lấy ability từ CASL
+  const auth = useAuth()
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions, 'ROLE')
+  }, [auth.user])
 
   useEffect(() => {
     dispatch(getAllRolesAsync({ params: { page, limit: pageSize, search } }))
   }, [dispatch, page, pageSize, search])
+
+  const canCreate = ability?.can('create', 'ROLE')
+  const canUpdate = ability?.can('update', 'ROLE')
+  const canDelete = ability?.can('delete', 'ROLE')
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
@@ -92,12 +106,18 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
       filterable: false,
       renderCell: params => (
         <Box gap={1} display='flex'>
-          <Box onClick={() => handleEdit(params.row.id)}>
+          <Box
+            onClick={() => canUpdate && handleEdit(params.row.id)}
+            sx={{ pointerEvents: canUpdate ? 'auto' : 'none', opacity: canUpdate ? 1 : 0.5 }}
+          >
             <CustomTag bgcolor='rgba(13, 110, 253, .15)' color='#0d6efd'>
               {t('Edit')}
             </CustomTag>
           </Box>
-          <Box onClick={() => handleDelete(params.row)}>
+          <Box
+            onClick={() => canDelete && handleDelete(params.row)}
+            sx={{ pointerEvents: canDelete ? 'auto' : 'none', opacity: canDelete ? 1 : 0.5 }}
+          >
             <CustomTag bgcolor='rgba(220, 53, 69, .15)' color='#dc3545'>
               {t('Delete')}
             </CustomTag>
@@ -119,6 +139,15 @@ const TableRole = ({ search = '', page, pageSize, onPageChange, onPageSizeChange
 
   return (
     <Box sx={{ width: '100%' }}>
+      {/* Nút Thêm (Add) */}
+      <Box mb={2}>
+        <Box
+          sx={{ display: 'inline-block', pointerEvents: canCreate ? 'auto' : 'none', opacity: canCreate ? 1 : 0.5 }}
+        >
+          {/* Thay thế nút Add của bạn ở đây, ví dụ: */}
+          {/* <Button onClick={handleAdd}>Thêm</Button> */}
+        </Box>
+      </Box>
       <CustomDataGrid
         rows={data}
         getRowId={row => row.id}

@@ -5,6 +5,7 @@ import ProductsPage from 'src/views/pages/admin/products'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
 const PageProducts: NextPageWithLayout = () => {
@@ -12,5 +13,6 @@ const PageProducts: NextPageWithLayout = () => {
 }
 
 PageProducts.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageProducts.permission = 'MANAGE-PRODUCT'
 
 export default PageProducts

@@ -5,12 +5,13 @@ import UsersRolePage from 'src/views/pages/admin/users/user-roles'
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactElement
+  permission?: string
 }
 
-const PageUsers: NextPageWithLayout = () => {
+const PageUsersRole: NextPageWithLayout = () => {
   return <UsersRolePage />
 }
 
-PageUsers.getLayout = page => <AdminLayout>{page}</AdminLayout>
-
-export default PageUsers
+PageUsersRole.getLayout = page => <AdminLayout>{page}</AdminLayout>
+PageUsersRole.permission = 'ROLE'
+export default PageUsersRole
