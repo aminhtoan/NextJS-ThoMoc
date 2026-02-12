@@ -60,6 +60,7 @@ export default function CustomSelect() {
           if (selected.length === 0) {
             return <em>Placeholder</em>
           }
+
           return selected.join(', ')
         }}
         MenuProps={MenuProps}

@@ -141,5 +141,11 @@
   "other": "Khác",
   "VIEW": "XEM",
   "ALL": "TẤT CẢ",
-  "CREATE": "TẠO"
+  "CREATE": "TẠO",
+  "User name": "Tên người dùng",
+  "Select Role": "Chọn Vai trò",
+  "Select Status": "Chọn Trạng thái",
+  "Status": "Trạng thái",
+  "Add User": "Thêm Người dùng",
+  "Create User": "Tạo Người dùng"
 }

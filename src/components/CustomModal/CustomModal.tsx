@@ -53,7 +53,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           width: '90%',
           maxHeight: '90vh',
           overflow: 'auto',
-          borderRadius: 2,
+          borderRadius: 1,
           outline: 'none'
         }}
       >

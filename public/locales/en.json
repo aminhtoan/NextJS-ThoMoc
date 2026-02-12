@@ -147,6 +147,12 @@
   "user-management": "user-management",
   "ALL": "ALL",
   "CREATE": "CREATE",
-  "VIEW": "VIEW"
+  "VIEW": "VIEW",
+  "User name": "User name",
+  "Select Role": "Select Role",
+  "Select Status": "Select Status",
+  "Status": "Status",
+  "Add User": "Add User",
+  "Create User": "Create User"
 
 }

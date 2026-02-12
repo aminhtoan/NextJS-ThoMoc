@@ -8,10 +8,6 @@ import CustomWelcome from 'src/components/CustomWelcome/CustomWelcome'
 import SearchBar from 'src/components/SearchBar/SearchBar'
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
 import useDebounce from 'src/hooks/useDebounce'
-
-import CreateRole from '../components/CreateRole'
-import TableRole from '../components/TableRole'
-import PermissionMatrix from '../components/PermissionMatrix'
 import { useAuth } from 'src/hooks/useAuth'
 import { buildAbilityFor } from 'src/configs/acl'
 import { useDispatch } from 'react-redux'
@@ -19,6 +15,9 @@ import { getAllRolesAsync } from 'src/stores/apps/role/actions'
 import { AppDispatch } from 'src/stores'
 import { MODULES } from 'src/configs/module'
 import { METHOD_MAP } from 'src/configs/method'
+import CreateRole from '../components/role-user/CreateRole'
+import TableRole from '../components/role-user/TableRole'
+import PermissionMatrix from '../components/role-user/PermissionMatrix'
 
 type TProps = {}
 
