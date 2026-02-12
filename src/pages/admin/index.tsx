@@ -9,17 +9,3 @@ const AdminPage: NextPage = () => {
 AdminPage.getLayout = page => <AdminLayout>{page}</AdminLayout>
 
 export default AdminPage
-
-// useEffect(() => {
-//   if (!loading && !user?.role?.name?.toLowerCase().includes('admin')) {
-//     router.replace('/')
-//   }
-// }, [loading, user, router])
-
-// if (loading) {
-//   return <Spinner />
-// }
-
-// if (!user?.role?.name?.toLowerCase().includes('admin')) {
-//   return null
-// }

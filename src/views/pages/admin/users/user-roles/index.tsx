@@ -60,7 +60,7 @@ const UsersRolePage: NextPage<TProps> = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Paper elevation={3} sx={{ p: 5 }}>
         <CustomWelcome>{t('Manage User Roles')}</CustomWelcome>
 

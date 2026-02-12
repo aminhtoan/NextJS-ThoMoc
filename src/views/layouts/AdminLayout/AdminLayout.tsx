@@ -69,7 +69,7 @@ const AdminLayout: NextPage<Props> = ({ children }) => {
         <AdminHeader />
         <Container maxWidth='lg' sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ p: 3 }}>
               {children}
             </Grid>
           </Grid>
