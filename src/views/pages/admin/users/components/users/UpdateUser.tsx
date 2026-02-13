@@ -300,6 +300,7 @@ const UpdateUser = ({ open, onClose, user, onUpdated }: CreateUserProps) => {
                   </MenuItem>
                   <MenuItem value='ACTIVE'>{t('Active')}</MenuItem>
                   <MenuItem value='INACTIVE'>{t('Inactive')}</MenuItem>
+                  <MenuItem value='BLOCKED'>{t('Blocked')}</MenuItem>
                 </Select>
                 {errors?.status && (
                   <FormLabel sx={{ color: 'error.main', fontSize: '0.75rem', mt: 0.5 }}>

@@ -80,7 +80,7 @@ const AuthProvider = ({ children }: Props) => {
         window.removeEventListener('authDataUpdated', handleAuthDataUpdated)
       }
     }
-  }, [])
+  }, [router])
 
   const handleLogout = () => {
     logoutAuth({ refreshToken: window.localStorage.getItem('refreshToken') || '' }).catch(error => {

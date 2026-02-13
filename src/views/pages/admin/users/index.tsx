@@ -1,5 +1,5 @@
 // ** MUI Imports
-import { Box, Divider, Grid, Paper } from '@mui/material'
+import { Box, Button, Divider, Grid, Paper } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
 
 // ** Next Imports
@@ -9,7 +9,7 @@ import { NextPage } from 'next/types'
 import React, { useCallback, useEffect } from 'react'
 
 // ** Components Imports
-import { CustomTag, CustomDataGrid, CustomPagination, CustomSelect, IconifyIcon, SearchBar } from 'src/components'
+import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon, SearchBar } from 'src/components'
 
 // ** Configs Imports
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
@@ -20,14 +20,16 @@ import { fetchUsers } from 'src/service/user'
 
 // ** Types Imports
 import { User, UserTableRow } from 'src/types/user'
+import { getAllRoles } from 'src/service/role'
 
 // ** Components User Imports
-import { StatCard, CreateUser } from './components/users'
+import { CreateUser, StatCard, DeleteUser, UpdateUser } from './components/users'
 
 // ** Translation Import
 import { useTranslation } from 'react-i18next'
-import UpdateUser from './components/users/UpdateUser'
-import DeleteUser from './components/users/DeleteUser'
+
+// ** Hooks
+import useDebounce from 'src/hooks/useDebounce'
 
 type TProps = {}
 
@@ -43,6 +45,11 @@ const UsersPage: NextPage<TProps> = () => {
   const [isOpenUpdateUser, setIsOpenUpdateUser] = React.useState(false)
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null)
   const [isOpenDeleteUser, setIsOpenDeleteUser] = React.useState(false)
+  const [filterRole, setFilterRole] = React.useState<string>('')
+  const [filterStatus, setFilterStatus] = React.useState<string>('')
+  const [dataRole, setDataRole] = React.useState<Array<{ value: string; label: string }>>([])
+
+  const debouncedSearch = useDebounce(searchTerm, 300)
   const { t } = useTranslation()
 
   const userColumns: GridColDef<UserTableRow>[] = [
@@ -50,7 +57,7 @@ const UsersPage: NextPage<TProps> = () => {
     {
       field: 'name',
       headerName: t('Name'),
-      width: 200,
+      width: 180,
       renderCell: params => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img
@@ -68,20 +75,36 @@ const UsersPage: NextPage<TProps> = () => {
     {
       field: 'status',
       headerName: t('Status'),
-      width: 100,
-      renderCell: params => (
-        <CustomTag
-          bgcolor={params.value === 'ACTIVE' ? 'rgba(28, 187, 140, .15)' : 'rgba(220, 53, 69, .15)'}
-          color={params.value === 'ACTIVE' ? '#1cbb8c' : '#dc3545'}
-        >
-          {params.value === 'ACTIVE' ? t('Active') : t('Inactive')}
-        </CustomTag>
-      )
+      width: 150,
+      renderCell: params => {
+        let bgcolor = ''
+        let color = ''
+        let label = ''
+        if (params.value === 'ACTIVE') {
+          bgcolor = 'rgba(28, 187, 140, .15)'
+          color = '#1cbb8c'
+          label = t('Active')
+        } else if (params.value === 'BLOCKED') {
+          bgcolor = 'rgba(220, 53, 69, .15)'
+          color = '#dc3545'
+          label = t('Blocked')
+        } else {
+          bgcolor = 'rgba(255, 193, 7, .15)'
+          color = '#ffc107'
+          label = t('Inactive')
+        }
+
+        return (
+          <CustomTag bgcolor={bgcolor} color={color}>
+            {label}
+          </CustomTag>
+        )
+      }
     },
     {
       field: 'actions',
       headerName: t('Actions'),
-      width: 150,
+      width: 140,
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Box sx={{ cursor: 'pointer' }} onClick={() => handleOpenUpdate(params.row)}>
@@ -101,7 +124,7 @@ const UsersPage: NextPage<TProps> = () => {
   const handleRefreshTable = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await fetchUsers(page, pageSize)
+      const response = await fetchUsers(page, pageSize, debouncedSearch, filterRole, filterStatus)
 
       // Transform API data to table format
       const tableData: UserTableRow[] = response.data.map((user: User) => ({
@@ -112,7 +135,7 @@ const UsersPage: NextPage<TProps> = () => {
         phoneNumber: user.phoneNumber,
         roleName: user.role?.name || 'N/A',
         roleId: user.roleId,
-        status: user.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
+        status: user.status === 'ACTIVE' ? 'ACTIVE' : user.status === 'BLOCKED' ? 'BLOCKED' : 'INACTIVE'
       }))
 
       setDataUser(tableData)
@@ -123,7 +146,7 @@ const UsersPage: NextPage<TProps> = () => {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize])
+  }, [page, pageSize, debouncedSearch, filterRole, filterStatus])
 
   useEffect(() => {
     handleRefreshTable()
@@ -152,6 +175,24 @@ const UsersPage: NextPage<TProps> = () => {
     setIsOpenDeleteUser(true)
   }
 
+  const handleResetSearch = () => {
+    setSearchTerm('')
+  }
+
+  const handleFilterRole = useCallback(async () => {
+    const { data } = await getAllRoles({ page: 1, limit: 100, search: '' })
+    setDataRole(data.data.map((role: any) => ({ id: String(role.id), name: role.name })))
+  }, [])
+  
+  useEffect(() => {
+    handleFilterRole()
+  }, [handleFilterRole])
+
+  const handleClearFilter = () => {
+    setFilterRole('')
+    setFilterStatus('')
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Stat Cards */}
@@ -176,21 +217,40 @@ const UsersPage: NextPage<TProps> = () => {
             {/* filter */}
             <Grid container spacing={2} sx={{ p: 3 }}>
               <Grid item xs={12} sm={6} md={4}>
-                <CustomSelect />
+                <CustomSelect
+                  placeholder={t('Filter by role')}
+                  options={dataRole}
+                  value={filterRole}
+                  onChange={value => setFilterRole(value as string)}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-                <CustomSelect />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <CustomSelect />
+                <CustomSelect
+                  placeholder={t('Filter by status')}
+                  options={[
+                    { id: 'ACTIVE', name: t('Active') },
+                    { id: 'INACTIVE', name: t('Inactive') },
+                    { id: 'BLOCKED', name: t('Blocked') }
+                  ]}
+                  value={filterStatus}
+                  onChange={value => setFilterStatus(value as string)}
+                />
               </Grid>
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, px: 3, pb: 2 }}>
               <Box>
-                <SearchBar value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                <Button onClick={handleClearFilter} sx={{ height: '100%' }}>
+                  <IconifyIcon icon='mdi:refresh' />
+                </Button>
+              </Box>
+              <Box>
+                <SearchBar
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  onReset={handleResetSearch}
+                />
               </Box>
 
               <Box onClick={handleOpenCreate}>
@@ -218,7 +278,9 @@ const UsersPage: NextPage<TProps> = () => {
                 </Box>
               </Box>
             </Box>
+
             <Divider />
+
             <CustomDataGrid
               rows={dataUser}
               columns={userColumns}
@@ -252,7 +314,9 @@ const UsersPage: NextPage<TProps> = () => {
         user={selectedUser}
         onUpdated={handleRefreshTable}
       />
+
       <CreateUser open={isOpenCreateUser} onClose={() => setIsOpenCreateUser(false)} onCreated={handleRefreshTable} />
+
       <DeleteUser
         open={isOpenDeleteUser}
         onClose={() => setIsOpenDeleteUser(false)}

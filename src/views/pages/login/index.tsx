@@ -21,16 +21,17 @@ import Head from 'next/head'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import SignInContainer from 'src/components/sign-in/SignInContainer'
+import OTP from 'src/components/OTP/OTP'
+import TOTP from 'src/components/OTP/TOTP'
+import CustomCard from 'src/components/SignIn/CustomCard'
+import SignInContainer from 'src/components/SignIn/SignInContainer'
 import { loginAuth } from 'src/service/auth'
-import CarCustomCard from '../../../components/sign-in/CustomCard'
 import { LoginFormData, LoginSchema } from 'src/types/auth'
 import BlankLayout from 'src/views/layouts/BlankLayout'
-import GoogleLogin from 'src/views/layouts/components/login/GoogleLogin'
-import FacebookLogin from 'src/views/layouts/components/login/FacebookLogin'
-import OTP from 'src/views/layouts/components/login/OTP'
-import TOTP from 'src/views/layouts/components/login/TOTP'
+import FacebookLogin from 'src/components/SocialLogin/FacebookLogin'
 import ForgotPassword from 'src/views/layouts/components/login/ForgotPassword'
+import GoogleLogin from 'src/components/SocialLogin/GoogleLogin'
+import { useTranslation } from 'react-i18next'
 
 type TProps = {}
 
@@ -48,6 +49,7 @@ const PageLogin: NextPage<TProps> = () => {
   const [dataInit, setDataInit] = React.useState<Datainit>()
   const [showOTP, setShowOTP] = React.useState(false)
   const [showTOTP, setShowTOTP] = React.useState(false)
+  const { t } = useTranslation()
 
   const {
     handleSubmit,
@@ -99,18 +101,20 @@ const PageLogin: NextPage<TProps> = () => {
   return (
     <Box>
       <Head>
-        <title>Đăng nhập - Thổ Mộc</title>
-        <meta name='description' content='Đăng nhập tài khoản ' />
+        <title>{t('Login')} - Thổ Mộc</title>
+        <meta name='description' content={t('Login Account')} />
       </Head>
+
       <CssBaseline enableColorScheme />
+
       <SignInContainer direction='column' justifyContent='space-between'>
-        <CarCustomCard variant='outlined' elevation={0}>
+        <CustomCard variant='outlined' elevation={0}>
           <Typography
             component='h1'
             variant='h4'
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: 'center' }}
           >
-            Sign in
+            {t('Sign In')}
           </Typography>
           <Box
             component='form'
@@ -157,7 +161,7 @@ const PageLogin: NextPage<TProps> = () => {
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <>
-                    <FormLabel htmlFor='password'>Password</FormLabel>
+                    <FormLabel htmlFor='password'>{t('Password')}</FormLabel>
                     <TextField
                       name='password'
                       placeholder='••••••'
@@ -179,7 +183,7 @@ const PageLogin: NextPage<TProps> = () => {
                         endAdornment: (
                           <InputAdornment position='end'>
                             <IconButton
-                              aria-label={showPassword ? 'hide the password' : 'display the password'}
+                              aria-label={showPassword ? t('hide the password') : t('display the password')}
                               onClick={handleClickShowPassword}
                               edge='end'
                               disabled={isLoading}
@@ -199,7 +203,7 @@ const PageLogin: NextPage<TProps> = () => {
               control={
                 <Checkbox value={isRemmember} onChange={e => setIsRemmember(e.target.checked)} color='primary' />
               }
-              label='Remember me'
+              label={t('Remember me')}
             />
 
             <Button
@@ -220,10 +224,10 @@ const PageLogin: NextPage<TProps> = () => {
                       color: 'white'
                     }}
                   />
-                  <Typography sx={{ ml: 1, opacity: 0.8 }}>Signing in...</Typography>
+                  <Typography sx={{ ml: 1, opacity: 0.8 }}>{t('Signing in...')}</Typography>
                 </>
               ) : (
-                'Sign in'
+                t('Sign In')
               )}
             </Button>
 
@@ -235,7 +239,7 @@ const PageLogin: NextPage<TProps> = () => {
               sx={{ alignSelf: 'center' }}
               disabled={isLoading}
             >
-              Forgot your password?
+              {t('Forgot your password?')}
             </Link>
           </Box>
 
@@ -244,13 +248,13 @@ const PageLogin: NextPage<TProps> = () => {
             <GoogleLogin />
             <FacebookLogin />
             <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+              {t("Don't have an account?")}{' '}
               <Link href='/register' variant='body2' sx={{ alignSelf: 'center' }}>
-                Sign up
+                {t('Sign up')}
               </Link>
             </Typography>
           </Box>
-        </CarCustomCard>
+        </CustomCard>
       </SignInContainer>
 
       {showOTP && dataInit && <OTP open={showOTP} data={dataInit} handClose={() => setShowOTP(false)} />}

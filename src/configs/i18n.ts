@@ -4,8 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend from 'i18next-http-backend'
 
 i18n
-
-.use(HttpBackend)
+  .use(HttpBackend)
 
   // Enable automatic language detection
   .use(LanguageDetector)
@@ -13,16 +12,21 @@ i18n
   // Enables the hook initialization module
   .use(initReactI18next)
   .init({
-    lng: 'vi',
+    // nếu mày muốn f5 vày chuyền về ngôn ngữ mặc đc thì bật dòng này lên, nếu k thì thôi
+    // lng: 'en',
     backend: {
       /* translation file path */
       loadPath: '/locales/{{lng}}.json'
     },
-    fallbackLng: 'vi',
+    fallbackLng: 'en',
     debug: false,
     keySeparator: false,
+    detection: {
+      order: ['localStorage', 'sessionStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage', 'sessionStorage']
+    },
     react: {
-      useSuspense: false
+      useSuspense: true
     },
     interpolation: {
       escapeValue: false,

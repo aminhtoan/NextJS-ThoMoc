@@ -1,13 +1,15 @@
 import { Button, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import handleAPI from 'src/apis/handleAPI'
 import { GoogleIcon } from 'src/components/Icon/SitemarkIcon'
 
 const GoogleLogin = () => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-
+  const { t } = useTranslation()
+  
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     try {
@@ -30,7 +32,7 @@ const GoogleLogin = () => {
       startIcon={isLoading ? <CircularProgress size={20} /> : <GoogleIcon />}
       sx={{ borderColor: '#dadce0' }}
     >
-      {isLoading ? 'Đang kết nối...' : 'Sign in with Google'}
+      {isLoading ? t('Processing...') : t('Sign in with Google')}
     </Button>
   )
 }

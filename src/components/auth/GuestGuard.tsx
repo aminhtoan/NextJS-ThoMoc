@@ -23,7 +23,7 @@ const GuestGuard = (props: GuestGuardProps) => {
         router.replace('/')
       }
     }
-  }, [router.route])
+  }, [router.isReady, router.asPath, router.replace, router])
 
   if (authContext.loading) {
     return fallback

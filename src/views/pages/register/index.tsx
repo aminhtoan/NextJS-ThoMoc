@@ -19,14 +19,16 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { FacebookIcon, GoogleIcon } from 'src/components/Icon/SitemarkIcon'
+import CustomCard from 'src/components/SignIn/CustomCard'
+import SignInContainer from 'src/components/SignIn/SignInContainer'
+import FacebookLogin from 'src/components/SocialLogin/FacebookLogin'
+import GoogleLogin from 'src/components/SocialLogin/GoogleLogin'
 import { sentOTP, verifyOTP } from 'src/service/auth'
 import { AppDispatch } from 'src/stores'
 import { registerAuthAsync } from 'src/stores/apps/auth/actions'
 import { RegisterBodySchema, RegisterBodyType, VerifyOTPType } from 'src/types/auth'
-import CarCustomCard from '../../../components/sign-in/CustomCard'
-import SignInContainer from '../../../components/sign-in/SignInContainer'
 
 type TProps = {}
 
@@ -48,6 +50,7 @@ const PageRegister: NextPage<TProps> = () => {
   const [otp, setOtp] = React.useState('')
   const route = useRouter()
   const dispatch: AppDispatch = useDispatch()
+  const { t } = useTranslation()
 
   const defaultValues: RegisterBodyType = {
     email: '',
@@ -89,11 +92,11 @@ const PageRegister: NextPage<TProps> = () => {
 
     try {
       await sentOTP(data.email, 'REGISTER')
-      toast.success('OTP đã được gửi tới email của bạn')
+      toast.success(t('OTP has been sent to your email'))
       setOtpSent(true)
       setStep(2)
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message[0].message || 'Gửi OTP thất bại'
+      const errorMsg = err.response?.data?.message[0].message || t('Failed to resend OTP')
       toast.error(errorMsg)
     } finally {
       setLoading(false)
@@ -110,13 +113,13 @@ const PageRegister: NextPage<TProps> = () => {
         code: data.code,
         type: 'REGISTER'
       })
-      toast.success('OTP hợp lệ, tiếp tục đăng ký')
+      toast.success(t('OTP is valid, continue registration'))
       setValue('code', '')
 
       setStep(3)
     } catch (err: any) {
       console.log(err)
-      const errorMsg = err.response?.data?.message[0].message || 'OTP không hợp lệ'
+      const errorMsg = err.response?.data?.message[0].message || t('OTP is invalid')
       toast.error(errorMsg)
     }
     setLoading(false)
@@ -136,13 +139,13 @@ const PageRegister: NextPage<TProps> = () => {
           code: otp
         })
       )
-      toast.success('Đăng ký thành công! Chuyển hướng...')
+      toast.success(t('Register successfully, redirecting...'))
       setOtp('')
       setDataInit(undefined)
       reset()
       route.push('/login')
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message[0].message || 'Đăng ký thất bại'
+      const errorMsg = err.response?.data?.message[0].message || t('Failed to register')
       toast.error(errorMsg)
     }
     setLoading(false)
@@ -154,8 +157,8 @@ const PageRegister: NextPage<TProps> = () => {
   return (
     <Box>
       <Head>
-        <title>Đăng Ký - Thổ Mộc</title>
-        <meta name='description' content='Đăng ký tài khoản mới' />
+        <title>{t('Register New Account')} - Thổ Mộc</title>
+        <meta name='description' content={t('Register New Account')} />
       </Head>
 
       <CssBaseline enableColorScheme />
@@ -166,13 +169,13 @@ const PageRegister: NextPage<TProps> = () => {
           height: 'auto'
         }}
       >
-        <CarCustomCard variant='outlined' elevation={0}>
+        <CustomCard variant='outlined' elevation={0}>
           <Typography
             component='h1'
             variant='h4'
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: 'center' }}
           >
-            Sign Up
+            {t('Sign Up')}
           </Typography>
           <Typography
             component='h1'
@@ -202,7 +205,7 @@ const PageRegister: NextPage<TProps> = () => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <>
-                        <FormLabel htmlFor='name'>Name</FormLabel>
+                        <FormLabel htmlFor='name'>{t('Name')}</FormLabel>
                         <TextField
                           id='name'
                           name='name'
@@ -263,7 +266,7 @@ const PageRegister: NextPage<TProps> = () => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <>
-                        <FormLabel htmlFor='password'>Password</FormLabel>
+                        <FormLabel htmlFor='password'>{t('Password')}</FormLabel>
                         <TextField
                           name='password'
                           placeholder='••••••'
@@ -285,7 +288,7 @@ const PageRegister: NextPage<TProps> = () => {
                             endAdornment: (
                               <InputAdornment position='end'>
                                 <IconButton
-                                  aria-label={showPassword ? 'hide the password' : 'display the password'}
+                                  aria-label={showPassword ? t('hide the password') : t('display the password')}
                                   onClick={handleClickShowPassword}
                                   edge='end'
                                   disabled={loading} // Disable button when loading
@@ -308,7 +311,7 @@ const PageRegister: NextPage<TProps> = () => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <>
-                        <FormLabel htmlFor='confirmPassword'>Confirm Password</FormLabel>
+                        <FormLabel htmlFor='confirmPassword'>{t('Confirm Password')}</FormLabel>
                         <TextField
                           name='confirmPassword'
                           placeholder='••••••'
@@ -330,7 +333,7 @@ const PageRegister: NextPage<TProps> = () => {
                             endAdornment: (
                               <InputAdornment position='end'>
                                 <IconButton
-                                  aria-label={showCPassword ? 'hide the password' : 'display the password'}
+                                  aria-label={showCPassword ? t('hide the password') : t('display the password')}
                                   onClick={handleClickShowCPassword}
                                   edge='end'
                                   disabled={loading} // Disable button when loading
@@ -353,7 +356,7 @@ const PageRegister: NextPage<TProps> = () => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <>
-                        <FormLabel htmlFor='phone'>Phone</FormLabel>
+                        <FormLabel htmlFor='phone'>{t('Phone')}</FormLabel>
                         <TextField
                           id='phone'
                           name='phone'
@@ -379,7 +382,7 @@ const PageRegister: NextPage<TProps> = () => {
                 </Box>
 
                 <Button type='submit' fullWidth variant='contained' disabled={loading}>
-                  Đăng ký
+                  {t('Sign Up')}
                 </Button>
               </>
             )}
@@ -395,7 +398,7 @@ const PageRegister: NextPage<TProps> = () => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <>
-                        <FormLabel htmlFor='code'>Mã OTP</FormLabel>
+                        <FormLabel htmlFor='code'>{t('OTP Authentication')}</FormLabel>
                         <TextField
                           id='code'
                           name='code'
@@ -429,7 +432,7 @@ const PageRegister: NextPage<TProps> = () => {
                 </Box>
 
                 <Button type='submit' fullWidth variant='contained' disabled={loading}>
-                  Xác thực OTP
+                  {t('OTP Authentication')}
                 </Button>
 
                 <Button
@@ -444,7 +447,7 @@ const PageRegister: NextPage<TProps> = () => {
                     setValue('code', '') // reset form field
                   }}
                 >
-                  Quay lại
+                  {t('Back to previous step')}
                 </Button>
               </>
             )}
@@ -452,7 +455,7 @@ const PageRegister: NextPage<TProps> = () => {
             {step === 3 && (
               <>
                 <Typography variant='h6' sx={{ textAlign: 'center', color: 'primary.main', mb: 2, fontWeight: 'bold' }}>
-                  Hoàn tất thông tin đăng ký của bạn
+                  {t('Complete your registration information.')}
                 </Typography>
 
                 <Box
@@ -471,10 +474,10 @@ const PageRegister: NextPage<TProps> = () => {
                     Email: <strong>{dataInit?.email}</strong>
                   </Typography>
                   <Typography variant='body1' sx={{ fontWeight: 'medium' }}>
-                    Tên: <strong>{dataInit?.name}</strong>
+                    {t('Name')}: <strong>{dataInit?.name}</strong>
                   </Typography>
                   <Typography variant='body1' sx={{ fontWeight: 'medium' }}>
-                    Số điện thoại: <strong>{dataInit?.phoneNumber}</strong>
+                    {t('Phone')}: <strong>{dataInit?.phoneNumber}</strong>
                   </Typography>
                 </Box>
 
@@ -485,7 +488,7 @@ const PageRegister: NextPage<TProps> = () => {
                   disabled={loading}
                   sx={{ mt: 3, py: 1.5, fontSize: '1rem', fontWeight: 'bold' }}
                 >
-                  {loading ? 'Đang đăng ký...' : 'Hoàn tất đăng ký'}
+                  {loading ? t('Processing...') : t('Complete Registration')}
                 </Button>
 
                 <Button
@@ -499,7 +502,7 @@ const PageRegister: NextPage<TProps> = () => {
                   }}
                   sx={{ mt: 2, py: 1.5, fontSize: '1rem' }}
                 >
-                  Quay lại
+                  {t('Back')}
                 </Button>
               </>
             )}
@@ -507,30 +510,16 @@ const PageRegister: NextPage<TProps> = () => {
 
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant='outlined'
-              onClick={() => alert('Sign in with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
-            <Button
-              fullWidth
-              variant='outlined'
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
-            </Button>
+            <GoogleLogin />
+            <FacebookLogin />
             <Typography sx={{ textAlign: 'center' }}>
-              Already have an account?{' '}
+              {t('Already have an account?')}{' '}
               <Link href='/login' variant='body2' sx={{ alignSelf: 'center' }}>
-                Sign In
+                {t('Sign In')}
               </Link>
             </Typography>
           </Box>
-        </CarCustomCard>
+        </CustomCard>
       </SignInContainer>
     </Box>
   )

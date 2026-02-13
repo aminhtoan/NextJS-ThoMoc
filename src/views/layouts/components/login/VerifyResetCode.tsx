@@ -2,9 +2,9 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typogra
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import OTPInput from './OTPInput'
+import OTPInput from 'src/components/OTP/OTPInput'
 import ResetPassword from './ResetPassword'
-import OTPCountdown from './OTPCountdown'
+import OTPCountdown from 'src/components/OTP/OTPCountdown'
 import { ResetPasswordData } from 'src/types/auth'
 import { TypeofVerificationCode } from 'src/configs/auth'
 

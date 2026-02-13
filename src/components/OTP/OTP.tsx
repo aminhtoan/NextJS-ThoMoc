@@ -48,7 +48,7 @@ const OTP = (props: OTPProps) => {
     } else {
       router.replace('/')
     }
-  }, [authReady])
+  }, [authReady, returnUrl, router.replace, router])
 
   useEffect(() => {
     if (!accessToken) return
@@ -76,7 +76,7 @@ const OTP = (props: OTPProps) => {
     }
 
     bootstrapAuth()
-  }, [accessToken, setUserData])
+  }, [accessToken, setUserData, handClose, router.replace, t, router])
 
   useEffect(() => {
     const sendOTP = async () => {

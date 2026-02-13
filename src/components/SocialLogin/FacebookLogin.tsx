@@ -3,10 +3,12 @@ import { useState } from 'react'
 import handleAPI from 'src/apis/handleAPI'
 import { FacebookIcon } from 'src/components/Icon/SitemarkIcon'
 import { useRouter } from 'next/router'
+import { useTranslation } from 'react-i18next'
 
 const FacebookLogin = () => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { t } = useTranslation()
 
   const handleFacebookLogin = async () => {
     try {
@@ -31,7 +33,7 @@ const FacebookLogin = () => {
       variant='outlined'
       sx={{ borderColor: '#dadce0' }}
     >
-      {isLoading ? 'Đang kết nối' : 'Sign in with Facebook'}
+      {isLoading ? t('Processing...') : t('Sign in with Facebook')}
     </Button>
   )
 }

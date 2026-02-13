@@ -4,9 +4,9 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import handleAPI from 'src/apis/handleAPI'
-import OTPInput from './OTPInput'
 import { OTPFormData } from 'src/types/auth'
 import { useLocalStorage } from 'src/hooks/useLocalStorage'
+import OTPInput from './OTPInput'
 
 interface OTPProps {
   open: boolean

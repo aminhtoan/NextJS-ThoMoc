@@ -2,7 +2,7 @@ import MuiAppBar from '@mui/material/AppBar'
 import { styled } from '@mui/material/styles'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import UserDropDown from 'src/components/user-dropdown'
+import UserDropDown from 'src/components/UserDropdown'
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   position: 'sticky',

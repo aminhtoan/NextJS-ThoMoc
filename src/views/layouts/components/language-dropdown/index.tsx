@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 
 // ** Next
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 // ** Components
 import IconifyIcon from 'src/components/Icon'
@@ -14,6 +15,7 @@ import i18n, { LANGUAGE_OPTIONS } from 'src/configs/i18n'
 const LanguageDropDown = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+  const { t } = useTranslation()
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -56,7 +58,7 @@ const LanguageDropDown = () => {
               onClick={() => handleOnChangeLang(option.value)}
               sx={{ backgroundColor: 'white !important' }}
             >
-              <Typography sx={isSelected ? { color: '#1872CE' } : {}}>{option.lang}</Typography>
+              <Typography sx={isSelected ? { color: '#1872CE' } : {}}>{t(option.lang)}</Typography>
             </MenuItem>
           )
         })}

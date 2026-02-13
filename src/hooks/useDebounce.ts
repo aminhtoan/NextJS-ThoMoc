@@ -9,7 +9,7 @@ const useDebounce = (value: any, delay: number) => {
     return () => {
       clearTimeout(timerRef)
     }
-  }, [value])
+  }, [value, delay])
 
   return debouncedValue
 }

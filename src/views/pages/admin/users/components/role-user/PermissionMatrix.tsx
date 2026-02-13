@@ -201,7 +201,7 @@ const PermissionMatrix = ({ page, pageSize }: { page: number; pageSize: number }
     } finally {
       setLoading(false)
     }
-  }, [ability, t])
+  }, [ability])
 
   // Chỉ gọi fetchPermissions khi đã có ability và có quyền xem
   useEffect(() => {

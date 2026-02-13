@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 // ** Custom Components
-import CustomTag from 'src/components/custom-tag'
+import { CustomTag } from 'src/components'
 import CustomDataGrid from 'src/components/CustomDataGrid'
 import CustomPagination from 'src/components/CustomPagination'
 

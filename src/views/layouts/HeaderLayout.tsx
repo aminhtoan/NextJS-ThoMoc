@@ -9,7 +9,7 @@ import { AppBar, Badge, Container, IconButton, Paper, Toolbar, Typography, Box, 
 import { useRouter } from 'next/router'
 
 // components
-import UserDropDown from 'src/components/user-dropdown'
+import UserDropDown from 'src/components/UserDropdown'
 import LanguageDropDown from './components/language-dropdown'
 import ModeToggle from './components/mode-toggle'
 
@@ -19,12 +19,12 @@ import { AUTH_LOG } from 'src/configs/auth'
 // Hooks
 import { useAuth } from 'src/hooks/useAuth'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const HeaderLayout = () => {
   const { user } = useAuth()
   const router = useRouter()
-
-  // Total header heights (dùng để đẩy nội dung tránh bị che khi AppBar fixed)
+  const { t } = useTranslation()
   const TOP_BAR_HEIGHT = 25
   const MAIN_BAR_HEIGHT = 80
 
@@ -73,7 +73,7 @@ const HeaderLayout = () => {
                           }}
                           onClick={() => router.push(item.path)}
                         >
-                          {item.label}
+                          {t(item.label)}
                           {index < AUTH_LOG.length - 1 && ' |'}
                         </Typography>
                       ))}
