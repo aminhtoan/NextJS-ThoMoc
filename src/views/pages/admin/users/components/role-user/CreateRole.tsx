@@ -15,7 +15,7 @@ import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 
 // ** Custom Modal Import
-import CustomModal from 'src/components/CustomModal/CustomModal'
+import CustomModal from 'src/components/CustomModal'
 
 // ** Service Import
 import { createRole } from 'src/service/role'

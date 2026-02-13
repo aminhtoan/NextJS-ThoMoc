@@ -1,4 +1,4 @@
-import { EMAIL_REG, PASSWORD_REG, PHONE_REG } from 'src/configs/regex'
+import { EMAIL_REG, NAME_REG, PASSWORD_REG, PHONE_REG } from 'src/configs/regex'
 import { Role } from 'src/types/role'
 import * as yup from 'yup'
 import { STATUS } from '../other'
@@ -11,6 +11,8 @@ export interface User {
   phoneNumber?: string
   roleId?: number
   role: Role
+  createdById?: number
+  updatedById?: number
   createdAt: string
   updatedAt?: string
   status?: string
@@ -39,7 +41,11 @@ export interface UserTableRow {
 
 export const CreateUserBodySchema = yup.object().shape({
   email: yup.string().required('Vui lòng nhập email').matches(EMAIL_REG, `Địa chỉ email không hợp lệ`),
-  name: yup.string().required('User name is required').max(50, 'User name must be at most 50 characters'),
+  name: yup
+    .string()
+    .required('User name is required')
+    .max(50, 'User name must be at most 50 characters')
+    .matches(NAME_REG, 'Name không được chứa số hoặc ký tự đặc biệt'),
   phoneNumber: yup
     .string()
     .required('Vui lòng nhập số điện thoại')
@@ -53,4 +59,26 @@ export const CreateUserBodySchema = yup.object().shape({
   status: yup.string().oneOf(STATUS).required('Vui lòng chọn trạng thái người dùng')
 })
 
+export const UpdateUserBodySchema = yup
+  .object()
+  .shape({
+    email: yup.string().matches(EMAIL_REG, `Địa chỉ email không hợp lệ`),
+    name: yup
+      .string()
+      .max(50, 'User name must be at most 50 characters')
+      .matches(NAME_REG, 'Name không được chứa số hoặc ký tự đặc biệt'),
+    phoneNumber: yup.string().matches(PHONE_REG, 'Số điện thoại phải bắt đầu bằng 0 hoặc +84 và có 10 số'),
+    roleId: yup.number(),
+    status: yup.string().oneOf(STATUS)
+  })
+  .partial()
+
 export type CreateUserBodyType = yup.InferType<typeof CreateUserBodySchema>
+
+export type UpdateUserBodyType = {
+  name?: string
+  email?: string
+  phoneNumber?: string
+  roleId?: number
+  status?: string
+}

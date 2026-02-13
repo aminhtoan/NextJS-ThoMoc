@@ -8,34 +8,30 @@ import DialogTitle from '@mui/material/DialogTitle'
 import * as React from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { deleteRole } from 'src/service/role'
-import { AppDispatch } from 'src/stores'
-import { getAllRolesAsync } from 'src/stores/apps/role/actions'
+import { deleteUser } from 'src/service/user'
 
 interface DeleteRoleProps {
   open: boolean
   onClose: () => void
   data: {
     id: number
-    name: string
+    email: string
   }
-  page: number
-  pageSize: number
+
+  onDeleted?: () => void
 }
 
-const DeleteRole = ({ open, onClose, data, page, pageSize }: DeleteRoleProps) => {
-  const dispatch: AppDispatch = useDispatch()
+const DeleteUser = ({ open, onClose, data, onDeleted }: DeleteRoleProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const { t } = useTranslation()
 
   const handleDelete = async () => {
     try {
       setIsLoading(true)
-      await deleteRole(data.id)
-      toast.success(t('Delete role successfully'))
-      dispatch(getAllRolesAsync({ params: { page, limit: pageSize } }))
+      await deleteUser(data.id)
+      toast.success(t('Delete user successfully'))
       onClose()
+      if (onDeleted) onDeleted()
     } catch (error: any) {
       onClose()
       toast.error(
@@ -72,7 +68,7 @@ const DeleteRole = ({ open, onClose, data, page, pageSize }: DeleteRoleProps) =>
             borderColor: 'error.main'
           }}
         >
-          {t('Delete Role')}
+          {t('Delete User')}
         </DialogTitle>
         <DialogContent sx={{ py: 3, px: 3 }}>
           <DialogContentText
@@ -83,8 +79,8 @@ const DeleteRole = ({ open, onClose, data, page, pageSize }: DeleteRoleProps) =>
               mb: 2
             }}
           >
-            {t('Are you sure you want to delete the role?')}{' '}
-            <strong style={{ color: '#dc3545' }}>"{data.name!}"</strong>?
+            {t('Are you sure you want to delete the user?')}{' '}
+            <strong style={{ color: '#dc3545' }}>"{data.email}"</strong>?
           </DialogContentText>
           <Box
             sx={{
@@ -160,4 +156,4 @@ const DeleteRole = ({ open, onClose, data, page, pageSize }: DeleteRoleProps) =>
   )
 }
 
-export default DeleteRole
+export default DeleteUser

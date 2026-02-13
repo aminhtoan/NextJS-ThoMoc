@@ -1,20 +1,33 @@
+// ** MUI Imports
 import { Box, Divider, Grid, Paper } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
+
+// ** Next Imports
 import { NextPage } from 'next/types'
-import React, { useEffect } from 'react'
-import CustomTag from 'src/components/custom-tag'
-import CustomDataGrid from 'src/components/CustomDataGrid/CustomDataGrid'
-import CustomPagination from 'src/components/CustomPagination'
-import CustomSelect from 'src/components/CustomSelect'
-import IconifyIcon from 'src/components/Icon'
-import SearchBar from 'src/components/SearchBar/SearchBar'
+
+// ** React Imports
+import React, { useCallback, useEffect } from 'react'
+
+// ** Components Imports
+import { CustomTag, CustomDataGrid, CustomPagination, CustomSelect, IconifyIcon, SearchBar } from 'src/components'
+
+// ** Configs Imports
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
 import { STATCARD_USER } from 'src/configs/user'
+
+// ** Service Imports
 import { fetchUsers } from 'src/service/user'
+
+// ** Types Imports
 import { User, UserTableRow } from 'src/types/user'
-import StatCard from './components/users/UserStatCard'
-import CreateUser from './components/users/CreateUser'
+
+// ** Components User Imports
+import { StatCard, CreateUser } from './components/users'
+
+// ** Translation Import
 import { useTranslation } from 'react-i18next'
+import UpdateUser from './components/users/UpdateUser'
+import DeleteUser from './components/users/DeleteUser'
 
 type TProps = {}
 
@@ -27,13 +40,16 @@ const UsersPage: NextPage<TProps> = () => {
   const [totalPages, setTotalPages] = React.useState(0)
   const [totalItems, setTotalItems] = React.useState(0)
   const [isOpenCreateUser, setIsOpenCreateUser] = React.useState(false)
+  const [isOpenUpdateUser, setIsOpenUpdateUser] = React.useState(false)
+  const [selectedUser, setSelectedUser] = React.useState<User | null>(null)
+  const [isOpenDeleteUser, setIsOpenDeleteUser] = React.useState(false)
   const { t } = useTranslation()
 
   const userColumns: GridColDef<UserTableRow>[] = [
     { field: 'id', headerName: 'ID', width: 70 },
     {
       field: 'name',
-      headerName: 'Name',
+      headerName: t('Name'),
       width: 200,
       renderCell: params => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -46,50 +62,43 @@ const UsersPage: NextPage<TProps> = () => {
         </Box>
       )
     },
-    { field: 'email', headerName: 'Email', width: 220 },
-    { field: 'phoneNumber', headerName: 'Phone', width: 150 },
-    { field: 'roleName', headerName: 'Role', width: 120 },
+    { field: 'email', headerName: t('Email'), width: 220 },
+    { field: 'phoneNumber', headerName: t('Phone'), width: 150 },
+    { field: 'roleName', headerName: t('Role'), width: 120 },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('Status'),
       width: 100,
       renderCell: params => (
         <CustomTag
-          bgcolor={params.value === 'Active' ? 'rgba(28, 187, 140, .15)' : 'rgba(220, 53, 69, .15)'}
-          color={params.value === 'Active' ? '#1cbb8c' : '#dc3545'}
+          bgcolor={params.value === 'ACTIVE' ? 'rgba(28, 187, 140, .15)' : 'rgba(220, 53, 69, .15)'}
+          color={params.value === 'ACTIVE' ? '#1cbb8c' : '#dc3545'}
         >
-          {params.value === 'Active' ? 'Active' : 'Inactive'}
+          {params.value === 'ACTIVE' ? t('Active') : t('Inactive')}
         </CustomTag>
       )
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('Actions'),
       width: 150,
       renderCell: params => (
-        console.log(params),
-        (
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Box sx={{ cursor: 'pointer' }}>
-              <IconifyIcon icon='tabler:pencil' />
-            </Box>
-            <Box sx={{ cursor: 'pointer' }}>
-              <IconifyIcon icon='tabler:trash' />
-            </Box>
-            <Box sx={{ cursor: 'pointer' }}>
-              <IconifyIcon icon='tabler:eye' />
-            </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ cursor: 'pointer' }} onClick={() => handleOpenUpdate(params.row)}>
+            <IconifyIcon icon='tabler:pencil' />
           </Box>
-        )
+          <Box sx={{ cursor: 'pointer' }} onClick={() => handleOpenDelete(params.row.id, params.row.email)}>
+            <IconifyIcon icon='tabler:trash' />
+          </Box>
+          <Box sx={{ cursor: 'pointer' }}>
+            <IconifyIcon icon='tabler:eye' />
+          </Box>
+        </Box>
       )
     }
   ]
 
-  useEffect(() => {
-    handleRefreshTable()
-  }, [page, pageSize])
-
-  const handleRefreshTable = async () => {
+  const handleRefreshTable = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetchUsers(page, pageSize)
@@ -102,7 +111,8 @@ const UsersPage: NextPage<TProps> = () => {
         avatar: user.avatar,
         phoneNumber: user.phoneNumber,
         roleName: user.role?.name || 'N/A',
-        status: user.status === 'ACTIVE' ? 'Active' : 'Inactive'
+        roleId: user.roleId,
+        status: user.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
       }))
 
       setDataUser(tableData)
@@ -113,7 +123,11 @@ const UsersPage: NextPage<TProps> = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, pageSize])
+
+  useEffect(() => {
+    handleRefreshTable()
+  }, [handleRefreshTable])
 
   const onPageChange = (newPage: number) => {
     setPage(newPage)
@@ -126,6 +140,16 @@ const UsersPage: NextPage<TProps> = () => {
 
   const handleOpenCreate = () => {
     setIsOpenCreateUser(true)
+  }
+
+  const handleOpenUpdate = (user: UserTableRow) => {
+    setSelectedUser(user as unknown as User)
+    setIsOpenUpdateUser(true)
+  }
+
+  const handleOpenDelete = (userId: number, email: string) => {
+    setSelectedUser({ id: userId, email } as User)
+    setIsOpenDeleteUser(true)
   }
 
   return (
@@ -222,7 +246,19 @@ const UsersPage: NextPage<TProps> = () => {
         </Box>
       </Box>
 
+      <UpdateUser
+        open={isOpenUpdateUser}
+        onClose={() => setIsOpenUpdateUser(false)}
+        user={selectedUser}
+        onUpdated={handleRefreshTable}
+      />
       <CreateUser open={isOpenCreateUser} onClose={() => setIsOpenCreateUser(false)} onCreated={handleRefreshTable} />
+      <DeleteUser
+        open={isOpenDeleteUser}
+        onClose={() => setIsOpenDeleteUser(false)}
+        data={selectedUser || { id: 0, email: '' }}
+        onDeleted={handleRefreshTable}
+      />
     </Box>
   )
 }

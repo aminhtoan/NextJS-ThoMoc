@@ -153,6 +153,12 @@
   "Select Status": "Select Status",
   "Status": "Status",
   "Add User": "Add User",
-  "Create User": "Create User"
+  "Create User": "Create User",
+  "No changes detected": "No changes detected",
+  "Update User": "Update User",
+  "Update user successfully": "Update user successfully",
+  "Delete User": "Delete User",
+  "Are you sure you want to delete the user?": "Are you sure you want to delete the user?",
+  "Delete user successfully": "Delete user successfully"
 
 }

@@ -19,25 +19,25 @@ import CustomModal from 'src/components/CustomModal'
 
 // ** Service Import
 import { getAllRoles } from 'src/service/role'
-import { createUser } from 'src/service/user'
+import { updateUser } from 'src/service/user'
 
 // ** Types Import
-import { CreateUserBodySchema, CreateUserBodyType } from 'src/types/user'
+import { UpdateUserBodySchema, UpdateUserBodyType, User } from 'src/types/user'
+
+// Cast schema to match UpdateUserBodyType
+const typedUpdateUserBodySchema = UpdateUserBodySchema as any
 
 interface CreateUserProps {
   open: boolean
   onClose: () => void
-  onCreated?: () => void
+  onUpdated?: () => void
+  user: User | null
 }
 
-const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
+const UpdateUser = ({ open, onClose, user, onUpdated }: CreateUserProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [roles, setRoles] = React.useState<any[]>([])
   const { t } = useTranslation()
-
-  React.useEffect(() => {
-    fetchRoles()
-  }, [open])
 
   const fetchRoles = async () => {
     try {
@@ -48,31 +48,67 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
     }
   }
 
+  React.useEffect(() => {
+    if (open) {
+      fetchRoles()
+    }
+  }, [open])
+
   const {
     handleSubmit,
     control,
     formState: { errors },
-    reset
-  } = useForm({
+    reset,
+    setValue
+  } = useForm<UpdateUserBodyType>({
     defaultValues: {
-      name: '',
       email: '',
+      name: '',
       phoneNumber: '',
-      password: '',
       roleId: undefined,
       status: undefined
     },
     mode: 'onBlur',
-    resolver: yupResolver(CreateUserBodySchema),
+    resolver: yupResolver(typedUpdateUserBodySchema),
     shouldUnregister: true
   })
 
-  const onSubmit = async (data: CreateUserBodyType) => {
+  React.useEffect(() => {
+    if (open && user) {
+      setValue('name', user.name)
+      setValue('email', user.email)
+      setValue('phoneNumber', user.phoneNumber || '')
+      if (user.roleId) {
+        setValue('roleId', user.roleId)
+      }
+      setValue('status', user.status)
+    } else {
+      reset()
+    }
+  }, [open, user, setValue, reset])
+
+  const onSubmit = async (data: UpdateUserBodyType) => {
+    if (
+      user &&
+      data.name === user.name &&
+      data.email === user.email &&
+      (data.phoneNumber || '') === (user.phoneNumber || '') &&
+      (data.roleId === user.roleId || roles.find(r => r.id === data.roleId)?.name === user.role?.name) &&
+      data.status === user.status
+    ) {
+      toast('No changes detected', {
+        icon: '⚠️'
+      })
+
+      return
+    }
+
     try {
       setIsLoading(true)
-      await createUser(data)
-      toast.success(t('Create user successfully'))
-      if (typeof onCreated === 'function') onCreated()
+
+      await updateUser(user?.id as number, data)
+      toast.success(t('Update user successfully'))
+      if (typeof onUpdated === 'function') onUpdated()
       onClose()
       reset()
     } catch (error: any) {
@@ -87,7 +123,7 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
   }
 
   return (
-    <CustomModal open={open} onClose={onClose} title={t('Create User')} maxWidth={450}>
+    <CustomModal open={open} onClose={onClose} title={t('Update User')} maxWidth={450}>
       <Box
         component='form'
         onSubmit={handleSubmit(onSubmit)}
@@ -111,7 +147,6 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
                   name='name'
                   placeholder={t('User name')}
                   autoComplete='off'
-                  required
                   fullWidth
                   variant='outlined'
                   onChange={item => onChange(item)}
@@ -140,7 +175,6 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
                   type='text'
                   id='email'
                   autoComplete='off'
-                  required={false}
                   fullWidth
                   variant='outlined'
                   onChange={item => onChange(item)}
@@ -170,7 +204,6 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
                   type='text'
                   id='phoneNumber'
                   autoComplete='off'
-                  required={false}
                   fullWidth
                   variant='outlined'
                   onChange={item => onChange(item)}
@@ -185,36 +218,6 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
               </>
             )}
             name='phoneNumber'
-          />
-        </Box>
-
-        <Box sx={{ mt: 2 }}>
-          <Controller
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <>
-                <FormLabel>{t('Password')}</FormLabel>
-                <TextField
-                  name='password'
-                  placeholder={t('Password')}
-                  type='password'
-                  id='password'
-                  autoComplete='off'
-                  required={false}
-                  fullWidth
-                  variant='outlined'
-                  onChange={item => onChange(item)}
-                  value={value}
-                  error={Boolean(errors?.password)}
-                  helperText={errors?.password?.message}
-                  FormHelperTextProps={{
-                    className: 'helper-text'
-                  }}
-                  disabled={isLoading}
-                />
-              </>
-            )}
-            name='password'
           />
         </Box>
 
@@ -323,4 +326,4 @@ const CreateUser = ({ open, onClose, onCreated }: CreateUserProps) => {
   )
 }
 
-export default CreateUser
+export default UpdateUser

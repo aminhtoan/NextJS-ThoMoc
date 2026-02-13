@@ -24,5 +24,8 @@ export const API_CONFIG = {
   },
   PERMISSION: {
     ALL: `/permission/all`
+  },
+  USERS: {
+    USERS: `/users`
   }
 }

@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 // ** Custom Modal Import
-import CustomModal from 'src/components/CustomModal/CustomModal'
+import CustomModal from 'src/components/CustomModal'
 
 // ** Service Imports
 import { getRoleById, updateRole } from 'src/service/role'

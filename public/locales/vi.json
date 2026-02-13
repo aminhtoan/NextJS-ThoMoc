@@ -147,5 +147,11 @@
   "Select Status": "Chọn Trạng thái",
   "Status": "Trạng thái",
   "Add User": "Thêm Người dùng",
-  "Create User": "Tạo Người dùng"
+  "Create User": "Tạo Người dùng",
+  "No changes detected": "Không phát hiện thay đổi",
+  "Update User": "Cập nhật Người dùng",
+  "Update user successfully": "Cập nhật người dùng thành công",
+  "Delete User": "Xóa Người dùng",
+  "Are you sure you want to delete the user?": "Bạn có chắc chắn muốn xóa người dùng không?",
+  "Delete user successfully": "Xóa người dùng thành công"
 }
