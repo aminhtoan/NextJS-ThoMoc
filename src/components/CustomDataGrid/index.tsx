@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { DataGrid, DataGridProps } from '@mui/x-data-grid'
+import { DataGrid, DataGridProps, GridRowClassNameParams } from '@mui/x-data-grid'
 import Box from '@mui/material/Box'
 
 const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
   return (
     <Box sx={{ width: '100%' }}>
       <DataGrid
+        getRowClassName={(params: GridRowClassNameParams) => {
+          return params.row?.deletedAt ? 'row-deleted' : ''
+        }}
         sx={{
           border: 1,
           borderColor: 'divider',
@@ -19,6 +22,12 @@ const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
             justifyContent: 'center',
             width: '100%',
             paddingLeft: 0
+          },
+          '& .row-deleted': {
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            color: '#dc3545',
+            opacity: 0.7,
+            textDecoration: 'line-through'
           },
           ...sx
         }}

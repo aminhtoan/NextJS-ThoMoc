@@ -1,6 +1,6 @@
 import axiosClient from './axiosClient'
 
-const handleAPI = async (url: string, data?: any, method?: 'post' | 'put' | 'get' | 'delete') => {
+const handleAPI = async (url: string, data?: any, method?: 'post' | 'put' | 'get' | 'delete' | 'patch') => {
   try {
     const response = await axiosClient({
       url,

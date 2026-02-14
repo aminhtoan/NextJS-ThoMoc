@@ -90,7 +90,7 @@ export default function CustomSelect({
       return option?.name || option?.label || val
     }
 
-    return <em>{placeholder}</em>
+    return <>{placeholder}</>
   }
 
   return (

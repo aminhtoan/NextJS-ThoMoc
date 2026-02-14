@@ -185,6 +185,12 @@
   "Don't have an account?": "Chưa có tài khoản?",
   "Sign up": "Đăng ký",
   "Remember me": "Ghi nhớ đăng nhập",
-  "Forgot your password?": "Quên mật khẩu?"
-  
+  "Forgot your password?": "Quên mật khẩu?",
+  "Payment Methods": "Phương thức thanh toán",
+  "Add Payment Method": "Thêm phương thức thanh toán",
+  "Update Payment Method": "Cập nhật phương thức thanh toán",
+  "Delete Payment Method": "Xóa phương thức thanh toán",
+  "Are you sure you want to delete the payment method?": "Bạn có chắc chắn muốn xóa phương thức thanh toán không?",
+  "Delete payment method successfully": "Xóa phương thức thanh toán thành công",
+  "Search": "Tìm kiếm"
 }

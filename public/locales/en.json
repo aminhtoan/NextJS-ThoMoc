@@ -191,5 +191,12 @@
   "Signing in...": "Signing in...",
   "Forgot your password?": "Forgot your password?",
   "Don&apos;t have an account?": "Don't have an account?",
-  "Remember me": "Remember me"
-}
+  "Remember me": "Remember me",
+  "Payment Methods": "Payment Methods",
+  "Add Payment Method": "Add Payment Method",
+  "Update Payment Method": "Update Payment Method",
+  "Delete payment method successfully": "Delete payment method successfully",
+  "Delete Payment Method": "Delete Payment Method",
+  "Are you sure you want to delete the payment method?": "Are you sure you want to delete the payment method?",
+  "Search": "Search"
+  }

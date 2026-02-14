@@ -27,5 +27,16 @@ export const API_CONFIG = {
   },
   USERS: {
     USERS: `/users`
+  },
+  PAYMENT_METHOD: {
+    PAYMENT_METHOD: `/payment-methods`
+  },
+  ORDER: {
+    ORDER: `/order`
+  },
+  PRODUCT: {
+    PRODUCT: `/product`,
+    PRODUCT_CATEGORY: `/product-category`,
+    PRODUCT_SKU: `/product-sku`
   }
 }

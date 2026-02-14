@@ -1,3 +1,4 @@
+
 export const VerticalItems = [
   {
     title: 'Dashboard',
@@ -122,11 +123,6 @@ export const VerticalItems = [
         path: '/admin/users'
       },
       {
-        title: 'Add New User',
-        icon: 'ic:baseline-person-add',
-        text: 'Add New User'
-      },
-      {
         title: 'User Roles',
         icon: 'ic:baseline-security',
         text: 'User Roles',
@@ -139,5 +135,18 @@ export const VerticalItems = [
     icon: 'ic:baseline-rate-review',
     text: 'All Reviews',
     path: '/admin/reviews'
+  },
+  {
+    title: 'Settings',
+    icon: 'ic:baseline-settings',
+    text: 'Settings',
+    children: [
+      {
+        title: 'Payment Methods',
+        icon: 'ic:baseline-payment',
+        text: 'Payment Methods',
+        path: '/admin/settings/payment-methods'
+      }
+    ]
   }
 ]

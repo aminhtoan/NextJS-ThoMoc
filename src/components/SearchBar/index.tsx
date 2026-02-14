@@ -2,6 +2,7 @@ import { TextField, InputAdornment, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import ClearIcon from '@mui/icons-material/Clear'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SearchBarProps {
   value: string
@@ -9,32 +10,35 @@ interface SearchBarProps {
   onReset?: () => void
   placeholder?: string
 }
+const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onReset, placeholder }) => {
+  const { t } = useTranslation()
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onReset, placeholder }) => (
-  <TextField
-    size='small'
-    variant='outlined'
-    value={value}
-    onChange={onChange}
-    placeholder={placeholder || 'Search...'}
-    sx={{ maxWidth: 1000, width: '100%' }}
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position='start'>
-          <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
-        </InputAdornment>
-      ),
-      endAdornment: (
-        <InputAdornment position='end'>
-          {value && (
-            <IconButton onClick={onReset} edge='end' sx={{ mr: 0.5 }} size='small'>
-              <ClearIcon />
-            </IconButton>
-          )}
-        </InputAdornment>
-      )
-    }}
-  />
-)
+  return (
+    <TextField
+      size='small'
+      variant='outlined'
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder || t('Search')}
+      sx={{ maxWidth: 1000, width: '100%' }}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position='start'>
+            <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+          </InputAdornment>
+        ),
+        endAdornment: (
+          <InputAdornment position='end'>
+            {value && (
+              <IconButton onClick={onReset} edge='end' sx={{ mr: 0.5 }} size='small'>
+                <ClearIcon />
+              </IconButton>
+            )}
+          </InputAdornment>
+        )
+      }}
+    />
+  )
+}
 
 export default SearchBar

@@ -29,14 +29,13 @@ import 'src/styles/globals.scss'
 import AclGuard from 'src/components/auth/AclGuard'
 import AuthGuard from 'src/components/auth/AuthGuard'
 import GuestGuard from 'src/components/auth/GuestGuard'
+import NoGuard from 'src/components/auth/NoGuard'
 import FallbackSpinner from 'src/components/FallBack'
 import { SettingsConsumer, SettingsProvider } from 'src/contexts/SettingsContext'
 import { useSettings } from 'src/hooks/useSettings'
 import { store } from 'src/stores'
 import ThemeComponent from 'src/theme/ThemeComponent'
 import UserLayout from 'src/views/layouts/UserLayout'
-import NoGuard from 'src/components/auth/NoGuard'
-import Head from 'next/head'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -119,7 +118,7 @@ export default function App(props: ExtendedAppProps) {
 
   return (
     <Provider store={store}>
-      <Head>
+      {/* <Head>
         <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
         <meta
           name='description'
@@ -127,7 +126,7 @@ export default function App(props: ExtendedAppProps) {
         />
         <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
-      </Head>
+      </Head> */}
 
       <AuthProvider>
         <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
