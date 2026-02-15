@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next'
 
 // ** Components Imports
 import { CustomDataGrid, CustomPagination, CustomTag, IconifyIcon, SearchBar } from 'src/components'
-import { CreatePaymentMethod, DeletePaymentMethod, UpdatePaymentMethod } from './components/PaymentMethod'
 
 // ** configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
 
 // ** Service Import
-import { getPaymentMethods, restorePaymentMethod, togglePaymentMethodStatus } from 'src/service/payment-methods'
+import { getDeliveryMethods, restoreDeliveryMethod, toggleDeliveryMethodStatus } from 'src/service/delivery-methods'
+import { CreateDeliveryMethod, DeleteDeliveryMethod, UpdateDeliveryMethod } from './components/DeliveryMethod'
 
-const PagePaymentMethods = () => {
+const PageDeliveryMethods = () => {
   const [searchTerm, setSearchTerm] = React.useState('')
   const [page, setPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(PAGINATION_CONFIG.pageSizeOptions[1])
@@ -40,11 +40,21 @@ const PagePaymentMethods = () => {
     {
       field: 'name',
       headerName: t('Name'),
-      width: 230
+      width: 180
     },
     {
       field: 'code',
       headerName: t('Code'),
+      width: 180
+    },
+    {
+      field: 'price',
+      headerName: t('Price'),
+      width: 100
+    },
+    {
+      field: 'description',
+      headerName: t('Description'),
       width: 200
     },
     {
@@ -126,7 +136,7 @@ const PagePaymentMethods = () => {
 
   const handleRestore = async (id: number) => {
     try {
-      await restorePaymentMethod(id)
+      await restoreDeliveryMethod(id)
       handleRefreshTable()
     } catch (error) {
       console.error(error)
@@ -135,7 +145,7 @@ const PagePaymentMethods = () => {
 
   const handleToggleStatus = async (id: number) => {
     try {
-      await togglePaymentMethodStatus(id)
+      await toggleDeliveryMethodStatus(id)
       handleRefreshTable()
     } catch (error) {
       console.error(error)
@@ -145,16 +155,16 @@ const PagePaymentMethods = () => {
   const handleRefreshTable = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await getPaymentMethods()
-      setTotalItems(res.data.length)
-      setTotalPages(Math.ceil(res.data.length / pageSize))
-      setData(res.data)
+      const res = await getDeliveryMethods(page, pageSize)
+      setTotalItems(res.data.totalItems)
+      setTotalPages(res.data.totalPages)
+      setData(res.data.data)
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false)
     }
-  }, [pageSize])
+  }, [pageSize, page])
 
   React.useEffect(() => {
     handleRefreshTable()
@@ -190,7 +200,7 @@ const PagePaymentMethods = () => {
               }}
             >
               <IconifyIcon icon='mdi:plus' />
-              {t('Add Payment Method')}
+              {t('Add Delivery Method')}
             </Box>
           </Box>
         </Box>
@@ -222,14 +232,15 @@ const PagePaymentMethods = () => {
           />
         </Box>
       </Paper>
-      <DeletePaymentMethod
+      <DeleteDeliveryMethod
         open={isOpenDelete}
         onClose={() => setIsOpenDelete(false)}
         data={deleteData}
         onDeleted={handleRefreshTable}
       />
-      <CreatePaymentMethod open={isOpenCreate} onClose={() => setIsOpenCreate(false)} onCreated={handleRefreshTable} />
-      <UpdatePaymentMethod
+      <CreateDeliveryMethod open={isOpenCreate} onClose={() => setIsOpenCreate(false)} onCreated={handleRefreshTable} />
+
+      <UpdateDeliveryMethod
         open={isOpenUpdate}
         onClose={() => setIsOpenUpdate(false)}
         onUpdated={handleRefreshTable}
@@ -240,4 +251,4 @@ const PagePaymentMethods = () => {
   )
 }
 
-export default PagePaymentMethods
+export default PageDeliveryMethods

@@ -9,6 +9,7 @@ const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
         getRowClassName={(params: GridRowClassNameParams) => {
           return params.row?.deletedAt ? 'row-deleted' : ''
         }}
+        isRowSelectable={params => !params.row?.deletedAt}
         sx={{
           border: 1,
           borderColor: 'divider',
@@ -24,9 +25,13 @@ const CustomDataGrid: React.FC<DataGridProps> = ({ sx, ...props }) => {
             paddingLeft: 0
           },
           '& .row-deleted': {
-            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            backgroundColor: 'rgba(220, 53, 69, 0.15) !important'
+          },
+          '& .row-deleted:hover': {
+            backgroundColor: 'rgba(220, 53, 69, 0.25) !important'
+          },
+          '& .row-deleted .MuiDataGrid-cell': {
             color: '#dc3545',
-            opacity: 0.7,
             textDecoration: 'line-through'
           },
           ...sx

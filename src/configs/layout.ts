@@ -1,4 +1,3 @@
-
 export const VerticalItems = [
   {
     title: 'Dashboard',
@@ -146,6 +145,12 @@ export const VerticalItems = [
         icon: 'ic:baseline-payment',
         text: 'Payment Methods',
         path: '/admin/settings/payment-methods'
+      },
+      {
+        title: 'Delivery Methods',
+        icon: 'ic:baseline-local-shipping',
+        text: 'Delivery Methods',
+        path: '/admin/settings/delivery-methods'
       }
     ]
   }

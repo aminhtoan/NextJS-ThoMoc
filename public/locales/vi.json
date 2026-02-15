@@ -192,5 +192,14 @@
   "Delete Payment Method": "Xóa phương thức thanh toán",
   "Are you sure you want to delete the payment method?": "Bạn có chắc chắn muốn xóa phương thức thanh toán không?",
   "Delete payment method successfully": "Xóa phương thức thanh toán thành công",
-  "Search": "Tìm kiếm"
+  "Search": "Tìm kiếm",
+  "Delivery Methods": "Phương thức giao hàng",
+  "Price": "Giá",
+  "Add Delivery Method": "Thêm phương thức giao hàng",
+  "Delete delivery method successfully": "Xóa phương thức giao hàng thành công",
+  "Delete Delivery Method": "Xóa phương thức giao hàng",
+  "Are you sure you want to delete the delivery method?": "Bạn có chắc chắn muốn xóa phương thức giao hàng không?",
+  "Update Delivery Method": "Cập nhật phương thức giao hàng",
+  "Update delivery method successfully": "Cập nhật phương thức giao hàng thành công",
+  "All Reviews": "Tất cả đánh giá"
 }

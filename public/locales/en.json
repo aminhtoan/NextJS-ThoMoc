@@ -198,5 +198,14 @@
   "Delete payment method successfully": "Delete payment method successfully",
   "Delete Payment Method": "Delete Payment Method",
   "Are you sure you want to delete the payment method?": "Are you sure you want to delete the payment method?",
-  "Search": "Search"
+  "Search": "Search",
+  "Delivery Methods": "Delivery Methods",
+  "Price": "Price",
+  "Add Delivery Method": "Add Delivery Method",
+  "Delete delivery method successfully": "Delete delivery method successfully",
+  "Delete Delivery Method": "Delete Delivery Method",
+  "Are you sure you want to delete the delivery method?": "Are you sure you want to delete the delivery method?",
+  "Update Delivery Method": "Update Delivery Method",
+  "Update delivery method successfully": "Update delivery method successfully",
+  "All Reviews": "All Reviews"
   }
