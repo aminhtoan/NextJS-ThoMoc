@@ -15,6 +15,10 @@ const api = axios.create({
 // Thêm interceptor nếu cần (ví dụ thêm token)
 api.interceptors.request.use(
   async config => {
+    const lang = localStorage.getItem('i18nextLng')
+
+    config.headers['Accept-Language'] = lang
+
     // Skip interceptor for refresh token API call
     if (config.url?.includes('/auth/refresh')) {
       return config
@@ -29,6 +33,7 @@ api.interceptors.request.use(
 
     // Check if the access token is still valid
     if (decodedAccessToken?.exp && decodedAccessToken.exp > Date.now() / 1000) {
+      config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${accessToken}`
 
       return config

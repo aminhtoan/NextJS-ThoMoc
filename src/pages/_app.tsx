@@ -36,6 +36,8 @@ import { useSettings } from 'src/hooks/useSettings'
 import { store } from 'src/stores'
 import ThemeComponent from 'src/theme/ThemeComponent'
 import UserLayout from 'src/views/layouts/UserLayout'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import '../styles/editor.css'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage

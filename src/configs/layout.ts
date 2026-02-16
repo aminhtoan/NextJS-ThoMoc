@@ -91,7 +91,8 @@ export const VerticalItems = [
       {
         title: 'Add New Product',
         icon: 'ic:baseline-add-box',
-        text: 'Add New Product'
+        text: 'Add New Product',
+        path: '/admin/products/add'
       },
       {
         title: 'Product Reviews',

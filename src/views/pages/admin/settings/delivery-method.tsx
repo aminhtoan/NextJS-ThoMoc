@@ -50,7 +50,12 @@ const PageDeliveryMethods = () => {
     {
       field: 'price',
       headerName: t('Price'),
-      width: 100
+      width: 100,
+      renderCell: params => {
+        const formattedPrice = new Intl.NumberFormat('vi-VN').format(params.value)
+
+        return `${formattedPrice} đ`
+      }
     },
     {
       field: 'description',

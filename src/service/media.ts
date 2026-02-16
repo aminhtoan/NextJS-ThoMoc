@@ -24,3 +24,24 @@ export const uploadMedia = async (file: any, folder: string) => {
     throw error
   }
 }
+
+export const UploadManyMedia = async (files: any[], folder: string) => {
+  const formData = new FormData()
+  files.forEach(file => {
+    formData.append(`files`, file)
+  })
+  formData.append('folder', folder)
+
+  try {
+    const response = await api.post(API_CONFIG.MEDIA_API.UPLOAD_IMAGES_CLOUDINARY, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.error('Upload failed:', error)
+    throw error
+  }
+}
