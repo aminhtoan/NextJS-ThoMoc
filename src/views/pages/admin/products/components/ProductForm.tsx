@@ -27,7 +27,7 @@ import VariantSettings, { VariantOption } from './VariantSettings'
 
 // ** Services
 import { GetBrand } from 'src/service/brand'
-import { GetCartegory } from 'src/service/category'
+import { GetCategory } from 'src/service/category'
 import { createProduct, getProductDetail, updateProduct } from 'src/service/manage-product'
 import { UploadManyMedia } from 'src/service/media'
 
@@ -127,7 +127,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       try {
         const [brandsRes, categoriesRes] = await Promise.all([
           GetBrand({ page: 1, limit: 100, search: '' }),
-          GetCartegory({})
+          GetCategory({})
         ])
         const brands = brandsRes.data?.data || []
         setBrandOptions(brands.map((b: BrandType) => ({ id: String(b.id), name: b.name })))
@@ -448,6 +448,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
         })
       }
     }
+  }
+
+  const convertUTCToLocalDateTime = (utcDateString: string | null): string => {
+    if (!utcDateString) return ''
+    const date = new Date(utcDateString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`
   }
 
   return (
@@ -821,7 +833,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
                           </Typography>
                           {watchedValues.publishedAt && (
                             <Typography variant='caption' color='text.secondary'>
-                              {new Date(watchedValues.publishedAt).toLocaleString('vi-VN')}
+                              {/* Sửa cách hiển thị để đúng giờ địa phương */}
+                              {new Date(watchedValues.publishedAt).toLocaleString('vi-VN', {
+                                hour12: false,
+                                timeZone: 'Asia/Ho_Chi_Minh'
+                              })}
                             </Typography>
                           )}
                         </Box>
@@ -851,13 +867,33 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
                             fullWidth
                             size='small'
                             type='datetime-local'
-                            value={publishField.value ? new Date(publishField.value).toISOString().slice(0, 16) : ''}
+                            value={publishField.value ? convertUTCToLocalDateTime(publishField.value) : ''}
                             onChange={e => {
-                              const date = e.target.value ? new Date(e.target.value).toISOString() : null
-                              publishField.onChange(date)
+                              // Convert local datetime to UTC ISO for server storage
+                              const localDateTime = e.target.value
+                              if (localDateTime) {
+                                // Parse the local datetime string: "YYYY-MM-DDTHH:mm"
+                                const [date, time] = localDateTime.split('T')
+                                const [year, month, day] = date.split('-')
+                                const [hours, minutes] = time.split(':')
+
+                                // Create Date object treating components as local time
+                                const local = new Date(
+                                  parseInt(year),
+                                  parseInt(month) - 1,
+                                  parseInt(day),
+                                  parseInt(hours),
+                                  parseInt(minutes)
+                                )
+
+                                // Convert to UTC ISO string for server
+                                publishField.onChange(local.toISOString())
+                              } else {
+                                publishField.onChange(null)
+                              }
                             }}
                             inputProps={{
-                              min: new Date().toISOString().slice(0, 16)
+                              min: convertUTCToLocalDateTime(new Date().toISOString())
                             }}
                             disabled={submitting}
                           />

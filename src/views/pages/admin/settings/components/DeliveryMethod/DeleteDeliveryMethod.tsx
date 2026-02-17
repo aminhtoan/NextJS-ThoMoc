@@ -16,7 +16,7 @@ import * as React from 'react'
 // ** Toast Import
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import { deleleDeliveryMethod } from 'src/service/delivery-methods'
+import { deleteDeliveryMethod } from 'src/service/delivery-methods'
 
 // ** Service Import
 
@@ -38,7 +38,7 @@ const DeleteDeliveryMethod = ({ open, onClose, data, onDeleted }: DeleteDelivery
   const handleDelete = async () => {
     try {
       setIsLoading(true)
-      await deleleDeliveryMethod(data.id)
+      await deleteDeliveryMethod(data.id)
       toast.success(t('Delete delivery method successfully'))
       onClose()
       if (onDeleted) onDeleted()

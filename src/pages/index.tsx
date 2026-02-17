@@ -1,10 +1,17 @@
-'use client'
 import { Box } from '@mui/material'
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
+import axios from 'axios'
+import HomePage from 'src/views/pages/home'
+import { ProductType } from 'src/types/product'
 
-export default function Home() {
-  // const theme = useTheme()
+const BASE_URL = process.env.URL_API || 'http://localhost:8888/api'
 
+interface HomeProps {
+  products: ProductType[]
+}
+
+export default function Home({ products }: HomeProps) {
   return (
     <>
       <Head>
@@ -13,9 +20,35 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Box sx={{ margin: 6, width: '200px' }}>Toan update</Box>
+      <Box sx={{ mx: { xs: 2, md: 6 } }}>
+        <HomePage products={products} />
+      </Box>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/product`, {
+      params: { page: 1, limit: 20 }
+    })
+
+    const products: ProductType[] = response.data?.data ?? []
+
+    return {
+      props: {
+        products: JSON.parse(JSON.stringify(products))
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch products:', error)
+
+    return {
+      props: {
+        products: []
+      }
+    }
+  }
 }
 
 // Home.getLayout = (page: React.ReactNode) => <>{page}</>

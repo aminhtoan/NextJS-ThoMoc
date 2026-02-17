@@ -40,5 +40,20 @@ export const API_CONFIG = {
     PRODUCT: `/product`,
     PRODUCT_CATEGORY: `/product-category`,
     PRODUCT_SKU: `/product-sku`
+  },
+  BRAND: {
+    BRAND: `/brand`
+  },
+  CART: {
+    CART: `/cart`
+  },
+  CATEGORY: {
+    CATEGORY: `/category`
+  },
+  DELIVERY_METHOD: {
+    DELIVERY_METHOD: `/delivery-methods`
+  },
+  LANGUAGE: {
+    LANGUAGE: `/language`
   }
 }

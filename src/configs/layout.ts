@@ -98,16 +98,6 @@ export const VerticalItems = [
         title: 'Product Reviews',
         icon: 'ic:baseline-rate-review',
         text: 'Product Reviews'
-      },
-      {
-        title: 'Product Tags',
-        icon: 'ic:baseline-label',
-        text: 'Product Tags'
-      },
-      {
-        title: 'Review Products',
-        icon: 'ic:baseline-rate-review',
-        text: 'Review Products'
       }
     ]
   },

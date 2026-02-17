@@ -3,11 +3,11 @@ import { Box, Button, Chip, Divider, Grid, IconButton, Paper, Tooltip, Typograph
 import { GridColDef } from '@mui/x-data-grid'
 
 // ** Next Imports
-import { NextPage } from 'next/types'
 import { useRouter } from 'next/router'
+import { NextPage } from 'next/types'
 
 // ** React Imports
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // ** Components Imports
 import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon, SearchBar } from 'src/components'
@@ -17,23 +17,23 @@ import { PAGINATION_CONFIG } from 'src/configs/pagination'
 import { ADMIN_ROUTES } from 'src/configs/route'
 
 // ** Services
-import { getProducts, deleteProduct } from 'src/service/manage-product'
 import { GetBrand } from 'src/service/brand'
-import { GetCartegory } from 'src/service/category'
+import { GetCategory } from 'src/service/category'
+import { deleteProduct, getProducts } from 'src/service/manage-product'
 
 // ** Hooks
 import { useTranslation } from 'react-i18next'
-import useDebounce from 'src/hooks/useDebounce'
 import { useAuth } from 'src/hooks/useAuth'
+import useDebounce from 'src/hooks/useDebounce'
 
 // ** Toast
 import toast from 'react-hot-toast'
 
 // ** Components
-import DeleteProductDialog from './components/DeleteProductDialog'
-import { GetManagerProductsQueryType, ProductType, VariantsType } from 'src/types/product'
 import { BrandType } from 'src/types/brand'
 import { CategoryType } from 'src/types/category'
+import { GetManagerProductsQueryType, ProductType, VariantsType } from 'src/types/product'
+import DeleteProductDialog from './components/DeleteProductDialog'
 
 type ProductRow = {
   id: number
@@ -172,14 +172,32 @@ const ProductsPage: NextPage = () => {
       width: 130,
       sortable: false,
       renderCell: params => {
-        const isPublished = !!params.value
+        const publishedAt = params.value
+        const now = new Date()
+        let bgColor: string
+        let color: string
+        let label: string
+
+        if (!publishedAt) {
+          bgColor = 'rgba(255, 193, 7, .15)'
+          color = '#ffc107'
+          label = t('Draft')
+        } else {
+          const publishDate = new Date(publishedAt)
+          if (publishDate <= now) {
+            bgColor = 'rgba(28, 187, 140, .15)'
+            color = '#1cbb8c'
+            label = t('Published')
+          } else {
+            bgColor = 'rgba(2, 136, 209, .15)' // Màu xanh dương nhạt
+            color = '#0288d1'
+            label = t('Pending')
+          }
+        }
 
         return (
-          <CustomTag
-            bgcolor={isPublished ? 'rgba(28, 187, 140, .15)' : 'rgba(255, 193, 7, .15)'}
-            color={isPublished ? '#1cbb8c' : '#ffc107'}
-          >
-            {isPublished ? t('Published') : t('Draft')}
+          <CustomTag bgcolor={bgColor} color={color}>
+            {label}
           </CustomTag>
         )
       }
@@ -285,7 +303,7 @@ const ProductsPage: NextPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await GetCartegory({})
+        const response = await GetCategory({})
         const categories = response.data?.data || []
         setCategoryOptions(categories.map((c: CategoryType) => ({ id: String(c.id), name: c.name })))
       } catch (error) {
@@ -383,7 +401,7 @@ const ProductsPage: NextPage = () => {
               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
                 {filterCategory.map(categoryId => {
                   const category = categoryOptions.find(c => c.id === categoryId)
-                  
+
                   return (
                     <Chip
                       key={categoryId}
