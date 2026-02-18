@@ -279,9 +279,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       }
 
       return { productUrls, skuImageMap }
-    } catch (error) {
-      console.error('Failed to upload images:', error)
-      throw new Error(t('Failed to upload images'))
+    } catch (error: any) {
+      // toast.error(error.response.data.message || t('Failed to upload images'))
+      throw error
     }
   }
 
@@ -292,19 +292,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       newErrors.images = t('At least one image is required')
     }
 
-    if (variants.length === 0) {
-      newErrors.variants = t('At least one variant is required')
-    }
-
     if (variants.length > 0) {
       const hasEmptyVariantName = variants.some(v => !v.value.trim())
       if (hasEmptyVariantName) {
         newErrors.variants = t('All variant names are required')
-      }
-
-      const hasEmptyOptions = variants.some(v => v.options.length === 0)
-      if (hasEmptyOptions) {
-        newErrors.variants = t('All variants must have at least one option')
       }
 
       const hasEmptyOptionValue = variants.some(v => v.options.some(option => !option.trim()))
@@ -338,7 +329,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
           productUrls = uploadResult.productUrls
           skuImageMap = uploadResult.skuImageMap
         } catch (error) {
-          toast.error(t('Failed to upload images'))
           throw error
         }
       }
@@ -351,15 +341,37 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
         image: skuImageMap[index] || sku.image
       }))
 
+      let finalVariants = variants
+      let finalSkus = updatedSKUs
+
+      // Nếu không có variant → auto tạo default
+      if (variants.length === 0) {
+        finalVariants = [
+          {
+            value: 'Default',
+            options: ['Default']
+          }
+        ]
+
+        finalSkus = [
+          {
+            value: 'Default',
+            price: data.basePrice,
+            stock: 100,
+            image: allImages[0] || ''
+          }
+        ]
+      }
+
       const body: CreateProductBodyType = {
         name: data.name,
         basePrice: data.basePrice,
         virtualPrice: data.virtualPrice,
         brandId: Number(data.brandId),
         images: allImages,
-        variants,
+        variants: finalVariants,
         categories: (data.categoryIds || []).map(Number),
-        skus: updatedSKUs.map(s => ({
+        skus: finalSkus.map(s => ({
           value: s.value,
           price: s.price,
           stock: s.stock,
@@ -599,6 +611,43 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
               {allImagePreviews.map((item, displayIndex) => (
                 <Grid item key={item.type === 'uploaded' ? `uploaded-${item.index}` : `pending-${item.id}`}>
                   <Box
+                    draggable={!submitting}
+                    onDragStart={e => {
+                      e.dataTransfer.effectAllowed = 'move'
+                      e.dataTransfer.setData('dragIndex', String(displayIndex))
+                    }}
+                    onDragOver={e => {
+                      e.preventDefault()
+                      e.dataTransfer.dropEffect = 'move'
+                    }}
+                    onDrop={e => {
+                      e.preventDefault()
+                      const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'))
+                      if (dragIndex === displayIndex) return
+
+                      const draggedItemIsUploaded = dragIndex < images.length
+                      const dropItemIsUploaded = displayIndex < images.length
+
+                      // Nếu cả hai là uploaded images
+                      if (draggedItemIsUploaded && dropItemIsUploaded) {
+                        const newImages = [...images]
+                        const temp = newImages[dragIndex]
+                        newImages[dragIndex] = newImages[displayIndex]
+                        newImages[displayIndex] = temp
+                        setImages(newImages)
+                      }
+
+                      // Nếu cả hai là pending images
+                      else if (!draggedItemIsUploaded && !dropItemIsUploaded) {
+                        const dragPendingIdx = dragIndex - images.length
+                        const dropPendingIdx = displayIndex - images.length
+                        const newPending = [...pendingImages]
+                        const temp = newPending[dragPendingIdx]
+                        newPending[dragPendingIdx] = newPending[dropPendingIdx]
+                        newPending[dropPendingIdx] = temp
+                        setPendingImages(newPending)
+                      }
+                    }}
                     sx={{
                       position: 'relative',
                       width: 120,
@@ -607,13 +656,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
                       overflow: 'hidden',
                       border: '1px solid',
                       borderColor: displayIndex === 0 ? 'primary.main' : 'divider',
-                      opacity: submitting ? 0.5 : 1
+                      opacity: submitting ? 0.5 : 1,
+                      cursor: submitting ? 'not-allowed' : 'grab',
+                      transition: 'all 0.2s ease',
+                      '&:active': { cursor: 'grabbing' },
+                      '&:hover': { transform: 'scale(1.02)' }
                     }}
                   >
                     <img
                       src={item.type === 'uploaded' ? item.url : item.preview}
                       alt={`product-${displayIndex}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
                     />
                     <IconButton
                       size='small'

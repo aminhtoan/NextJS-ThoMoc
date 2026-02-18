@@ -109,6 +109,10 @@ const SKUTable: React.FC<SKUTableProps> = ({
   const handleUploadImage = (file: File, index: number, skuValue: string) => {
     // Store file as pending, don't upload yet
     const preview = URL.createObjectURL(file)
+
+    // Remove ảnh cũ của SKU này trước
+    const filtered = pendingImages.filter(img => img.skuIndex !== index)
+
     const newPendingImage: PendingSKUImage = {
       skuValue,
       skuIndex: index,
@@ -116,7 +120,8 @@ const SKUTable: React.FC<SKUTableProps> = ({
       preview
     }
 
-    const updated = [...pendingImages, newPendingImage]
+    const updated = [...filtered, newPendingImage]
+
     onPendingImagesChange?.(updated)
   }
 

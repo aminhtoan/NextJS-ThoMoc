@@ -34,7 +34,7 @@ interface VariantSettingsProps {
 interface SortableVariantItemProps {
   variant: VariantOption
   variantIndex: number
-  expandedIndex: number | null
+  isExpanded: boolean
   toggleExpand: (index: number) => void
   handleVariantNameChange: (index: number, name: string) => void
   handleRemoveOption: (variantIndex: number, optionIndex: number) => void
@@ -70,7 +70,7 @@ interface SortableOptionItemProps {
 const SortableVariantItem: React.FC<SortableVariantItemProps> = ({
   variant,
   variantIndex,
-  expandedIndex,
+  isExpanded,
   toggleExpand,
   handleVariantNameChange,
   handleRemoveOption,
@@ -106,7 +106,7 @@ const SortableVariantItem: React.FC<SortableVariantItemProps> = ({
         variant='outlined'
         sx={{
           p: 2,
-          borderColor: expandedIndex === variantIndex ? 'primary.main' : 'divider'
+          borderColor: isExpanded ? 'primary.main' : 'divider'
         }}
       >
         {/* Collapsed header */}
@@ -123,7 +123,7 @@ const SortableVariantItem: React.FC<SortableVariantItemProps> = ({
             </IconButton>
             <Box onClick={() => toggleExpand(variantIndex)} sx={{ cursor: 'pointer', flex: 1 }}>
               <Typography fontWeight={600}>{variant.value || t('Option name')}</Typography>
-              {expandedIndex !== variantIndex && variant.options.length > 0 && (
+              {!isExpanded && variant.options.length > 0 && (
                 <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
                   {variant.options.map((opt: string, i: number) => (
                     <Chip key={i} label={opt} size='small' variant='outlined' />
@@ -133,12 +133,12 @@ const SortableVariantItem: React.FC<SortableVariantItemProps> = ({
             </Box>
           </Box>
           <IconButton size='small' onClick={() => toggleExpand(variantIndex)}>
-            <IconifyIcon icon={expandedIndex === variantIndex ? 'tabler:chevron-up' : 'tabler:chevron-down'} />
+            <IconifyIcon icon={isExpanded ? 'tabler:chevron-up' : 'tabler:chevron-down'} />
           </IconButton>
         </Box>
 
         {/* Expanded content */}
-        <Collapse in={expandedIndex === variantIndex}>
+        <Collapse in={isExpanded}>
           <Box sx={{ mt: 2 }}>
             {/* Option name */}
             <Typography variant='body2' color='text.secondary' sx={{ mb: 0.5 }}>
@@ -319,7 +319,7 @@ const SortableOptionItem: React.FC<SortableOptionItemProps> = ({
 
 const VariantSettings: React.FC<VariantSettingsProps> = ({ variants, onChange, error }) => {
   const { t } = useTranslation()
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set())
   const [newOptionValue, setNewOptionValue] = useState<Record<number, string>>({})
   const addOptionRefs = useRef<Record<number, HTMLInputElement | null>>({})
 
@@ -333,13 +333,17 @@ const VariantSettings: React.FC<VariantSettingsProps> = ({ variants, onChange, e
   const handleAddVariant = () => {
     const updated = [...variants, { value: '', options: [] }]
     onChange(updated)
-    setExpandedIndex(updated.length - 1)
+    const newIndices = new Set(expandedIndices)
+    newIndices.add(updated.length - 1)
+    setExpandedIndices(newIndices)
   }
 
   const handleRemoveVariant = (index: number) => {
     const updated = variants.filter((_, i) => i !== index)
     onChange(updated)
-    if (expandedIndex === index) setExpandedIndex(null)
+    const newIndices = new Set(expandedIndices)
+    newIndices.delete(index)
+    setExpandedIndices(newIndices)
   }
 
   const handleVariantNameChange = (index: number, name: string) => {
@@ -375,7 +379,13 @@ const VariantSettings: React.FC<VariantSettingsProps> = ({ variants, onChange, e
   }
 
   const toggleExpand = (index: number) => {
-    setExpandedIndex(prev => (prev === index ? null : index))
+    const newIndices = new Set(expandedIndices)
+    if (newIndices.has(index)) {
+      newIndices.delete(index)
+    } else {
+      newIndices.add(index)
+    }
+    setExpandedIndices(newIndices)
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -413,7 +423,7 @@ const VariantSettings: React.FC<VariantSettingsProps> = ({ variants, onChange, e
               key={`variant-${variantIndex}`}
               variant={variant}
               variantIndex={variantIndex}
-              expandedIndex={expandedIndex}
+              isExpanded={expandedIndices.has(variantIndex)}
               toggleExpand={toggleExpand}
               handleVariantNameChange={handleVariantNameChange}
               handleRemoveOption={handleRemoveOption}

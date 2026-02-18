@@ -8,6 +8,13 @@ interface HomePageProps {
 }
 
 const HomePage = ({ products }: HomePageProps) => {
+  const handleProductClick = (productId: number) => {
+    console.log('Clicked product:', productId)
+
+    // Hoặc navigate tới product detail page
+    // navigate(`/product/${productId}`)
+  }
+
   return (
     <Box sx={{ py: 4 }}>
       <Box
@@ -50,7 +57,7 @@ const HomePage = ({ products }: HomePageProps) => {
         <Grid container spacing={2.8}>
           {products.map(product => (
             <Grid item xs={12} sm={6} md={4} lg={2} key={product.id}>
-              <ProductCard product={product} />
+              <ProductCard product={product} onProductClick={handleProductClick} />
             </Grid>
           ))}
         </Grid>

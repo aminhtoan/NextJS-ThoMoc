@@ -106,11 +106,12 @@ const PLACEHOLDER_IMAGE =
 
 interface ProductCardProps {
   product: ProductType
+  onProductClick?: (productId: number) => void
 }
 
 // ============ Component ============
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
@@ -122,7 +123,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0
 
   return (
-    <StyledCard>
+    <StyledCard onClick={() => onProductClick && onProductClick(product.id)}>
       {/* Image Section */}
       <ImageSection>
         {hasDiscount && (
