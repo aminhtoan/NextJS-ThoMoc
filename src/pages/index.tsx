@@ -27,7 +27,7 @@ export default function Home({ products }: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    const response = await axios.get(`http://localhost:8888/api/product`, {
+    const response = await axios.get(`https://nestjs-thomoc.onrender.com/api/product`, {
       params: { page: 1, limit: 20 }
     })
 
