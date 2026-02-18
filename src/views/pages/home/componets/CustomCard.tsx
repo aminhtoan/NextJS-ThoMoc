@@ -2,6 +2,7 @@ import { LocalOffer, ShoppingCart } from '@mui/icons-material'
 import { Box, Button, Card, CardContent, Chip, Paper, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { ProductType } from 'src/types/product'
 
 // ============ Styled Components ============
@@ -113,6 +114,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const router = useRouter()
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
   const currentImage = images[activeImageIndex] || images[0]
@@ -122,8 +124,13 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
     ? Math.round(((product.virtualPrice - product.basePrice) / product.virtualPrice) * 100)
     : 0
 
+  const handleCardClick = () => {
+    router.push(`/product/${product.id}`)
+    if (onProductClick) onProductClick(product.id)
+  }
+
   return (
-    <StyledCard onClick={() => onProductClick && onProductClick(product.id)}>
+    <StyledCard onClick={handleCardClick} sx={{ cursor: 'pointer' }}>
       {/* Image Section */}
       <ImageSection>
         {hasDiscount && (

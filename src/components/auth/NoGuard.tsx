@@ -33,7 +33,7 @@ const NoGuard = (props: AclGuardProps) => {
   }
 
   // Nếu không đủ quyền thì render trang 401 trong layout trắng
-  return <>children</>
+  return <>{children}</>
 }
 
 export default NoGuard
