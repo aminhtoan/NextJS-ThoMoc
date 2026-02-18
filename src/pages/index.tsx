@@ -5,8 +5,6 @@ import axios from 'axios'
 import HomePage from 'src/views/pages/home'
 import { ProductType } from 'src/types/product'
 
-const BASE_URL = process.env.URL_API || 'http://localhost:8888/api'
-
 interface HomeProps {
   products: ProductType[]
 }
@@ -29,7 +27,7 @@ export default function Home({ products }: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/product`, {
+    const response = await axios.get(`http://localhost:8888/api/product`, {
       params: { page: 1, limit: 20 }
     })
 
