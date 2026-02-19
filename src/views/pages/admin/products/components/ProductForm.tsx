@@ -35,16 +35,14 @@ import { UploadManyMedia } from 'src/service/media'
 import { ADMIN_ROUTES } from 'src/configs/route'
 
 // ** Rich Text Editor (react-draft-wysiwyg)
-import { EditorState } from 'draft-js'
-import dynamic from 'next/dynamic'
 
 import { BrandType } from 'src/types/brand'
 import { CategoryType } from 'src/types/category'
 import { CreateProductBodyType, ProductFormFields, ProductFormSchema, SKUItem } from 'src/types/product'
 
-const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), {
-  ssr: false
-})
+// const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), {
+//   ssr: false
+// })
 
 interface ProductFormProps {
   productId?: number
@@ -103,7 +101,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
   const watchedValues = watch()
 
   // Local state for complex data
-  const [editorState, setEditorState] = useState(EditorState.createEmpty())
+  // const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
   const [images, setImages] = useState<string[]>([])
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
   const [variants, setVariants] = useState<VariantOption[]>([])
@@ -551,7 +550,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
           </Paper>
 
           {/* Description */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          {/* <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant='body2' fontWeight={500} sx={{ mb: 1 }}>
               {t('Description')}
             </Typography>
@@ -592,7 +591,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
                 }}
               />
             </Box>
-          </Paper>
+          </Paper> */}
 
           {/* Images */}
           <Paper sx={{ p: 3, mb: 3 }}>

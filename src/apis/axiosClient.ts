@@ -4,9 +4,11 @@ import { refreshTokenAuth } from 'src/service/auth'
 import { AccessTokenPayLoad } from 'src/types/jwt'
 import { clearLocalStorage } from 'src/helpers/localstorge'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8888/api'
+
 // Tạo instance Axios chung
 const api = axios.create({
-  baseURL: 'http://localhost:8888/api/', // URL backend NestJS của bạn,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -25,6 +25,7 @@ import {
   StorefrontOutlined
 } from '@mui/icons-material'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 // ========== Types ==========
 interface SKU {
@@ -80,6 +81,7 @@ interface ProductDetail {
 
 interface ProductDetailViewProps {
   product: ProductDetail
+  defaultLanguage?: string
 }
 
 // ========== Constants ==========
@@ -91,11 +93,29 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN').format(price) + '₫'
 }
 
+const mapLanguageToId = (lang: string): string => {
+  const baseLang = lang.split('-')[0].toLowerCase()
+  const mapping: Record<string, string> = {
+    en: 'EN',
+    vi: 'VI'
+  }
+
+  return mapping[baseLang] || 'EN'
+}
+
 // ========== Component ==========
-const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
+const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultLanguage = 'vi' }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [selectedVariantOptions, setSelectedVariantOptions] = useState<Record<string, string>>({})
+  const [currentLanguageId, setCurrentLanguageId] = useState<string | null>(null)
+
+  const { i18n } = useTranslation()
+
+  useEffect(() => {
+    const lang = i18n.language || defaultLanguage
+    setCurrentLanguageId(mapLanguageToId(lang))
+  }, [i18n.language, defaultLanguage])
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
   const currentImage = images[selectedImageIndex] || images[0]
@@ -105,41 +125,40 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
     ? Math.round(((product.virtualPrice - product.basePrice) / product.virtualPrice) * 100)
     : 0
 
-  // Get description from translations
   const description = useMemo(() => {
-    if (product.productTranslations && product.productTranslations.length > 0) {
-      return product.productTranslations[0].description || ''
-    }
+    if (!currentLanguageId || !product.productTranslations) return ''
+    const translation =
+      product.productTranslations.find(t => t.languageId === currentLanguageId) ||
+      product.productTranslations.find(t => t.languageId.toUpperCase() === currentLanguageId.toUpperCase())
 
-    return ''
-  }, [product.productTranslations])
+    return translation?.description || product.productTranslations[0]?.description || ''
+  }, [product.productTranslations, currentLanguageId])
 
-  // Get translated name
   const translatedName = useMemo(() => {
-    if (product.productTranslations && product.productTranslations.length > 0) {
-      return product.productTranslations[0].name || product.name
-    }
+    if (!currentLanguageId || !product.productTranslations) return product.name
+    const translation =
+      product.productTranslations.find(t => t.languageId === currentLanguageId) ||
+      product.productTranslations.find(t => t.languageId.toUpperCase() === currentLanguageId.toUpperCase())
 
-    return product.name
-  }, [product])
+    return translation?.name || product.productTranslations[0]?.name || product.name
+  }, [product, currentLanguageId])
 
-  // Get category names
   const categoryNames = useMemo(() => {
-    if (!product.categories) return []
+    if (!product.categories || !currentLanguageId) return []
 
     return product.categories.map(cat => {
       if (cat.categoryTranslations && cat.categoryTranslations.length > 0) {
-        return cat.categoryTranslations[0].name
+        const translation = cat.categoryTranslations.find(t => t.languageId === currentLanguageId)
+
+        return translation?.name || cat.categoryTranslations[0]?.name || cat.name
       }
 
       return cat.name
     })
-  }, [product.categories])
+  }, [product.categories, currentLanguageId])
 
-  // Calculate selected SKU price
   const selectedSku = useMemo(() => {
     if (!product.skus || product.skus.length === 0) return null
-
     const selectedValues = Object.values(selectedVariantOptions)
     if (selectedValues.length === 0) return null
 
@@ -151,6 +170,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
   }, [product.skus, selectedVariantOptions])
 
   const displayPrice = selectedSku ? selectedSku.price : product.basePrice
+
   const totalStock = useMemo(() => {
     if (!product.skus || product.skus.length === 0) return 999
 
@@ -192,9 +212,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
       {/* Main Product Section */}
       <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '8px', mb: 3 }}>
         <Grid container spacing={3}>
-          {/* ==================== LEFT: Image Gallery ==================== */}
+          {/* LEFT: Image Gallery */}
           <Grid item xs={12} md={5}>
-            {/* Main Image */}
             <Box
               sx={{
                 position: 'relative',
@@ -211,11 +230,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                 component='img'
                 src={currentImage}
                 alt={product.name}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain'
-                }}
+                sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
               {hasDiscount && (
                 <Box
@@ -264,9 +279,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                     cursor: 'pointer',
                     border: selectedImageIndex === index ? '2px solid #ee4d2d' : '2px solid #e0e0e0',
                     transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: '#ee4d2d'
-                    }
+                    '&:hover': { borderColor: '#ee4d2d' }
                   }}
                 >
                   <Box
@@ -279,7 +292,6 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               ))}
             </Box>
 
-            {/* Share & Favorite buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer', color: '#555' }}>
                 <Share sx={{ fontSize: 18 }} />
@@ -292,9 +304,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
             </Box>
           </Grid>
 
-          {/* ==================== RIGHT: Product Info ==================== */}
+          {/* RIGHT: Product Info */}
           <Grid item xs={12} md={7}>
-            {/* Badges + Title */}
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
               {product.brand && (
                 <Chip
@@ -313,19 +324,12 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               )}
               <Typography
                 variant='h5'
-                sx={{
-                  fontSize: { xs: '16px', md: '20px' },
-                  fontWeight: 500,
-                  color: '#222',
-                  lineHeight: 1.5,
-                  flex: 1
-                }}
+                sx={{ fontSize: { xs: '16px', md: '20px' }, fontWeight: 500, color: '#222', lineHeight: 1.5, flex: 1 }}
               >
                 {translatedName}
               </Typography>
             </Box>
 
-            {/* Rating & Sold */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Typography
@@ -347,7 +351,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               </Box>
             </Box>
 
-            {/* Price Section */}
+            {/* Price */}
             <Box
               sx={{
                 background: '#fafafa',
@@ -361,24 +365,11 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               }}
             >
               {hasDiscount && (
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                    color: '#929292',
-                    textDecoration: 'line-through',
-                    fontWeight: 400
-                  }}
-                >
+                <Typography sx={{ fontSize: '16px', color: '#929292', textDecoration: 'line-through' }}>
                   {formatPrice(product.virtualPrice)}
                 </Typography>
               )}
-              <Typography
-                sx={{
-                  fontSize: { xs: '24px', md: '30px' },
-                  fontWeight: 500,
-                  color: '#ee4d2d'
-                }}
-              >
+              <Typography sx={{ fontSize: { xs: '24px', md: '30px' }, fontWeight: 500, color: '#ee4d2d' }}>
                 {formatPrice(displayPrice)}
               </Typography>
               {hasDiscount && (
@@ -397,7 +388,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               )}
             </Box>
 
-            {/* Shipping Info */}
+            {/* Shipping */}
             <Box sx={{ mb: 3 }}>
               <Grid container spacing={1} alignItems='flex-start'>
                 <Grid item xs={3} sm={2}>
@@ -415,7 +406,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
 
             <Divider sx={{ mb: 2 }} />
 
-            {/* Brand Info */}
+            {/* Brand */}
             {product.brand && (
               <Box sx={{ mb: 2 }}>
                 <Grid container spacing={1} alignItems='center'>
@@ -437,8 +428,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
             )}
 
             {/* Variants */}
-            {product.variants &&
-              product.variants.length > 0 &&
+            {product.variants?.length > 0 &&
               product.variants.map((variant, index) => (
                 <Box key={index} sx={{ mb: 2 }}>
                   <Grid container spacing={1} alignItems='flex-start'>
@@ -449,14 +439,12 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         {variant.options.map((option, optIndex) => {
                           const isSelected = selectedVariantOptions[variant.value] === option
-
-                          // Find matching SKU image
                           const matchingSku = product.skus?.find(sku => sku.value.includes(option))
 
                           return (
                             <Button
                               key={optIndex}
-                              variant={isSelected ? 'outlined' : 'outlined'}
+                              variant='outlined'
                               onClick={() => handleVariantSelect(variant.value, option)}
                               sx={{
                                 minWidth: 'auto',
@@ -495,7 +483,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                 </Box>
               ))}
 
-            {/* Quantity Selector */}
+            {/* Quantity */}
             <Box sx={{ mb: 3 }}>
               <Grid container spacing={1} alignItems='center'>
                 <Grid item xs={3} sm={2}>
@@ -567,10 +555,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                   borderRadius: '2px',
                   fontWeight: 500,
                   flex: { xs: 1, sm: 'none' },
-                  '&:hover': {
-                    borderColor: '#ee4d2d',
-                    backgroundColor: '#fce4de'
-                  }
+                  '&:hover': { borderColor: '#ee4d2d', backgroundColor: '#fce4de' }
                 }}
               >
                 Thêm Vào Giỏ Hàng
@@ -586,16 +571,13 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
                   borderRadius: '2px',
                   fontWeight: 500,
                   flex: { xs: 1, sm: 'none' },
-                  '&:hover': {
-                    backgroundColor: '#d73211'
-                  }
+                  '&:hover': { backgroundColor: '#d73211' }
                 }}
               >
                 Mua Ngay
               </Button>
             </Box>
 
-            {/* Guarantee */}
             <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
               <Verified sx={{ fontSize: 18, color: '#ee4d2d' }} />
               <Typography sx={{ fontSize: '13px', color: '#222' }}>
@@ -619,26 +601,22 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               <Typography sx={{ fontSize: '16px', fontWeight: 600, color: '#222' }}>{product.brand.name}</Typography>
               <Typography sx={{ fontSize: '13px', color: '#757575', mt: 0.5 }}>Online vài phút trước</Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant='outlined'
-                startIcon={<StorefrontOutlined />}
-                size='small'
-                sx={{
-                  textTransform: 'none',
-                  fontSize: '13px',
-                  borderColor: '#ee4d2d',
-                  color: '#ee4d2d',
-                  borderRadius: '2px',
-                  '&:hover': { borderColor: '#d73211', backgroundColor: '#fff0ed' }
-                }}
-              >
-                Xem Shop
-              </Button>
-            </Box>
+            <Button
+              variant='outlined'
+              startIcon={<StorefrontOutlined />}
+              size='small'
+              sx={{
+                textTransform: 'none',
+                fontSize: '13px',
+                borderColor: '#ee4d2d',
+                color: '#ee4d2d',
+                borderRadius: '2px',
+                '&:hover': { borderColor: '#d73211', backgroundColor: '#fff0ed' }
+              }}
+            >
+              Xem Shop
+            </Button>
           </Box>
-
-          {/* Shop Stats */}
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {[
               { label: 'Sản Phẩm', value: '150+' },
@@ -659,20 +637,12 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
 
       {/* Product Description */}
       <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '8px', mb: 3 }}>
-        <Box
-          sx={{
-            backgroundColor: '#fafafa',
-            p: 2,
-            mb: 2,
-            borderRadius: '2px'
-          }}
-        >
+        <Box sx={{ backgroundColor: '#fafafa', p: 2, mb: 2, borderRadius: '2px' }}>
           <Typography sx={{ fontSize: '18px', fontWeight: 500, color: '#222', textTransform: 'uppercase' }}>
             MÔ TẢ SẢN PHẨM
           </Typography>
         </Box>
 
-        {/* Product Details Table */}
         <Box sx={{ mb: 3 }}>
           <Typography
             sx={{
@@ -687,7 +657,6 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
           >
             ✅ CHI TIẾT SẢN PHẨM
           </Typography>
-
           <Box
             sx={{
               '& > div': {
@@ -698,7 +667,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               }
             }}
           >
-            {product.categories && product.categories.length > 0 && (
+            {product.categories?.length > 0 && (
               <Box>
                 <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>Danh Mục</Typography>
                 <Typography sx={{ fontSize: '14px', color: '#222' }}>{categoryNames.join(' > ')}</Typography>
@@ -716,7 +685,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>Kho hàng</Typography>
               <Typography sx={{ fontSize: '14px', color: '#222' }}>{totalStock}</Typography>
             </Box>
-            {product.skus && product.skus.length > 0 && (
+            {product.skus?.length > 0 && (
               <Box>
                 <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>
                   Phân loại
@@ -729,7 +698,6 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Description Content */}
         <Box sx={{ mb: 2 }}>
           <Typography
             sx={{
@@ -744,16 +712,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
           >
             📝 MÔ TẢ SẢN PHẨM
           </Typography>
-
           {description ? (
             <Typography
-              sx={{
-                fontSize: '14px',
-                color: '#333',
-                lineHeight: 1.8,
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
-              }}
+              sx={{ fontSize: '14px', color: '#333', lineHeight: 1.8, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
               dangerouslySetInnerHTML={{ __html: description }}
             />
           ) : (
@@ -761,7 +722,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
               <Typography sx={{ fontSize: '14px', color: '#333', lineHeight: 1.8, mb: 1 }}>
                 <strong>Tên Sản Phẩm:</strong> {product.name}
               </Typography>
-              {product.variants && product.variants.length > 0 && (
+              {product.variants?.length > 0 && (
                 <Typography sx={{ fontSize: '14px', color: '#333', lineHeight: 1.8, mb: 1 }}>
                   <strong>Phân loại:</strong>{' '}
                   {product.variants.map(v => `${v.value}: ${v.options.join(', ')}`).join(' | ')}

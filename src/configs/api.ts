@@ -54,6 +54,9 @@ export const API_CONFIG = {
     DELIVERY_METHOD: `/delivery-methods`
   },
   LANGUAGE: {
-    LANGUAGE: `/language`
+    LANGUAGE: `/languages`
+  },
+  PRODUCT_TRANSLATION: {
+    PRODUCT_TRANSLATION: `/product-translation`
   }
 }

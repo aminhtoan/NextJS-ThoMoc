@@ -95,10 +95,12 @@ export const VerticalItems = [
         path: '/admin/products/add'
       },
       {
-        title: 'Product Reviews',
-        icon: 'ic:baseline-rate-review',
-        text: 'Product Reviews'
-      }
+        title: 'Product Translations',
+        icon: 'ic:baseline-translate',
+        text: 'Product Translations',
+        path: '/admin/products/translations'
+      },
+      { title: 'Product Reviews', icon: 'ic:baseline-rate-review', text: 'Product Reviews' }
     ]
   },
   {

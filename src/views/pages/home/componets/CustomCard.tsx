@@ -107,12 +107,11 @@ const PLACEHOLDER_IMAGE =
 
 interface ProductCardProps {
   product: ProductType
-  onProductClick?: (productId: number) => void
 }
 
 // ============ Component ============
 
-const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const router = useRouter()
 
@@ -126,7 +125,6 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
 
   const handleCardClick = () => {
     router.push(`/product/${product.id}`)
-    if (onProductClick) onProductClick(product.id)
   }
 
   return (

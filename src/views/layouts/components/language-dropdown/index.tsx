@@ -27,6 +27,9 @@ const LanguageDropDown = () => {
 
   const handleOnChangeLang = (lang: string) => {
     i18n.changeLanguage(lang)
+    localStorage.setItem('i18nextLng', lang)
+    document.cookie = `i18nextLng=${lang}; path=/; max-age=31536000`
+    window.location.reload()
     setAnchorEl(null)
   }
 

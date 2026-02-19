@@ -45,6 +45,7 @@ export const ADMIN_ROUTES = {
   PRODUCTS_ADD: '/admin/products/add',
   PRODUCT_REVIEWS: '/admin/products/reviews',
   PRODUCT_TAGS: '/admin/products/tags',
+  PRODUCT_TRANSLATIONS: '/admin/products/translations',
 
   // Users
   USERS: '/admin/users',

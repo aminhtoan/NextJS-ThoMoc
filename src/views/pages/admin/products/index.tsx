@@ -216,10 +216,20 @@ const ProductsPage: NextPage = () => {
     {
       field: 'actions',
       headerName: t('Actions'),
-      width: 130,
+      width: 160,
       sortable: false,
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title={t('Translations')}>
+            <IconButton
+              size='small'
+              onClick={() => router.push(`${ADMIN_ROUTES.PRODUCTS}/translations?productId=${params.row.id}`)}
+              sx={{ color: 'info.main' }}
+            >
+              <IconifyIcon icon='ic:baseline-translate' />
+            </IconButton>
+          </Tooltip>
+
           <Tooltip title={t('Edit')}>
             <IconButton size='small' onClick={() => handleEdit(params.row.id)}>
               <IconifyIcon icon='tabler:pencil' />

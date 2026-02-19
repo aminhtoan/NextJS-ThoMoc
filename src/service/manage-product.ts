@@ -46,4 +46,4 @@ export const updateProduct = async (productId: number, data: UpdateProductBodyTy
 
 export const deleteProduct = async (productId: number) => {
   return await handleAPI(`manage-product/product/${productId}`, {}, 'delete')
-}
+} 

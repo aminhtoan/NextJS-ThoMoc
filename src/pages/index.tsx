@@ -1,13 +1,15 @@
 import { Box } from '@mui/material'
+import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import axios from 'axios'
-import HomePage from 'src/views/pages/home'
 import { ProductType } from 'src/types/product'
+import HomePage from 'src/views/pages/home'
 
 interface HomeProps {
   products: ProductType[]
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function Home({ products }: HomeProps) {
   return (
@@ -25,10 +27,17 @@ export default function Home({ products }: HomeProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async context => {
+  const acceptLanguage = context.req.headers['accept-language'] || 'en'
+
+  const baseLang = acceptLanguage.split('-')[0].split(',')[0].toLowerCase()
+
   try {
-    const response = await axios.get(`https://nestjs-thomoc.onrender.com/api/product`, {
-      params: { page: 1, limit: 20 }
+    const response = await axios.get(`${API_URL}/product`, {
+      params: { page: 1, limit: 20 },
+      headers: {
+        'Accept-Language': baseLang // Send normalized base language
+      }
     })
 
     const products: ProductType[] = response.data?.data ?? []
@@ -50,5 +59,5 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
 }
 
 // Home.getLayout = (page: React.ReactNode) => <>{page}</>
-Home.guestGuard = true
-Home.authGuard = true
+Home.guestGuard = false
+Home.authGuard = false
