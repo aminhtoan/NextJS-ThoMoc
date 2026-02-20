@@ -13,6 +13,7 @@ import {
   Breadcrumbs,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   Grid,
   IconButton,
@@ -22,8 +23,14 @@ import {
   Typography
 } from '@mui/material'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useAuth } from 'src/hooks/useAuth'
+import { AppDispatch } from 'src/stores'
+import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
 
 // ========== Types ==========
 interface SKU {
@@ -114,9 +121,13 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
   const [quantity, setQuantity] = useState(1)
   const [selectedVariantOptions, setSelectedVariantOptions] = useState<Record<string, string>>({})
   const [currentLanguageId, setCurrentLanguageId] = useState<string | null>(null)
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
 
   const { i18n } = useTranslation()
   const { t } = useTranslation()
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const { user } = useAuth()
 
   useEffect(() => {
     const lang = i18n.language || defaultLanguage
@@ -232,6 +243,99 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
       return next
     })
+  }
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error(t('Please login to add to cart'))
+      router.push('/login')
+
+      return
+    }
+
+    // Check if variants are selected
+    if (product.variants && product.variants.length > 0) {
+      const allSelected = product.variants.every(
+        variant => selectedVariantOptions[variant.value] && selectedVariantOptions[variant.value] !== ''
+      )
+      if (!allSelected) {
+        toast.error(t('Please select product options'))
+
+        return
+      }
+    }
+
+    // Get SKU ID
+    let skuId: number | null = null
+    if (selectedSku) {
+      skuId = selectedSku.id
+    } else if (product.skus && product.skus.length > 0) {
+      // Default to first SKU if no variant selection required
+      skuId = product.skus[0].id
+    }
+
+    if (!skuId) {
+      toast.error(t('Product not available'))
+
+      return
+    }
+
+    setIsAddingToCart(true)
+    try {
+      await dispatch(addToCartAsync({ skuId, quantity })).unwrap()
+      toast.success(t('Added to cart successfully'))
+
+      dispatch(fetchCartAsync({ page: 1, limit: 100 }))
+    } catch (error: any) {
+      toast.error(error?.message || t('Failed to add to cart'))
+    } finally {
+      setIsAddingToCart(false)
+    }
+  }
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      toast.error(t('Please login to continue'))
+      router.push('/login')
+
+      return
+    }
+
+    // Check if variants are selected
+    if (product.variants && product.variants.length > 0) {
+      const allSelected = product.variants.every(
+        variant => selectedVariantOptions[variant.value] && selectedVariantOptions[variant.value] !== ''
+      )
+      if (!allSelected) {
+        toast.error(t('Please select product options'))
+
+        return
+      }
+    }
+
+    // Get SKU ID
+    let skuId: number | null = null
+    if (selectedSku) {
+      skuId = selectedSku.id
+    } else if (product.skus && product.skus.length > 0) {
+      skuId = product.skus[0].id
+    }
+
+    if (!skuId) {
+      toast.error(t('Product not available'))
+
+      return
+    }
+
+    setIsAddingToCart(true)
+    try {
+      await dispatch(addToCartAsync({ skuId, quantity })).unwrap()
+      router.push('/cart')
+    } catch (error: any) {
+      toast.error(error?.message || t('Failed to add to cart'))
+    } finally {
+      setIsAddingToCart(false)
+    }
   }
 
   return (
@@ -561,7 +665,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
               <Button
                 variant='outlined'
-                startIcon={<ShoppingCart />}
+                startIcon={isAddingToCart ? <CircularProgress size={20} /> : <ShoppingCart />}
+                onClick={handleAddToCart}
+                disabled={isAddingToCart}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -581,6 +687,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
               </Button>
               <Button
                 variant='contained'
+                onClick={handleBuyNow}
+                disabled={isAddingToCart}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -599,7 +707,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Verified sx={{ fontSize: 18, color: PRIMARY }} />
-              <Typography sx={{ fontSize: '13px', color: '#222' }}>{t('Return Policy')}</Typography>
+              <Typography sx={{ fontSize: '13px', color: '#222' }}>{t('return Policy')}</Typography>
             </Box>
           </Grid>
         </Grid>
@@ -616,6 +724,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
             />
             <Box sx={{ flex: 1 }}>
               <Typography sx={{ fontSize: '16px', fontWeight: 600, color: '#222' }}>{product.brand.name}</Typography>
+
               <Typography sx={{ fontSize: '13px', color: '#757575', mt: 0.5 }}>Online vài phút trước</Typography>
             </Box>
             <Button

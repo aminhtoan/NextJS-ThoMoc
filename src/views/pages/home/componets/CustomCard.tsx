@@ -127,6 +127,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
     router.push(`/product/${product.id}`)
   }
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click
+    // Navigate to product detail page to select variants
+    router.push(`/product/${product.id}`)
+  }
+
   return (
     <StyledCard onClick={handleCardClick} sx={{ cursor: 'pointer' }}>
       {/* Image Section */}
@@ -271,7 +277,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Add to Cart Button */}
-        <AddToCartButton variant='contained' startIcon={<ShoppingCart />} fullWidth>
+        <AddToCartButton variant='contained' startIcon={<ShoppingCart />} fullWidth onClick={handleAddToCart}>
           Add to Cart
         </AddToCartButton>
       </CardContent>

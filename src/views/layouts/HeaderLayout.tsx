@@ -18,15 +18,27 @@ import { AUTH_LOG } from 'src/configs/auth'
 
 // Hooks
 import { useAuth } from 'src/hooks/useAuth'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/stores'
+import { fetchCartAsync } from 'src/stores/apps/cart/actions'
 
 const HeaderLayout = () => {
   const { user } = useAuth()
   const router = useRouter()
   const { t } = useTranslation()
+  const dispatch = useDispatch<AppDispatch>()
+  const { totalItems } = useSelector((state: RootState) => state.cart)
   const TOP_BAR_HEIGHT = 25
   const MAIN_BAR_HEIGHT = 80
+
+  // Fetch cart data when user is logged in
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchCartAsync({ page: 1, limit: 100 }))
+    }
+  }, [user, dispatch])
 
   return (
     <React.Fragment>
@@ -165,10 +177,11 @@ const HeaderLayout = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <IconButton
                     color='inherit'
+                    onClick={() => router.push('/cart')}
                     sx={{ transition: 'all .2s', '&:hover': { transform: 'scale(1.05)' }, mr: '50px' }}
                   >
                     <Badge
-                      badgeContent={2}
+                      badgeContent={totalItems}
                       color='error'
                       sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', right: 1 } }}
                     >

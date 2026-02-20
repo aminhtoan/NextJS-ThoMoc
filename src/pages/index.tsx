@@ -2,16 +2,32 @@ import { Box } from '@mui/material'
 import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { ProductType } from 'src/types/product'
+import { CategoryWithTranslationsType } from 'src/types/category'
 import HomePage from 'src/views/pages/home'
 
 interface HomeProps {
   products: ProductType[]
+  totalPages: number
+  currentPage: number
+  categories: CategoryWithTranslationsType[]
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+const LIMIT = 10
 
-export default function Home({ products }: HomeProps) {
+export default function Home({ products, totalPages, currentPage, categories }: HomeProps) {
+  const router = useRouter()
+
+  const handlePageChange = (page: number) => {
+    router.push({ pathname: '/', query: { page } }, undefined, { scroll: true })
+  }
+
+  const handleCategoryClick = (categoryId: number) => {
+    router.push(`/category/${categoryId}`)
+  }
+
   return (
     <>
       <Head>
@@ -21,7 +37,14 @@ export default function Home({ products }: HomeProps) {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Box sx={{ mx: { xs: 2, md: 6 } }}>
-        <HomePage products={products} />
+        <HomePage
+          products={products}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          categories={categories}
+          onCategoryClick={handleCategoryClick}
+        />
       </Box>
     </>
   )
@@ -29,35 +52,51 @@ export default function Home({ products }: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async context => {
   const acceptLanguage = context.req.headers['accept-language'] || 'en'
-
   const baseLang = acceptLanguage.split('-')[0].split(',')[0].toLowerCase()
 
-  try {
-    const response = await axios.get(`${API_URL}/product`, {
-      params: { page: 1, limit: 20 },
-      headers: {
-        'Accept-Language': baseLang // Send normalized base language
-      }
-    })
+  // Lấy page từ query string, mặc định là 1
+  const page = Number(context.query.page) || 1
 
-    const products: ProductType[] = response.data?.data ?? []
+  try {
+    const [productResponse, categoryResponse] = await Promise.all([
+      axios.get(`${API_URL}/product`, {
+        params: { page, limit: LIMIT },
+        headers: {
+          'Accept-Language': baseLang
+        }
+      }),
+      axios.get(`${API_URL}/category`, {
+        headers: {
+          'Accept-Language': baseLang
+        }
+      })
+    ])
+
+    const products: ProductType[] = productResponse.data?.data ?? []
+    const totalPages: number = productResponse.data?.totalPages ?? 1
+    const categories: CategoryWithTranslationsType[] = categoryResponse.data?.data ?? []
 
     return {
       props: {
-        products: JSON.parse(JSON.stringify(products))
+        products: JSON.parse(JSON.stringify(products)),
+        totalPages,
+        currentPage: page,
+        categories: JSON.parse(JSON.stringify(categories))
       }
     }
   } catch (error) {
-    console.error('Failed to fetch products:', error)
+    console.error('Failed to fetch data:', error)
 
     return {
       props: {
-        products: []
+        products: [],
+        totalPages: 1,
+        currentPage: 1,
+        categories: []
       }
     }
   }
 }
 
-// Home.getLayout = (page: React.ReactNode) => <>{page}</>
 Home.guestGuard = false
 Home.authGuard = false
