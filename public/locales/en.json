@@ -245,5 +245,27 @@
   "All variants must have at least one option": "All variants must have at least one option",
   "All option values must be filled": "All option values must be filled", 
   "Please add variant options to generate SKUs": "Please add variant options to generate SKUs",
-  "All SKUs must have price > 0 and stock >= 0": "All SKUs must have price > 0 and stock >= 0"
-  }
+  "All SKUs must have price > 0 and stock >= 0": "All SKUs must have price > 0 and stock >= 0",
+  "Discount": "DISCOUNT",
+  "Favorite": "Favorite",
+  "Reviews": "Reviews",
+  "Sold": "Sold",
+   "Shipping": "Shipping",
+  "Free Shipping": "Free Shipping",
+  "Shipping Fee": "Shipping Fee",
+  "Available Product": "Available Product",
+"Add to Cart": "Add to Cart",
+"Buy Now": "Buy Now",
+"Return Policy": "Free return within 15 days | 100% authentic products",
+"PRODUCT DETAILS": "PRODUCT DETAILS",
+"Description1": "PRODUCT DESCRIPTION",
+"category": "Category",
+"brand": "Brand",
+"stock": "Stock",
+"Màu Sắc": "Color",
+"Kích Thước": "Size",
+"Color": "Color",
+"Size": "Size",
+"Số Lượng": "Quantity"
+
+}

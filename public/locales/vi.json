@@ -239,5 +239,31 @@
   "All variants must have at least one option": "Tất cả biến thể phải có ít nhất một tùy chọn",
   "All option values must be filled": "Tất cả giá trị tùy chọn phải được điền", 
   "Please add variant options to generate SKUs": "Vui lòng thêm tùy chọn biến thể để tạo mã SKU",
-  "All SKUs must have price > 0 and stock >= 0": "Tất cả mã SKU phải có giá > 0 và số lượng tồn kho >= 0"
+  "All SKUs must have price > 0 and stock >= 0": "Tất cả mã SKU phải có giá > 0 và số lượng tồn kho >= 0",
+  "Discount": "GIẢM",
+  "Favorite": "Yêu thích",
+  "Reviews": "Đánh giá",
+  "Sold": "Đã bán",
+  "Shipping": "Vận chuyển",
+  "Free Shipping": "Miễn phí vận chuyển",
+  "Shipping Fee": "Phí vận chuyển",
+  "Available Product": "Sản phẩm có sẵn", 
+"Add to Cart": "Thêm Vào Giỏ Hàng",
+"Buy Now": "Mua Ngay",
+"Return Policy": "Trả hàng miễn phí 15 ngày | Hàng chính hãng 100%",
+"PRODUCT DETAILS": "CHI TIẾT SẢN PHẨM",
+"Description1": "MÔ TẢ SẢN PHẨM",
+"category": "Danh mục",
+"brand": "Thương hiệu",
+"stock": "Kho",
+"Màu Sắc": "Màu Sắc",
+"Kích Thước": "Kích thước",
+"Color": "Màu Sắc",
+"Size": "Kích thước",
+"Số Lượng": "Số lượng"
+
+
+
+                
+
   }

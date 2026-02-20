@@ -1,30 +1,28 @@
-import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Box,
-  Typography,
-  Grid,
-  Chip,
-  Button,
-  Divider,
-  Rating,
-  Paper,
-  Breadcrumbs,
-  IconButton,
-  Avatar,
-  Link as MuiLink
-} from '@mui/material'
-import {
-  ShoppingCart,
-  FavoriteBorder,
-  Share,
-  LocalShipping,
-  Verified,
-  NavigateNext,
   Add,
+  LocalShipping,
+  NavigateNext,
   Remove,
-  StorefrontOutlined
+  ShoppingCart,
+  StorefrontOutlined,
+  Verified
 } from '@mui/icons-material'
+import {
+  Avatar,
+  Box,
+  Breadcrumbs,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  Link as MuiLink,
+  Paper,
+  Rating,
+  Typography
+} from '@mui/material'
 import Link from 'next/link'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ========== Types ==========
@@ -88,6 +86,12 @@ interface ProductDetailViewProps {
 const PLACEHOLDER_IMAGE =
   "data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='400' height='400' fill='%23f5f5f5'/%3E%3Ctext x='200' y='200' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='18' fill='%23bbb'%3ENo Image%3C/text%3E%3C/svg%3E"
 
+// ========== Theme Color ==========
+const PRIMARY = '#1565c0' // xanh header
+const PRIMARY_LIGHT = '#e3f0fb' // nền nhạt
+const PRIMARY_HOVER = '#0d47a1' // hover đậm hơn
+const PRIMARY_BG = '#e8f0fe' // background nhạt cho price box
+
 // ========== Helper ==========
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN').format(price) + '₫'
@@ -106,11 +110,13 @@ const mapLanguageToId = (lang: string): string => {
 // ========== Component ==========
 const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultLanguage = 'vi' }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [overrideImage, setOverrideImage] = useState<string | null>(null) // ảnh override từ SKU màu
   const [quantity, setQuantity] = useState(1)
   const [selectedVariantOptions, setSelectedVariantOptions] = useState<Record<string, string>>({})
   const [currentLanguageId, setCurrentLanguageId] = useState<string | null>(null)
 
   const { i18n } = useTranslation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const lang = i18n.language || defaultLanguage
@@ -118,7 +124,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
   }, [i18n.language, defaultLanguage])
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
-  const currentImage = images[selectedImageIndex] || images[0]
+
+  // Ưu tiên overrideImage nếu có, không thì dùng gallery bình thường
+  const currentImage = overrideImage ?? images[selectedImageIndex] ?? images[0]
 
   const hasDiscount = product.virtualPrice > product.basePrice
   const discountPercentage = hasDiscount
@@ -178,10 +186,42 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
   }, [product.skus])
 
   const handleVariantSelect = (variantName: string, option: string) => {
+    const isDeselecting = selectedVariantOptions[variantName] === option
+
     setSelectedVariantOptions(prev => ({
       ...prev,
-      [variantName]: prev[variantName] === option ? '' : option
+      [variantName]: isDeselecting ? '' : option
     }))
+
+    // Chỉ xử lý chuyển ảnh với variant màu sắc
+    const isColorVariant = variantName === 'Màu Sắc' || variantName === 'Color'
+    if (isColorVariant) {
+      if (isDeselecting) {
+        // Bỏ chọn → reset về ảnh đầu gallery
+        setOverrideImage(null)
+        setSelectedImageIndex(0)
+      } else {
+        // Chọn màu → tìm ảnh SKU tương ứng
+        const matchingSku = product.skus?.find(sku => sku.value.includes(option))
+        if (matchingSku?.image) {
+          const imgIndex = images.findIndex(img => img === matchingSku.image)
+          if (imgIndex !== -1) {
+            // Ảnh có trong gallery → dùng index
+            setOverrideImage(null)
+            setSelectedImageIndex(imgIndex)
+          } else {
+            // Ảnh không trong gallery → override trực tiếp
+            setOverrideImage(matchingSku.image)
+          }
+        }
+      }
+    }
+  }
+
+  // Click thumbnail → xoá override, dùng gallery bình thường
+  const handleThumbnailClick = (index: number) => {
+    setOverrideImage(null)
+    setSelectedImageIndex(index)
   }
 
   const handleQuantityChange = (delta: number) => {
@@ -199,19 +239,19 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       {/* Breadcrumbs */}
       <Breadcrumbs separator={<NavigateNext fontSize='small' />} sx={{ mb: 2 }}>
         <MuiLink component={Link} href='/' underline='hover' color='inherit' sx={{ fontSize: '14px' }}>
-          Trang chủ
+          {t('Home')}
         </MuiLink>
         {categoryNames.map((name, index) => (
           <Typography key={index} sx={{ fontSize: '14px', color: '#555' }}>
             {name}
           </Typography>
         ))}
-        <Typography sx={{ fontSize: '14px', color: '#333', fontWeight: 500 }}>{product.name}</Typography>
+        <Typography sx={{ fontSize: '14px', color: '#333', fontWeight: 500 }}>{translatedName}</Typography>
       </Breadcrumbs>
 
       {/* Main Product Section */}
-      <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '8px', mb: 3 }}>
-        <Grid container spacing={3}>
+      <Paper sx={{ p: 5, pb: 5, borderRadius: '8px', mb: 3 }}>
+        <Grid container spacing={4}>
           {/* LEFT: Image Gallery */}
           <Grid item xs={12} md={5}>
             <Box
@@ -238,7 +278,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                     position: 'absolute',
                     top: 0,
                     right: 0,
-                    backgroundColor: '#ee4d2d',
+                    backgroundColor: PRIMARY,
                     color: '#fff',
                     px: 1,
                     py: 0.5,
@@ -250,7 +290,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                   }}
                 >
                   <Box sx={{ fontSize: '16px', fontWeight: 800 }}>{discountPercentage}%</Box>
-                  <Box sx={{ fontSize: '11px' }}>GIẢM</Box>
+                  <Box sx={{ fontSize: '11px' }}>{t('Discount')}</Box>
                 </Box>
               )}
             </Box>
@@ -266,59 +306,54 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                 '&::-webkit-scrollbar-thumb': { backgroundColor: '#ddd', borderRadius: 2 }
               }}
             >
-              {images.map((img, index) => (
-                <Box
-                  key={index}
-                  onClick={() => setSelectedImageIndex(index)}
-                  sx={{
-                    width: 82,
-                    height: 82,
-                    minWidth: 82,
-                    borderRadius: '4px',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    border: selectedImageIndex === index ? '2px solid #ee4d2d' : '2px solid #e0e0e0',
-                    transition: 'all 0.2s ease',
-                    '&:hover': { borderColor: '#ee4d2d' }
-                  }}
-                >
-                  <Box
-                    component='img'
-                    src={img}
-                    alt={`${product.name} ${index + 1}`}
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </Box>
-              ))}
-            </Box>
+              {images.map((img, index) => {
+                const isActive = !overrideImage && selectedImageIndex === index
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer', color: '#555' }}>
-                <Share sx={{ fontSize: 18 }} />
-                <Typography sx={{ fontSize: '14px' }}>Chia sẻ</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer', color: '#555' }}>
-                <FavoriteBorder sx={{ fontSize: 18, color: '#ee4d2d' }} />
-                <Typography sx={{ fontSize: '14px' }}>Yêu thích</Typography>
-              </Box>
+                return (
+                  <Box
+                    key={index}
+                    onClick={() => handleThumbnailClick(index)}
+                    sx={{
+                      width: 82,
+                      height: 82,
+                      minWidth: 82,
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: isActive ? `2px solid ${PRIMARY}` : '2px solid #e0e0e0',
+                      transition: 'all 0.2s ease',
+                      '&:hover': { borderColor: PRIMARY }
+                    }}
+                  >
+                    <Box
+                      component='img'
+                      src={img}
+                      alt={`${product.name} ${index + 1}`}
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </Box>
+                )
+              })}
             </Box>
           </Grid>
 
           {/* RIGHT: Product Info */}
           <Grid item xs={12} md={7}>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
+            {/* Title */}
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
               {product.brand && (
                 <Chip
-                  label='Yêu thích'
+                  label={t('Favorite')}
                   size='small'
                   sx={{
-                    backgroundColor: '#ee4d2d',
+                    backgroundColor: PRIMARY,
                     color: '#fff',
                     fontWeight: 700,
                     fontSize: '11px',
                     height: 22,
                     mt: 0.5,
-                    borderRadius: '2px'
+                    borderRadius: '2px',
+                    flexShrink: 0
                   }}
                 />
               )}
@@ -330,34 +365,35 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+            {/* Rating & Stats */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 5, flexWrap: 'wrap' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Typography
-                  sx={{ fontSize: '16px', fontWeight: 500, color: '#ee4d2d', borderBottom: '1px solid #ee4d2d' }}
+                  sx={{ fontSize: '16px', fontWeight: 500, color: PRIMARY, borderBottom: `1px solid ${PRIMARY}` }}
                 >
                   4.7
                 </Typography>
-                <Rating value={4.7} readOnly precision={0.1} size='small' sx={{ color: '#ee4d2d' }} />
+                <Rating value={4.7} readOnly precision={0.1} size='small' sx={{ color: PRIMARY }} />
               </Box>
               <Divider orientation='vertical' flexItem />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Typography sx={{ fontSize: '16px', fontWeight: 500, borderBottom: '1px solid #555' }}>735</Typography>
-                <Typography sx={{ fontSize: '14px', color: '#767676' }}>Đánh Giá</Typography>
+                <Typography sx={{ fontSize: '14px', color: '#767676' }}>{t('Reviews')}</Typography>
               </Box>
               <Divider orientation='vertical' flexItem />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>3k+</Typography>
-                <Typography sx={{ fontSize: '14px', color: '#767676' }}>Đã Bán</Typography>
+                <Typography sx={{ fontSize: '14px', color: '#767676' }}>{t('Sold')}</Typography>
               </Box>
             </Box>
 
             {/* Price */}
             <Box
               sx={{
-                background: '#fafafa',
-                p: 2,
+                background: PRIMARY_BG,
+                p: 2.5,
                 borderRadius: '4px',
-                mb: 3,
+                mb: 8,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2,
@@ -369,7 +405,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                   {formatPrice(product.virtualPrice)}
                 </Typography>
               )}
-              <Typography sx={{ fontSize: { xs: '24px', md: '30px' }, fontWeight: 500, color: '#ee4d2d' }}>
+              <Typography sx={{ fontSize: { xs: '24px', md: '30px' }, fontWeight: 500, color: PRIMARY }}>
                 {formatPrice(displayPrice)}
               </Typography>
               {hasDiscount && (
@@ -377,7 +413,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                   label={`${discountPercentage}% GIẢM`}
                   size='small'
                   sx={{
-                    backgroundColor: '#ee4d2d',
+                    backgroundColor: PRIMARY,
                     color: '#fff',
                     fontWeight: 700,
                     fontSize: '12px',
@@ -389,57 +425,39 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
             </Box>
 
             {/* Shipping */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 4 }}>
               <Grid container spacing={1} alignItems='flex-start'>
                 <Grid item xs={3} sm={2}>
-                  <Typography sx={{ fontSize: '14px', color: '#757575' }}>Vận Chuyển</Typography>
+                  <Typography sx={{ fontSize: '14px', color: '#757575', pt: 0.5 }}>{t('Shipping')}</Typography>
                 </Grid>
                 <Grid item xs={9} sm={10}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                     <LocalShipping sx={{ fontSize: 20, color: '#26aa99' }} />
-                    <Typography sx={{ fontSize: '14px', color: '#222' }}>Miễn phí vận chuyển</Typography>
+                    <Typography sx={{ fontSize: '14px', color: '#222' }}>{t('Free Shipping')}</Typography>
                   </Box>
-                  <Typography sx={{ fontSize: '13px', color: '#26aa99', fontWeight: 500 }}>Phí ship 0đ</Typography>
+                  <Typography sx={{ fontSize: '13px', color: '#26aa99', fontWeight: 500 }}>
+                    {t('Free shipping fee')}
+                  </Typography>
                 </Grid>
               </Grid>
             </Box>
 
-            <Divider sx={{ mb: 2 }} />
-
-            {/* Brand */}
-            {product.brand && (
-              <Box sx={{ mb: 2 }}>
-                <Grid container spacing={1} alignItems='center'>
-                  <Grid item xs={3} sm={2}>
-                    <Typography sx={{ fontSize: '14px', color: '#757575' }}>Thương hiệu</Typography>
-                  </Grid>
-                  <Grid item xs={9} sm={10}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {product.brand.logo && (
-                        <Avatar src={product.brand.logo} sx={{ width: 24, height: 24 }} variant='rounded' />
-                      )}
-                      <Typography sx={{ fontSize: '14px', color: '#08f', fontWeight: 500 }}>
-                        {product.brand.name}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
+            <Divider sx={{ mb: 3 }} />
 
             {/* Variants */}
             {product.variants?.length > 0 &&
               product.variants.map((variant, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
+                <Box key={index} sx={{ mb: 6 }}>
                   <Grid container spacing={1} alignItems='flex-start'>
                     <Grid item xs={3} sm={2}>
-                      <Typography sx={{ fontSize: '14px', color: '#757575', pt: 1 }}>{variant.value}</Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#757575', pt: 1.5 }}>{t(variant.value)}</Typography>
                     </Grid>
                     <Grid item xs={9} sm={10}>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                         {variant.options.map((option, optIndex) => {
                           const isSelected = selectedVariantOptions[variant.value] === option
-                          const matchingSku = product.skus?.find(sku => sku.value.includes(option))
+                          const showImage = variant.value === 'Màu Sắc' || variant.value === 'Color'
+                          const matchingSku = showImage ? product.skus?.find(sku => sku.value.includes(option)) : null
 
                           return (
                             <Button
@@ -447,21 +465,21 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                               variant='outlined'
                               onClick={() => handleVariantSelect(variant.value, option)}
                               sx={{
-                                minWidth: 'auto',
-                                px: 2,
-                                py: 1,
+                                minWidth: '70px',
+                                px: 3,
+                                py: 1.5,
                                 fontSize: '14px',
                                 textTransform: 'none',
-                                color: isSelected ? '#ee4d2d' : '#333',
-                                borderColor: isSelected ? '#ee4d2d' : '#e0e0e0',
-                                backgroundColor: isSelected ? '#fff0ed' : '#fff',
+                                color: isSelected ? PRIMARY : '#333',
+                                borderColor: isSelected ? PRIMARY : '#e0e0e0',
+                                backgroundColor: isSelected ? PRIMARY_LIGHT : '#fff',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 1,
                                 borderRadius: '2px',
                                 '&:hover': {
-                                  borderColor: '#ee4d2d',
-                                  backgroundColor: isSelected ? '#fff0ed' : '#fafafa'
+                                  borderColor: PRIMARY,
+                                  backgroundColor: isSelected ? PRIMARY_LIGHT : '#fafafa'
                                 }
                               }}
                             >
@@ -484,10 +502,10 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
               ))}
 
             {/* Quantity */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 8, mt: 1 }}>
               <Grid container spacing={1} alignItems='center'>
                 <Grid item xs={3} sm={2}>
-                  <Typography sx={{ fontSize: '14px', color: '#757575' }}>Số Lượng</Typography>
+                  <Typography sx={{ fontSize: '14px', color: '#757575' }}>{t('Số Lượng')}</Typography>
                 </Grid>
                 <Grid item xs={9} sm={10}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
@@ -496,8 +514,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                       sx={{
                         border: '1px solid #e0e0e0',
                         borderRadius: '2px',
-                        width: 32,
-                        height: 32,
+                        width: 36,
+                        height: 36,
                         '&:hover': { backgroundColor: '#f5f5f5' }
                       }}
                     >
@@ -505,8 +523,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                     </IconButton>
                     <Box
                       sx={{
-                        width: 50,
-                        height: 32,
+                        width: 56,
+                        height: 36,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -524,15 +542,15 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                       sx={{
                         border: '1px solid #e0e0e0',
                         borderRadius: '2px',
-                        width: 32,
-                        height: 32,
+                        width: 36,
+                        height: 36,
                         '&:hover': { backgroundColor: '#f5f5f5' }
                       }}
                     >
                       <Add sx={{ fontSize: 16 }} />
                     </IconButton>
                     <Typography sx={{ ml: 2, fontSize: '14px', color: '#757575' }}>
-                      {selectedSku ? selectedSku.stock : totalStock} sản phẩm có sẵn
+                      {selectedSku ? selectedSku.stock : totalStock} {t('Available Product')}
                     </Typography>
                   </Box>
                 </Grid>
@@ -540,7 +558,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
             </Box>
 
             {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
               <Button
                 variant='outlined'
                 startIcon={<ShoppingCart />}
@@ -549,16 +567,17 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                   py: 1.5,
                   fontSize: '14px',
                   textTransform: 'none',
-                  borderColor: '#ee4d2d',
-                  color: '#ee4d2d',
-                  backgroundColor: '#fff0ed',
+                  borderColor: PRIMARY,
+                  color: PRIMARY,
+                  backgroundColor: PRIMARY_LIGHT,
                   borderRadius: '2px',
                   fontWeight: 500,
+                  height: 42,
                   flex: { xs: 1, sm: 'none' },
-                  '&:hover': { borderColor: '#ee4d2d', backgroundColor: '#fce4de' }
+                  '&:hover': { borderColor: PRIMARY_HOVER, backgroundColor: '#c8ddf7' }
                 }}
               >
-                Thêm Vào Giỏ Hàng
+                {t('Add to Cart')}
               </Button>
               <Button
                 variant='contained'
@@ -567,22 +586,20 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                   py: 1.5,
                   fontSize: '14px',
                   textTransform: 'none',
-                  backgroundColor: '#ee4d2d',
+                  backgroundColor: PRIMARY,
                   borderRadius: '2px',
                   fontWeight: 500,
                   flex: { xs: 1, sm: 'none' },
-                  '&:hover': { backgroundColor: '#d73211' }
+                  '&:hover': { backgroundColor: PRIMARY_HOVER }
                 }}
               >
-                Mua Ngay
+                {t('Buy Now')}
               </Button>
             </Box>
 
-            <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Verified sx={{ fontSize: 18, color: '#ee4d2d' }} />
-              <Typography sx={{ fontSize: '13px', color: '#222' }}>
-                Trả hàng miễn phí 15 ngày | Hàng chính hãng 100%
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Verified sx={{ fontSize: 18, color: PRIMARY }} />
+              <Typography sx={{ fontSize: '13px', color: '#222' }}>{t('Return Policy')}</Typography>
             </Box>
           </Grid>
         </Grid>
@@ -590,11 +607,11 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
       {/* Shop Info */}
       {product.brand && (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '8px', mb: 3 }}>
+        <Paper sx={{ p: 5, borderRadius: '8px', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             <Avatar
               src={product.brand.logo}
-              sx={{ width: 64, height: 64, border: '2px solid #ee4d2d' }}
+              sx={{ width: 64, height: 64, border: `1px solid #757575` }}
               variant='rounded'
             />
             <Box sx={{ flex: 1 }}>
@@ -608,10 +625,10 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
               sx={{
                 textTransform: 'none',
                 fontSize: '13px',
-                borderColor: '#ee4d2d',
-                color: '#ee4d2d',
+                borderColor: PRIMARY,
+                color: PRIMARY,
                 borderRadius: '2px',
-                '&:hover': { borderColor: '#d73211', backgroundColor: '#fff0ed' }
+                '&:hover': { borderColor: PRIMARY_HOVER, backgroundColor: PRIMARY_LIGHT }
               }}
             >
               Xem Shop
@@ -627,7 +644,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
               <Grid item xs={6} sm={3} key={i}>
                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                   <Typography sx={{ fontSize: '13px', color: '#757575' }}>{stat.label}:</Typography>
-                  <Typography sx={{ fontSize: '13px', color: '#ee4d2d', fontWeight: 500 }}>{stat.value}</Typography>
+                  <Typography sx={{ fontSize: '13px', color: PRIMARY, fontWeight: 500 }}>{stat.value}</Typography>
                 </Box>
               </Grid>
             ))}
@@ -636,27 +653,13 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       )}
 
       {/* Product Description */}
-      <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '8px', mb: 3 }}>
-        <Box sx={{ backgroundColor: '#fafafa', p: 2, mb: 2, borderRadius: '2px' }}>
-          <Typography sx={{ fontSize: '18px', fontWeight: 500, color: '#222', textTransform: 'uppercase' }}>
-            MÔ TẢ SẢN PHẨM
-          </Typography>
-        </Box>
-
+      <Paper sx={{ p: 5, borderRadius: '8px', mb: 30 }}>
         <Box sx={{ mb: 3 }}>
-          <Typography
-            sx={{
-              fontSize: '16px',
-              fontWeight: 500,
-              color: '#222',
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-          >
-            ✅ CHI TIẾT SẢN PHẨM
-          </Typography>
+          <Box sx={{ backgroundColor: '#fafafa', p: 2, mt: 2, mb: 2, borderRadius: '2px' }}>
+            <Typography sx={{ fontSize: '18px', fontWeight: 500, color: '#222', textTransform: 'uppercase' }}>
+              {t('PRODUCT DETAILS')}
+            </Typography>
+          </Box>
           <Box
             sx={{
               '& > div': {
@@ -664,54 +667,51 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                 py: 1,
                 borderBottom: '1px solid #f5f5f5',
                 '&:last-child': { borderBottom: 'none' }
-              }
+              },
+              display: 'flex',
+              gap: 5,
+              flexDirection: 'column'
             }}
           >
             {product.categories?.length > 0 && (
               <Box>
-                <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>Danh Mục</Typography>
+                <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>
+                  {t('category')}
+                </Typography>
                 <Typography sx={{ fontSize: '14px', color: '#222' }}>{categoryNames.join(' > ')}</Typography>
               </Box>
             )}
             {product.brand && (
               <Box>
                 <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>
-                  Thương Hiệu
+                  {t('brand')}
                 </Typography>
                 <Typography sx={{ fontSize: '14px', color: '#222' }}>{product.brand.name}</Typography>
               </Box>
             )}
             <Box>
-              <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>Kho hàng</Typography>
+              <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>
+                {t('stock')}
+              </Typography>
               <Typography sx={{ fontSize: '14px', color: '#222' }}>{totalStock}</Typography>
             </Box>
             {product.skus?.length > 0 && (
               <Box>
                 <Typography sx={{ width: 150, fontSize: '14px', color: '#757575', flexShrink: 0 }}>
-                  Phân loại
+                  {t('Variant')}
                 </Typography>
-                <Typography sx={{ fontSize: '14px', color: '#222' }}>{product.skus.length} loại</Typography>
+                <Typography sx={{ fontSize: '14px', color: '#222' }}>{product.skus.length}</Typography>
               </Box>
             )}
           </Box>
         </Box>
 
-        <Divider sx={{ my: 2 }} />
-
-        <Box sx={{ mb: 2 }}>
-          <Typography
-            sx={{
-              fontSize: '16px',
-              fontWeight: 500,
-              color: '#222',
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-          >
-            📝 MÔ TẢ SẢN PHẨM
-          </Typography>
+        <Box sx={{ mb: 2, mt: 8 }}>
+          <Box sx={{ backgroundColor: '#fafafa', p: 2, mb: 2, borderRadius: '2px' }}>
+            <Typography sx={{ fontSize: '18px', fontWeight: 500, color: '#222', textTransform: 'uppercase' }}>
+              {t('Description1')}
+            </Typography>
+          </Box>
           {description ? (
             <Typography
               sx={{ fontSize: '14px', color: '#333', lineHeight: 1.8, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
