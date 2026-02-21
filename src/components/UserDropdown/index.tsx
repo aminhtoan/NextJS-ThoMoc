@@ -116,7 +116,7 @@ const UserDropDown = () => {
           <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.MY_PROFILE)}>{t('My Account')}</MenuItem>
 
           <Divider />
-          <MenuItem onClick={handleClose}>{t('Orders')}</MenuItem>
+          <MenuItem onClick={() => handleNavigate(ROUTE_CONFIG.MY_ORDERS)}>{t('Orders')}</MenuItem>
 
           <MenuItem onClick={logout}>{t('Logout')}</MenuItem>
           {user?.role.name !== 'CLIENT' && <Divider />}

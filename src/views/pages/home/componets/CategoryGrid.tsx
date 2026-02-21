@@ -4,6 +4,7 @@ import Image from 'next/image'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface CategoryGridProps {
   categories: CategoryWithTranslationsType[]
@@ -21,6 +22,7 @@ const CategoryGrid = ({ categories, onCategoryClick }: CategoryGridProps) => {
   const visibleCategories = parentCategories.slice(startIndex, startIndex + ITEMS_PER_PAGE)
   const hasNext = startIndex + ITEMS_PER_PAGE < parentCategories.length
   const hasPrev = startIndex > 0
+  const { t } = useTranslation()
 
   const handleNext = () => {
     if (hasNext) setStartIndex(prev => prev + ITEMS_PER_PAGE)
@@ -33,42 +35,41 @@ const CategoryGrid = ({ categories, onCategoryClick }: CategoryGridProps) => {
   if (parentCategories.length === 0) return null
 
   return (
-    <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+    <Paper sx={{ p: 3, mb: 4, borderRadius: 0.5 }}>
       <Typography
         sx={{
           fontSize: '16px',
-          fontWeight: 600,
           color: '#333',
           mb: 2,
           textTransform: 'uppercase'
         }}
       >
-        DANH MỤC
+        {t('DANH MỤC')}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        {/* Nút prev */}
-        <IconButton
-          onClick={handlePrev}
-          disabled={!hasPrev}
-          size='small'
-          sx={{
-            flexShrink: 0,
-            backgroundColor: '#f5f5f5',
-            visibility: hasPrev ? 'visible' : 'hidden',
-            '&:hover': { backgroundColor: '#e0e0e0' }
-          }}
-        >
-          <ChevronLeftIcon />
-        </IconButton>
+        {/* Nút prev - chỉ render khi có thể prev */}
+        {hasPrev && (
+          <IconButton
+            onClick={handlePrev}
+            size='small'
+            sx={{
+              flexShrink: 0,
+              backgroundColor: '#f5f5f5',
+              '&:hover': { backgroundColor: '#e0e0e0' }
+            }}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+        )}
 
         {/* Grid category */}
         <Box
           sx={{
             flex: 1,
             display: 'grid',
-            gridTemplateColumns: 'repeat(10, 1fr)', // Luôn 10 cột
-            gridTemplateRows: 'auto auto', // 2 hàng
+            gridTemplateColumns: 'repeat(10, 1fr)',
+            gridTemplateRows: 'auto auto',
             gap: 1
           }}
         >
@@ -162,20 +163,20 @@ const CategoryGrid = ({ categories, onCategoryClick }: CategoryGridProps) => {
           })}
         </Box>
 
-        {/* Nút next */}
-        <IconButton
-          onClick={handleNext}
-          disabled={!hasNext}
-          size='small'
-          sx={{
-            flexShrink: 0,
-            backgroundColor: '#f5f5f5',
-            visibility: hasNext ? 'visible' : 'hidden',
-            '&:hover': { backgroundColor: '#e0e0e0' }
-          }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
+        {/* Nút next - chỉ render khi có thể next */}
+        {hasNext && (
+          <IconButton
+            onClick={handleNext}
+            size='small'
+            sx={{
+              flexShrink: 0,
+              backgroundColor: '#f5f5f5',
+              '&:hover': { backgroundColor: '#e0e0e0' }
+            }}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        )}
       </Box>
     </Paper>
   )

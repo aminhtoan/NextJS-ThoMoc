@@ -6,13 +6,15 @@ import user from 'src/stores/apps/user'
 import auth from 'src/stores/apps/auth'
 import role from 'src/stores/apps/role'
 import cart from 'src/stores/apps/cart'
+import order from 'src/stores/apps/order'
 
 export const store = configureStore({
   reducer: {
     user,
     auth,
     role,
-    cart
+    cart,
+    order
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
