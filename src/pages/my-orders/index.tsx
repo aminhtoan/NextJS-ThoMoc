@@ -1,4 +1,5 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined'
 import { Box, Button, Chip, CircularProgress, Pagination, Paper, Tab, Tabs, Typography } from '@mui/material'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -7,7 +8,9 @@ import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import ReviewDialog from 'src/components/ReviewDialog'
 import { useAuth } from 'src/hooks/useAuth'
+import { ReviewItem } from 'src/service/review'
 import { AppDispatch, RootState } from 'src/stores'
 import { addToCartAsync } from 'src/stores/apps/cart/actions'
 import { cancelOrderAsync, fetchOrdersAsync } from 'src/stores/apps/order/actions'
@@ -41,6 +44,17 @@ export default function MyOrdersPage() {
 
   const [activeTab, setActiveTab] = useState(0)
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+
+  // Review dialog state
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
+  const [reviewTarget, setReviewTarget] = useState<{
+    orderId: number
+    productId: number
+    productName: string
+    productImage: string
+    skuValue?: string
+    existingReview?: ReviewItem | null
+  } | null>(null)
 
   const currentStatus = ORDER_TABS[activeTab]?.value as OrderStatusType | undefined
 
@@ -112,6 +126,22 @@ export default function MyOrdersPage() {
     } catch (error: any) {
       toast.error(t('repurchase_error'))
     }
+  }
+
+  const handleOpenReview = (orderId: number, item: ProductSKUSnapshotType, existingReview?: ReviewItem | null) => {
+    setReviewTarget({
+      orderId,
+      productId: item.productId || 0,
+      productName: getItemName(item),
+      productImage: item.image || PLACEHOLDER_IMAGE,
+      skuValue: item.skuValue || undefined,
+      existingReview: existingReview || null
+    })
+    setReviewDialogOpen(true)
+  }
+
+  const handleReviewSuccess = () => {
+    fetchOrders(currentPage)
   }
 
   if (!user) {
@@ -302,6 +332,30 @@ export default function MyOrdersPage() {
                           {t('repurchase')}
                         </Button>
                       )}
+
+                      {order.status === ORDER_STATUS.DELIVERED && (
+                        <Button
+                          size='small'
+                          variant='outlined'
+                          startIcon={<RateReviewOutlinedIcon />}
+                          onClick={() => {
+                            if (items.length > 0) {
+                              handleOpenReview(order.id, items[0])
+                            }
+                          }}
+                          sx={{
+                            fontSize: '12px',
+                            borderColor: '#ee4d2d',
+                            color: '#ee4d2d',
+                            '&:hover': {
+                              borderColor: '#d73211',
+                              backgroundColor: '#fff5f0'
+                            }
+                          }}
+                        >
+                          Đánh giá
+                        </Button>
+                      )}
                     </Box>
 
                     {/* Góc phải */}
@@ -333,6 +387,24 @@ export default function MyOrdersPage() {
           </>
         )}
       </Box>
+
+      {/* Review Dialog */}
+      {reviewTarget && (
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onClose={() => {
+            setReviewDialogOpen(false)
+            setReviewTarget(null)
+          }}
+          orderId={reviewTarget.orderId}
+          productId={reviewTarget.productId}
+          productName={reviewTarget.productName}
+          productImage={reviewTarget.productImage}
+          skuValue={reviewTarget.skuValue}
+          existingReview={reviewTarget.existingReview}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
     </>
   )
 }

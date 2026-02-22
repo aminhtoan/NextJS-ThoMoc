@@ -60,5 +60,10 @@ export const API_CONFIG = {
   },
   PRODUCT_TRANSLATION: {
     PRODUCT_TRANSLATION: `/product-translation`
+  },
+  REVIEW: {
+    REVIEW: `/review`,
+    PRODUCT_REVIEWS: `/review/product`,
+    DETAIL: `/review/detail/review`
   }
 }

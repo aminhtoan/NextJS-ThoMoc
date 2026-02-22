@@ -28,6 +28,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import ProductReviews from 'src/components/ProductReviews'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch } from 'src/stores'
 import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
@@ -762,7 +763,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       )}
 
       {/* Product Description */}
-      <Paper sx={{ p: 5, borderRadius: '8px', mb: 30 }}>
+      <Paper sx={{ p: 5, borderRadius: '8px', mb: 3 }}>
         <Box sx={{ mb: 3 }}>
           <Box sx={{ backgroundColor: '#fafafa', p: 2, mt: 2, mb: 2, borderRadius: '2px' }}>
             <Typography sx={{ fontSize: '18px', fontWeight: 500, color: '#222', textTransform: 'uppercase' }}>
@@ -844,6 +845,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
           )}
         </Box>
       </Paper>
+
+      {/* Product Reviews */}
+      <ProductReviews productId={product.id} />
     </Box>
   )
 }
