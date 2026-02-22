@@ -175,3 +175,67 @@ export const GetOrderQuerySchema = yup.object({
 })
 
 export type GetOrderQueryType = yup.InferType<typeof GetOrderQuerySchema>
+
+// ==================== ADMIN ORDER TYPES ====================
+
+export const AdminOrderUserSchema = yup.object({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  email: yup.string().required(),
+  avatar: yup.string().nullable().optional()
+})
+
+export type AdminOrderUserType = yup.InferType<typeof AdminOrderUserSchema>
+
+export const AdminOrderSchema = OrderDetailSchema.shape({
+  user: AdminOrderUserSchema.optional()
+})
+
+export type AdminOrderType = yup.InferType<typeof AdminOrderSchema>
+
+export const AdminGetOrderListResSchema = yup.object({
+  page: yup.number().required(),
+  limit: yup.number().required(),
+  totalItems: yup.number().required(),
+  totalPages: yup.number().required(),
+  data: yup.array().of(AdminOrderSchema).default([])
+})
+
+export type AdminGetOrderListResType = yup.InferType<typeof AdminGetOrderListResSchema>
+
+export const AdminGetOrderQuerySchema = yup.object({
+  page: yup.number().positive().integer().default(1),
+  limit: yup.number().positive().integer().default(10),
+  status: yup
+    .mixed<OrderStatusType>()
+    .oneOf(Object.values(ORDER_STATUS) as OrderStatusType[])
+    .optional(),
+  search: yup.string().optional(),
+  id: yup.number().positive().integer().optional()
+})
+
+export type AdminGetOrderQueryType = yup.InferType<typeof AdminGetOrderQuerySchema>
+
+export const AdminUpdateOrderStatusSchema = yup.object({
+  status: yup
+    .mixed<OrderStatusType>()
+    .oneOf(Object.values(ORDER_STATUS) as OrderStatusType[])
+    .required('Trạng thái là bắt buộc')
+})
+
+export type AdminUpdateOrderStatusType = yup.InferType<typeof AdminUpdateOrderStatusSchema>
+
+export interface AdminOrderStatisticsType {
+  total: number
+  byStatus: Record<OrderStatusType, number>
+}
+
+// Valid status transitions for admin
+export const VALID_STATUS_TRANSITIONS: Record<OrderStatusType, OrderStatusType[]> = {
+  PENDING_PAYMENT: ['PENDING_PICKUP', 'CANCELLED'],
+  PENDING_PICKUP: ['PENDING_DELIVERY', 'CANCELLED'],
+  PENDING_DELIVERY: ['DELIVERED', 'RETURNED'],
+  DELIVERED: ['RETURNED'],
+  RETURNED: [],
+  CANCELLED: []
+}

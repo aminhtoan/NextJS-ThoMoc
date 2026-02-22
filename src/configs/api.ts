@@ -34,7 +34,9 @@ export const API_CONFIG = {
     PAYMENT_METHOD: `/payment-methods`
   },
   ORDER: {
-    ORDER: `/order`
+    ORDER: `/order`,
+    ADMIN: `/order/admin`,
+    ADMIN_STATISTICS: `/order/admin/statistics`
   },
   PRODUCT: {
     PRODUCT: `/product`,

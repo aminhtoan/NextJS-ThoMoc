@@ -1,6 +1,11 @@
 import handleAPI from 'src/apis/handleAPI'
 import { API_CONFIG } from 'src/configs/api'
-import { CreateOrderBodyType, GetOrderQueryType } from 'src/types/order'
+import {
+  AdminGetOrderQueryType,
+  AdminUpdateOrderStatusType,
+  CreateOrderBodyType,
+  GetOrderQueryType
+} from 'src/types/order'
 
 // Create order (from cart items)
 export const createOrder = async (data: CreateOrderBodyType) => {
@@ -37,4 +42,35 @@ export const getActiveDeliveryMethods = async () => {
 // Get payment methods (active only)
 export const getActivePaymentMethods = async () => {
   return await handleAPI(API_CONFIG.PAYMENT_METHOD.PAYMENT_METHOD)
+}
+
+// ==================== ADMIN ORDER SERVICES ====================
+
+// Get all orders (admin)
+export const adminGetOrders = async (params?: AdminGetOrderQueryType) => {
+  const query = new URLSearchParams()
+  if (params?.page) query.append('page', String(params.page))
+  if (params?.limit) query.append('limit', String(params.limit))
+  if (params?.status) query.append('status', params.status as string)
+  if (params?.search) query.append('search', params.search)
+  if (params?.id) query.append('id', String(params.id))
+
+  const queryString = query.toString()
+
+  return await handleAPI(`${API_CONFIG.ORDER.ADMIN}${queryString ? `?${queryString}` : ''}`)
+}
+
+// Get order detail (admin)
+export const adminGetOrderDetail = async (orderId: number) => {
+  return await handleAPI(`${API_CONFIG.ORDER.ADMIN}/${orderId}`)
+}
+
+// Update order status (admin)
+export const adminUpdateOrderStatus = async (orderId: number, data: AdminUpdateOrderStatusType) => {
+  return await handleAPI(`${API_CONFIG.ORDER.ADMIN}/${orderId}/status`, data, 'patch')
+}
+
+// Get order statistics (admin)
+export const adminGetOrderStatistics = async () => {
+  return await handleAPI(API_CONFIG.ORDER.ADMIN_STATISTICS)
 }

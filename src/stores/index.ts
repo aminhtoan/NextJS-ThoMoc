@@ -7,6 +7,7 @@ import auth from 'src/stores/apps/auth'
 import role from 'src/stores/apps/role'
 import cart from 'src/stores/apps/cart'
 import order from 'src/stores/apps/order'
+import adminOrder from 'src/stores/apps/admin-order'
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
     auth,
     role,
     cart,
-    order
+    order,
+    adminOrder
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

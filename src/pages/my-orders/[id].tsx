@@ -181,7 +181,7 @@ export default function OrderDetailPage() {
                       '& .MuiStepIcon-root.Mui-completed': { color: '#4caf50' }
                     }}
                   >
-                    {t(`step.${step.label}`)}
+                    {t(`${step.label}`)}
                   </StepLabel>
                 </Step>
               ))}
