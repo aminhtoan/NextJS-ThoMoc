@@ -12,15 +12,14 @@ export const ORDER_STATUS = {
 
 export type OrderStatusType = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS]
 
-export const ORDER_STATUS_LABELS: Record<OrderStatusType, string> = {
-  PENDING_PAYMENT: 'Chờ thanh toán',
-  PENDING_PICKUP: 'Chờ lấy hàng',
-  PENDING_DELIVERY: 'Đang giao',
-  DELIVERED: 'Đã giao',
-  RETURNED: 'Trả hàng',
-  CANCELLED: 'Đã hủy'
+export const ORDER_STATUS_LABELS: Record<string, string> = {
+  PENDING_PAYMENT: 'PENDING_PAYMENT',
+  PENDING_PICKUP: 'PENDING_PICKUP',
+  PENDING_DELIVERY: 'PENDING_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
 }
-
 export const ORDER_STATUS_COLORS: Record<OrderStatusType, string> = {
   PENDING_PAYMENT: '#ff9800',
   PENDING_PICKUP: '#2196f3',

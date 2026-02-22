@@ -707,7 +707,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Verified sx={{ fontSize: 18, color: PRIMARY }} />
-              <Typography sx={{ fontSize: '13px', color: '#222' }}>{t('return Policy')}</Typography>
+              <Typography sx={{ fontSize: '13px', color: '#222' }}>{t('Return Policy')}</Typography>
             </Box>
           </Grid>
         </Grid>

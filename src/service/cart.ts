@@ -13,5 +13,5 @@ export const updateCartItem = async (cartItemId: number, data: { quantity: numbe
 }
 
 export const removeCartItem = async (cartItemIds: number[]) => {
-  return await handleAPI('/cart/remove', { cartItemIds }, 'delete')
+  return await handleAPI('/cart/remove', { cartItemIds }, 'post')
 }

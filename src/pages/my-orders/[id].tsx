@@ -21,6 +21,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch, RootState } from 'src/stores'
@@ -41,16 +42,16 @@ const PLACEHOLDER_IMAGE =
 
 // Order progress steps
 const ORDER_STEPS = [
-  { label: 'Chờ thanh toán', status: ORDER_STATUS.PENDING_PAYMENT },
-  { label: 'Chờ lấy hàng', status: ORDER_STATUS.PENDING_PICKUP },
-  { label: 'Đang giao', status: ORDER_STATUS.PENDING_DELIVERY },
-  { label: 'Đã giao', status: ORDER_STATUS.DELIVERED }
+  { label: 'transaction_processing', status: ORDER_STATUS.PENDING_PAYMENT },
+  { label: 'pending_pickup', status: ORDER_STATUS.PENDING_PICKUP },
+  { label: 'out_for_delivery', status: ORDER_STATUS.PENDING_DELIVERY },
+  { label: 'delivered', status: ORDER_STATUS.DELIVERED }
 ]
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Chờ thanh toán',
-  SUCCESS: 'Đã thanh toán',
-  FAILED: 'Thanh toán thất bại'
+  PENDING: 'pending_payment',
+  SUCCESS: 'paid',
+  FAILED: 'payment_failed'
 }
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
@@ -65,7 +66,7 @@ export default function OrderDetailPage() {
   const { user } = useAuth()
   const { orderDetail, isLoading } = useSelector((state: RootState) => state.order)
   const { id } = router.query
-
+  const { t } = useTranslation()
   const [cancellingOrder, setCancellingOrder] = useState(false)
 
   useEffect(() => {
@@ -102,26 +103,13 @@ export default function OrderDetailPage() {
     setCancellingOrder(true)
     try {
       await dispatch(cancelOrderAsync(orderDetail.id)).unwrap()
-      toast.success('Đã hủy đơn hàng')
+      toast.success(t('order_cancelled_successfully'))
       dispatch(fetchOrderDetailAsync(orderDetail.id))
     } catch (error: any) {
-      toast.error(error?.message || 'Không thể hủy đơn hàng')
+      toast.error(error?.message || t('cannot_cancel_order'))
     } finally {
       setCancellingOrder(false)
     }
-  }
-
-  if (!user) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 10 }}>
-        <Typography variant='h6' sx={{ mb: 2 }}>
-          Vui lòng đăng nhập để xem đơn hàng
-        </Typography>
-        <Button variant='contained' onClick={() => router.push('/login')}>
-          Đăng nhập
-        </Button>
-      </Box>
-    )
   }
 
   if (isLoading || !orderDetail) {
@@ -159,16 +147,16 @@ export default function OrderDetailPage() {
             onClick={() => router.push('/my-orders')}
             sx={{ color: '#666', textTransform: 'none' }}
           >
-            Quay lại đơn hàng
+            {t('back_to_orders')}
           </Button>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography sx={{ fontSize: '13px', color: '#888' }}>
-              MÃ ĐƠN HÀNG: <b>#{orderDetail.id}</b>
+              {t('order_code_label')}: <b>#{orderDetail.id}</b>
             </Typography>
             <Typography sx={{ fontSize: '13px', color: '#888' }}>|</Typography>
             <Chip
-              label={ORDER_STATUS_LABELS[orderStatus] || orderStatus}
+              label={t(ORDER_STATUS_LABELS[orderStatus]) || orderStatus}
               size='small'
               sx={{
                 backgroundColor: ORDER_STATUS_COLORS[orderStatus] || '#888',
@@ -193,7 +181,7 @@ export default function OrderDetailPage() {
                       '& .MuiStepIcon-root.Mui-completed': { color: '#4caf50' }
                     }}
                   >
-                    {step.label}
+                    {t(`step.${step.label}`)}
                   </StepLabel>
                 </Step>
               ))}
@@ -213,10 +201,10 @@ export default function OrderDetailPage() {
             }}
           >
             <Typography sx={{ fontWeight: 600, color: ORDER_STATUS_COLORS[orderStatus], fontSize: '16px' }}>
-              {ORDER_STATUS_LABELS[orderStatus]}
+              {t(ORDER_STATUS_LABELS[orderStatus])}
             </Typography>
             <Typography sx={{ fontSize: '13px', color: '#666', mt: 0.5 }}>
-              {orderStatus === ORDER_STATUS.CANCELLED ? 'Đơn hàng đã bị hủy.' : 'Đơn hàng đã được trả lại.'}
+              {orderStatus === ORDER_STATUS.CANCELLED ? t('order_cancelled') : t('order_returned')}
             </Typography>
           </Paper>
         )}
@@ -225,7 +213,9 @@ export default function OrderDetailPage() {
         <Paper sx={{ p: 3, mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <PersonOutlinedIcon sx={{ color: PRIMARY_COLOR }} />
-            <Typography sx={{ fontSize: '16px', fontWeight: 600, color: PRIMARY_COLOR }}>Địa Chỉ Nhận Hàng</Typography>
+            <Typography sx={{ fontSize: '16px', fontWeight: 600, color: PRIMARY_COLOR }}>
+              {t('receiver_info')}
+            </Typography>
           </Box>
 
           {receiver ? (
@@ -235,27 +225,27 @@ export default function OrderDetailPage() {
               <Typography sx={{ fontSize: '13px', color: '#666' }}>{receiver.address}</Typography>
             </Box>
           ) : (
-            <Typography sx={{ fontSize: '13px', color: '#999' }}>Không có thông tin người nhận</Typography>
+            <Typography sx={{ fontSize: '13px', color: '#999' }}>{t('no_receiver_info')}</Typography>
           )}
         </Paper>
 
         {/* Product Items */}
         <Paper sx={{ p: 3, mb: 2 }}>
-          <Typography sx={{ fontSize: '16px', fontWeight: 600, mb: 2 }}>Sản phẩm</Typography>
+          <Typography sx={{ fontSize: '16px', fontWeight: 600, mb: 2 }}>{t('products')}</Typography>
 
           {/* Table header */}
           <Grid container sx={{ py: 1, borderBottom: '1px solid #e0e0e0', display: { xs: 'none', md: 'flex' } }}>
             <Grid item md={6}>
-              <Typography sx={{ color: '#888', fontSize: '13px' }}>Sản phẩm</Typography>
+              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('product_name')}</Typography>
             </Grid>
             <Grid item md={2} sx={{ textAlign: 'center' }}>
-              <Typography sx={{ color: '#888', fontSize: '13px' }}>Đơn giá</Typography>
+              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('unit_price')}</Typography>
             </Grid>
             <Grid item md={2} sx={{ textAlign: 'center' }}>
-              <Typography sx={{ color: '#888', fontSize: '13px' }}>Số lượng</Typography>
+              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('quantity')}</Typography>
             </Grid>
             <Grid item md={2} sx={{ textAlign: 'right' }}>
-              <Typography sx={{ color: '#888', fontSize: '13px' }}>Thành tiền</Typography>
+              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('total_price')}</Typography>
             </Grid>
           </Grid>
 
@@ -338,7 +328,7 @@ export default function OrderDetailPage() {
             <Paper sx={{ p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <LocalShippingOutlinedIcon sx={{ color: PRIMARY_COLOR }} />
-                <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>Phương Thức Vận Chuyển</Typography>
+                <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>{t('delivery_method')}</Typography>
               </Box>
 
               {deliveryMethod ? (
@@ -354,7 +344,7 @@ export default function OrderDetailPage() {
                   )}
                 </Box>
               ) : (
-                <Typography sx={{ fontSize: '13px', color: '#999' }}>Không có thông tin vận chuyển</Typography>
+                <Typography sx={{ fontSize: '13px', color: '#999' }}>{t('no_delivery_info')}</Typography>
               )}
             </Paper>
           </Grid>
@@ -364,7 +354,7 @@ export default function OrderDetailPage() {
             <Paper sx={{ p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <PaymentOutlinedIcon sx={{ color: PRIMARY_COLOR }} />
-                <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>Thanh Toán</Typography>
+                <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>{t('payment_info')}</Typography>
               </Box>
 
               {payment ? (
@@ -374,7 +364,7 @@ export default function OrderDetailPage() {
                       {(payment as any).paymentMethod?.name || 'Không xác định'}
                     </Typography>
                     <Chip
-                      label={PAYMENT_STATUS_LABELS[payment.status] || payment.status}
+                      label={t(PAYMENT_STATUS_LABELS[payment.status]) || payment.status}
                       size='small'
                       sx={{
                         backgroundColor: PAYMENT_STATUS_COLORS[payment.status] || '#888',
@@ -385,11 +375,11 @@ export default function OrderDetailPage() {
                     />
                   </Box>
                   <Typography sx={{ fontSize: '13px', color: '#666' }}>
-                    Số tiền: {((payment as any).amount || 0).toLocaleString()}đ
+                    {t('payment_amount')}: {((payment as any).amount || 0).toLocaleString()}đ
                   </Typography>
                 </Box>
               ) : (
-                <Typography sx={{ fontSize: '13px', color: '#999' }}>Không có thông tin thanh toán</Typography>
+                <Typography sx={{ fontSize: '13px', color: '#999' }}>{t('no_payment_info')}</Typography>
               )}
             </Paper>
           </Grid>
@@ -397,26 +387,26 @@ export default function OrderDetailPage() {
 
         {/* Order Summary */}
         <Paper sx={{ p: 3, mb: 2 }}>
-          <Typography sx={{ fontSize: '16px', fontWeight: 600, mb: 2 }}>Chi Tiết Thanh Toán</Typography>
+          <Typography sx={{ fontSize: '16px', fontWeight: 600, mb: 2 }}>{t('order_summary')}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontSize: '14px', color: '#666' }}>
-              Tổng tiền hàng ({items.reduce((sum, i) => sum + (i.quantity || 0), 0)} sản phẩm)
+              {t('product_total')} ({items.reduce((sum, i) => sum + (i.quantity || 0), 0)} {t('product1')})
             </Typography>
             <Typography sx={{ fontSize: '14px' }}>{productTotal.toLocaleString()}đ</Typography>
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography sx={{ fontSize: '14px', color: '#666' }}>Phí vận chuyển</Typography>
+            <Typography sx={{ fontSize: '14px', color: '#666' }}>{t('shipping_fee')}</Typography>
             <Typography sx={{ fontSize: '14px' }}>
-              {shippingFee === 0 ? 'Miễn phí' : `${shippingFee.toLocaleString()}đ`}
+              {shippingFee === 0 ? t('free_shipping') : `${shippingFee.toLocaleString()}đ`}
             </Typography>
           </Box>
 
           <Divider sx={{ my: 2 }} />
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>Tổng thanh toán</Typography>
+            <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>{t('grand_total')}</Typography>
             <Typography sx={{ fontSize: '24px', fontWeight: 600, color: PRIMARY_COLOR }}>
               {grandTotal.toLocaleString()}đ
             </Typography>
@@ -428,10 +418,10 @@ export default function OrderDetailPage() {
           <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
               <Typography sx={{ fontSize: '13px', color: '#888', mb: 0.5 }}>
-                Mã đơn hàng: <b>#{orderDetail.id}</b>
+                {t('order_id')}: <b>#{orderDetail.id}</b>
               </Typography>
               <Typography sx={{ fontSize: '13px', color: '#888', mb: 0.5 }}>
-                Ngày đặt hàng:{' '}
+                {t('order_date')}:{' '}
                 {new Date(orderDetail.createdAt).toLocaleDateString('vi-VN', {
                   day: '2-digit',
                   month: '2-digit',
@@ -441,7 +431,7 @@ export default function OrderDetailPage() {
                 })}
               </Typography>
               <Typography sx={{ fontSize: '13px', color: '#888' }}>
-                Cập nhật lần cuối:{' '}
+                {t('last_updated')}:{' '}
                 {new Date(orderDetail.updatedAt).toLocaleDateString('vi-VN', {
                   day: '2-digit',
                   month: '2-digit',
@@ -462,7 +452,7 @@ export default function OrderDetailPage() {
                   disabled={cancellingOrder}
                   sx={{ textTransform: 'none' }}
                 >
-                  Hủy đơn hàng
+                  {t('cancel_order')}
                 </Button>
               )}
             </Grid>

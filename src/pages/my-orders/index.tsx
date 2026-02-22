@@ -5,16 +5,18 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch, RootState } from 'src/stores'
+import { addToCartAsync } from 'src/stores/apps/cart/actions'
 import { cancelOrderAsync, fetchOrdersAsync } from 'src/stores/apps/order/actions'
 import {
-    ORDER_STATUS,
-    ORDER_STATUS_COLORS,
-    ORDER_STATUS_LABELS,
-    OrderStatusType,
-    ProductSKUSnapshotType
+  ORDER_STATUS,
+  ORDER_STATUS_COLORS,
+  ORDER_STATUS_LABELS,
+  OrderStatusType,
+  ProductSKUSnapshotType
 } from 'src/types/order'
 
 const PRIMARY_COLOR = '#1677ff'
@@ -42,6 +44,7 @@ export default function MyOrdersPage() {
 
   const currentStatus = ORDER_TABS[activeTab]?.value as OrderStatusType | undefined
 
+  const { t } = useTranslation()
   const fetchOrders = useCallback(
     (page = 1) => {
       dispatch(fetchOrdersAsync({ page, limit: 10, status: currentStatus }))
@@ -67,10 +70,10 @@ export default function MyOrdersPage() {
     setCancellingId(orderId)
     try {
       await dispatch(cancelOrderAsync(orderId)).unwrap()
-      toast.success('Đã hủy đơn hàng')
+      toast.success(t('order_cancelled_successfully'))
       fetchOrders(currentPage)
     } catch (error: any) {
-      toast.error(error?.message || 'Không thể hủy đơn hàng')
+      toast.error(error?.message || t('failed_to_cancel_order'))
     } finally {
       setCancellingId(null)
     }
@@ -86,6 +89,29 @@ export default function MyOrdersPage() {
 
   const canCancel = (status: string) => {
     return [ORDER_STATUS.PENDING_PAYMENT, ORDER_STATUS.PENDING_PICKUP].includes(status as any)
+  }
+
+  const handleRepurchase = async (orderId: number) => {
+    const order = orders.find(o => o.id === orderId)
+    if (!order) return
+
+    try {
+      // Add từng sản phẩm vào cart
+      await Promise.all(
+        order.items.map(item =>
+          dispatch(
+            addToCartAsync({
+              skuId: item.skuId!,
+              quantity: item.quantity
+            })
+          )
+        )
+      )
+      toast.success(t('repurchase_success'))
+      router.push('/cart')
+    } catch (error: any) {
+      toast.error(t('repurchase_error'))
+    }
   }
 
   if (!user) {
@@ -104,7 +130,8 @@ export default function MyOrdersPage() {
   return (
     <>
       <Head>
-        <title>Đơn hàng của tôi - Thổ mộc</title>
+        <title>{t('my_orders_title')}</title>
+        <meta name='description' content={t('my_orders_description')} />
       </Head>
 
       <Box sx={{ mx: { xs: 2, md: 6 }, py: 3, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
@@ -122,7 +149,7 @@ export default function MyOrdersPage() {
             }}
           >
             {ORDER_TABS.map((tab, index) => (
-              <Tab key={index} label={tab.label} />
+              <Tab key={index} label={t(tab.label)} />
             ))}
           </Tabs>
         </Paper>
@@ -134,7 +161,7 @@ export default function MyOrdersPage() {
           </Box>
         ) : orders.length === 0 ? (
           <Paper sx={{ p: 8, textAlign: 'center' }}>
-            <Typography sx={{ color: '#999', fontSize: '16px' }}>Chưa có đơn hàng nào</Typography>
+            <Typography sx={{ color: '#999', fontSize: '16px' }}>{t('no_orders')}</Typography>
           </Paper>
         ) : (
           <>
@@ -157,7 +184,7 @@ export default function MyOrdersPage() {
                     }}
                   >
                     <Typography sx={{ fontSize: '13px', color: '#888' }}>
-                      Đơn hàng #{order.id} -{' '}
+                      {t('ORDER')} #{order.id} -{' '}
                       {new Date(order.createdAt).toLocaleDateString('vi-VN', {
                         day: '2-digit',
                         month: '2-digit',
@@ -167,7 +194,7 @@ export default function MyOrdersPage() {
                       })}
                     </Typography>
                     <Chip
-                      label={ORDER_STATUS_LABELS[order.status as OrderStatusType] || order.status}
+                      label={t(ORDER_STATUS_LABELS[order.status as OrderStatusType] || order.status)}
                       size='small'
                       sx={{
                         backgroundColor: ORDER_STATUS_COLORS[order.status as OrderStatusType] || '#888',
@@ -200,7 +227,7 @@ export default function MyOrdersPage() {
                           height: 70,
                           position: 'relative',
                           flexShrink: 0,
-                          borderRadius: 1,
+                          borderRadius: 0.5,
                           overflow: 'hidden',
                           border: '1px solid #f0f0f0'
                         }}
@@ -246,7 +273,8 @@ export default function MyOrdersPage() {
                       borderTop: '1px solid #f0f0f0'
                     }}
                   >
-                    <Box>
+                    {/* Góc trái */}
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       {canCancel(order.status as string) && (
                         <Button
                           size='small'
@@ -259,13 +287,27 @@ export default function MyOrdersPage() {
                           disabled={cancellingId === order.id}
                           sx={{ fontSize: '12px' }}
                         >
-                          Hủy đơn
+                          {t('cancel_order')}
+                        </Button>
+                      )}
+
+                      {(order.status === ORDER_STATUS.CANCELLED || order.status === ORDER_STATUS.DELIVERED) && (
+                        <Button
+                          size='small'
+                          variant='outlined'
+                          color='primary'
+                          onClick={() => handleRepurchase(order.id)}
+                          sx={{ fontSize: '12px' }}
+                        >
+                          {t('repurchase')}
                         </Button>
                       )}
                     </Box>
+
+                    {/* Góc phải */}
                     <Box sx={{ textAlign: 'right' }}>
                       <Typography sx={{ fontSize: '13px', color: '#888' }}>
-                        Tổng số tiền ({items.reduce((sum, i) => sum + (i.quantity || 0), 0)} sản phẩm):
+                        {t('total_amount')} ({items.reduce((sum, i) => sum + (i.quantity || 0), 0)} {t('product1')}):
                       </Typography>
                       <Typography sx={{ fontSize: '20px', fontWeight: 600, color: PRIMARY_COLOR }}>
                         {orderTotal.toLocaleString()}đ

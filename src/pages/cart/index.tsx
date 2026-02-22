@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch, RootState } from 'src/stores'
@@ -24,6 +25,7 @@ export default function CartPage() {
   const { items, isLoading, selectedItems } = useSelector((state: RootState) => state.cart)
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set())
   const PRIMARY_COLOR = '#1677ff'
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (user) {
@@ -121,7 +123,8 @@ export default function CartPage() {
     try {
       await dispatch(removeCartItemAsync([cartItemId])).unwrap()
       toast.success('Đã xóa sản phẩm khỏi giỏ hàng')
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Failed to remove cart item:', error)
       toast.error('Không thể xóa sản phẩm')
     }
   }
@@ -162,19 +165,6 @@ export default function CartPage() {
     return PLACEHOLDER_IMAGE
   }
 
-  if (!user) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 10 }}>
-        <Typography variant='h6' sx={{ mb: 2 }}>
-          Vui lòng đăng nhập để xem giỏ hàng
-        </Typography>
-        <Button variant='contained' onClick={() => router.push('/login')}>
-          Đăng nhập
-        </Button>
-      </Box>
-    )
-  }
-
   if (isLoading && items.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
@@ -193,10 +183,17 @@ export default function CartPage() {
         {items.length === 0 ? (
           <Paper sx={{ p: 8, textAlign: 'center' }}>
             <Typography variant='h6' sx={{ color: '#999', mb: 2 }}>
-              Giỏ hàng của bạn đang trống
+              {t('cart_empty_message')}
             </Typography>
-            <Button variant='contained' onClick={() => router.push('/')}>
-              Tiếp tục mua sắm
+            <Button
+              sx={{
+                backgroundColor: PRIMARY_COLOR,
+                color: 'white',
+                '&:hover': { backgroundColor: '#d73211' }
+              }}
+              onClick={() => router.push('/')}
+            >
+              {t('continue_shopping')}
             </Button>
           </Paper>
         ) : (
