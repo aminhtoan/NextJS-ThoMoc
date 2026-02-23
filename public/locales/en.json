@@ -307,6 +307,7 @@
   "cancel_order": "Cancel Order",
   "cancel_order_success": "Order cancelled successfully",
   "cancel_order_error": "Cannot cancel order",
+  "pay_now": "Pay Now",
   "unknown_payment": "Unknown",
   "step": {
     "transaction_processing": "Transaction Processing",

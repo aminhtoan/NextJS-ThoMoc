@@ -34,6 +34,11 @@ export const cancelOrder = async (orderId: number) => {
   return await handleAPI(`${API_CONFIG.ORDER.ORDER}/cancel/${orderId}`, {}, 'delete')
 }
 
+// Get payment QR for bank transfer
+export const getPaymentQR = async (orderId: number) => {
+  return await handleAPI(`${API_CONFIG.ORDER.ORDER}/payment-qr/${orderId}`)
+}
+
 // Get delivery methods (active only)
 export const getActiveDeliveryMethods = async () => {
   return await handleAPI(`${API_CONFIG.DELIVERY_METHOD.DELIVERY_METHOD}?page=1&limit=100`)

@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import PaymentQRDialog from 'src/components/PaymentQRDialog'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch, RootState } from 'src/stores'
 import { clearOrderDetail } from 'src/stores/apps/order'
@@ -68,6 +69,7 @@ export default function OrderDetailPage() {
   const { id } = router.query
   const { t } = useTranslation()
   const [cancellingOrder, setCancellingOrder] = useState(false)
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
 
   useEffect(() => {
     if (id && user) {
@@ -442,7 +444,26 @@ export default function OrderDetailPage() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}
+            >
+              {orderStatus === ORDER_STATUS.PENDING_PAYMENT && (
+                <Button
+                  variant='contained'
+                  startIcon={<PaymentOutlinedIcon />}
+                  onClick={() => setPaymentDialogOpen(true)}
+                  sx={{
+                    textTransform: 'none',
+                    backgroundColor: '#1677ff',
+                    '&:hover': { backgroundColor: '#0958d9' }
+                  }}
+                >
+                  {t('pay_now')}
+                </Button>
+              )}
               {canCancel(orderStatus) && (
                 <Button
                   variant='outlined'
@@ -459,6 +480,16 @@ export default function OrderDetailPage() {
           </Grid>
         </Paper>
       </Box>
+
+      {/* Payment QR Dialog */}
+      <PaymentQRDialog
+        open={paymentDialogOpen}
+        onClose={() => {
+          setPaymentDialogOpen(false)
+          dispatch(fetchOrderDetailAsync(Number(id)))
+        }}
+        orderId={orderDetail.id}
+      />
     </>
   )
 }

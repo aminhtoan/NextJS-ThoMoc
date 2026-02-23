@@ -55,7 +55,7 @@ export default function CartPage() {
     items.forEach(shop => {
       shop.cartItems?.forEach(item => {
         if (item?.id && selectedItems.includes(item.id)) {
-          const itemPrice = item.sku?.price || item.sku?.product?.basePrice || 0
+          const itemPrice = item.sku?.price ?? 0
           price += itemPrice * (item.quantity || 0)
           quantity += item.quantity || 0
         }
@@ -173,6 +173,7 @@ export default function CartPage() {
     )
   }
 
+  console.log('Cart items:', items)
   return (
     <>
       <Head>
@@ -256,7 +257,7 @@ export default function CartPage() {
                   {shop.cartItems?.map((item, itemIndex) => {
                     if (!item) return null
                     const isSelected = item.id ? selectedItems.includes(item.id) : false
-                    const itemPrice = item.sku?.price || item.sku?.product?.basePrice || 0
+                    const itemPrice = item.sku?.price ?? 0
                     const totalItemPrice = itemPrice * (item.quantity || 0)
                     const stock = item.sku?.stock || 0
                     const isUpdating = item.id ? updatingItems.has(item.id) : false

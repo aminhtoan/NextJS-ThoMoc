@@ -301,6 +301,7 @@
   "cancel_order": "Hủy đơn hàng",
   "cancel_order_success": "Đã hủy đơn hàng",
   "cancel_order_error": "Không thể hủy đơn hàng",
+  "pay_now": "Thanh toán",
   "unknown_payment": "Không xác định",
   "step": {
     "transaction_processing": "Chờ thanh toán",

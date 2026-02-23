@@ -31,3 +31,8 @@ export const getPublicProducts = async (query: GetProductsQueryType) => {
 export const getProductDetail = async (productId: number) => {
   return await handleAPI(`product/${productId}`)
 }
+
+// Get SKU detail by ID
+export const getSKUDetail = async (skuId: number) => {
+  return await handleAPI(`product/sku/${skuId}`)
+}

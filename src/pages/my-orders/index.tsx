@@ -1,4 +1,5 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
+import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined'
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined'
 import { Box, Button, Chip, CircularProgress, Pagination, Paper, Tab, Tabs, Typography } from '@mui/material'
 import Head from 'next/head'
@@ -8,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import PaymentQRDialog from 'src/components/PaymentQRDialog'
 import ReviewDialog from 'src/components/ReviewDialog'
 import { useAuth } from 'src/hooks/useAuth'
 import { ReviewItem } from 'src/service/review'
@@ -44,6 +46,10 @@ export default function MyOrdersPage() {
 
   const [activeTab, setActiveTab] = useState(0)
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+
+  // Payment QR dialog state
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [paymentOrderId, setPaymentOrderId] = useState<number | null>(null)
 
   // Review dialog state
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
@@ -196,8 +202,10 @@ export default function MyOrdersPage() {
         ) : (
           <>
             {orders.map(order => {
+              const shippingFee = order.shippingFee || 0
               const items = order.items || []
-              const orderTotal = items.reduce((sum, item) => sum + (item.skuPrice || 0) * (item.quantity || 0), 0)
+              const orderTotal =
+                items.reduce((sum, item) => sum + (item.skuPrice || 0) * (item.quantity || 0), 0) + shippingFee
 
               return (
                 <Paper key={order.id} sx={{ mb: 2, overflow: 'hidden' }}>
@@ -305,6 +313,25 @@ export default function MyOrdersPage() {
                   >
                     {/* Góc trái */}
                     <Box sx={{ display: 'flex', gap: 1 }}>
+                      {order.status === ORDER_STATUS.PENDING_PAYMENT && (
+                        <Button
+                          size='small'
+                          variant='contained'
+                          startIcon={<PaymentOutlinedIcon />}
+                          onClick={() => {
+                            setPaymentOrderId(order.id)
+                            setPaymentDialogOpen(true)
+                          }}
+                          sx={{
+                            fontSize: '12px',
+                            backgroundColor: '#1677ff',
+                            '&:hover': { backgroundColor: '#0958d9' }
+                          }}
+                        >
+                          {t('pay_now')}
+                        </Button>
+                      )}
+
                       {canCancel(order.status as string) && (
                         <Button
                           size='small'
@@ -387,6 +414,19 @@ export default function MyOrdersPage() {
           </>
         )}
       </Box>
+
+      {/* Payment QR Dialog */}
+      {paymentOrderId && (
+        <PaymentQRDialog
+          open={paymentDialogOpen}
+          onClose={() => {
+            setPaymentDialogOpen(false)
+            setPaymentOrderId(null)
+            fetchOrders(currentPage)
+          }}
+          orderId={paymentOrderId}
+        />
+      )}
 
       {/* Review Dialog */}
       {reviewTarget && (
