@@ -85,7 +85,6 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (router.query.pay === 'true' && orderDetail?.status === ORDER_STATUS.PENDING_PAYMENT) {
       setPaymentDialogOpen(true)
-      // Remove ?pay from URL without reload
       router.replace(`/my-orders/${id}`, undefined, { shallow: true })
     }
   }, [router.query.pay, orderDetail?.status, id, router])
