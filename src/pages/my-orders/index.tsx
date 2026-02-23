@@ -426,9 +426,11 @@ export default function MyOrdersPage() {
           }}
           orderId={paymentOrderId}
           onPaymentSuccess={() => {
+            setPaymentDialogOpen(false)
+            setPaymentOrderId(null)
             setTimeout(() => {
               fetchOrders(currentPage)
-            }, 1500)
+            })
           }}
         />
       )}

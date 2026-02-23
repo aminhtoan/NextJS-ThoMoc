@@ -77,9 +77,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       try {
         const res = await getOrderDetail(orderId)
         if (res?.data?.payment?.status === 'SUCCESS') {
-          console.log('[PaymentQR] Polling detected payment success')
           setPaymentSuccess(true)
-          toast.success('Thanh toán thành công!')
           stopPolling()
           onPaymentSuccess?.()
         }
@@ -114,12 +112,13 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       console.log('[PaymentQR] WebSocket connected')
     })
 
-    socket.on('payment', (data: any) => {
+    socket.on('payment', (data: { status: string }) => {
       console.log('[PaymentQR] WebSocket payment event:', data)
       if (data.status === 'success') {
+        stopPolling()
+        socket.disconnect()
         setPaymentSuccess(true)
         toast.success('Thanh toán thành công!')
-        stopPolling()
         onPaymentSuccess?.()
       }
     })
