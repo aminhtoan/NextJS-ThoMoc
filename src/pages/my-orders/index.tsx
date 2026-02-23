@@ -425,6 +425,11 @@ export default function MyOrdersPage() {
             fetchOrders(currentPage)
           }}
           orderId={paymentOrderId}
+          onPaymentSuccess={() => {
+            setTimeout(() => {
+              fetchOrders(currentPage)
+            }, 1500)
+          }}
         />
       )}
 

@@ -2,25 +2,26 @@ import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlin
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import {
-    Box,
-    Button,
-    CircularProgress,
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    IconButton,
-    Typography
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  Typography
 } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { io, Socket } from 'socket.io-client'
 import { useAuth } from 'src/hooks/useAuth'
-import { getPaymentQR } from 'src/service/order'
+import { getOrderDetail, getPaymentQR } from 'src/service/order'
 import { getAccessToken } from 'src/service/token'
 
 const PRIMARY_COLOR = '#1677ff'
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8888'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8888/api'
+const POLL_INTERVAL = 3000 // 3 seconds
 
 interface PaymentQRData {
   orderId: number
@@ -50,53 +51,81 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
   const [error, setError] = useState<string | null>(null)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const socketRef = useRef<Socket | null>(null)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (open && orderId) {
       fetchQRData()
       setPaymentSuccess(false)
+      startPolling()
     }
 
     return () => {
       setQrData(null)
       setError(null)
       setPaymentSuccess(false)
+      stopPolling()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, orderId])
 
-  // WebSocket connection for real-time payment notification
+  // Start polling for payment status
+  const startPolling = () => {
+    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+
+    pollIntervalRef.current = setInterval(async () => {
+      try {
+        const res = await getOrderDetail(orderId)
+        if (res?.data?.payment?.status === 'SUCCESS') {
+          console.log('[PaymentQR] Polling detected payment success')
+          setPaymentSuccess(true)
+          toast.success('Thanh toán thành công!')
+          stopPolling()
+          onPaymentSuccess?.()
+        }
+      } catch (err) {
+        console.warn('[PaymentQR] Polling error (will retry):', err)
+      }
+    }, POLL_INTERVAL)
+  }
+
+  const stopPolling = () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+    }
+  }
+
+  // WebSocket connection for real-time payment notification (backup)
   useEffect(() => {
     if (!open || !user?.id) return
 
     const wsUrl = API_BASE_URL.replace('/api', '')
-    const accessToken = getAccessToken()
+    const accessToken = JSON.parse(getAccessToken() || 'null')
 
     const socket = io(`${wsUrl}/payment`, {
       transports: ['websocket', 'polling'],
-      extraHeaders: {
+      auth: {
         authorization: `Bearer ${accessToken}`
       }
     })
 
     socket.on('connect', () => {
       console.log('[PaymentQR] WebSocket connected')
-
-      // Join the user's room
-      socket.emit('join', `room-${user.id}`)
     })
 
-    socket.on('payment', (data: { status: string }) => {
-      console.log('[PaymentQR] Payment event received:', data)
+    socket.on('payment', (data: any) => {
+      console.log('[PaymentQR] WebSocket payment event:', data)
       if (data.status === 'success') {
         setPaymentSuccess(true)
         toast.success('Thanh toán thành công!')
+        stopPolling()
         onPaymentSuccess?.()
       }
     })
 
     socket.on('connect_error', err => {
-      console.warn('[PaymentQR] WebSocket connection error:', err.message)
+      console.warn('[PaymentQR] WebSocket error:', err.message)
     })
 
     socketRef.current = socket
@@ -126,10 +155,15 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     toast.success(`Đã sao chép ${label}`)
   }
 
+  const handleCloseDialog = () => {
+    stopPolling()
+    onClose()
+  }
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleCloseDialog}
       maxWidth='sm'
       fullWidth
       PaperProps={{
@@ -160,7 +194,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
             <Typography sx={{ fontSize: '14px', color: '#666', mb: 3 }}>
               Đơn hàng của bạn đã được xác nhận thanh toán.
             </Typography>
-            <Button variant='contained' onClick={onClose} sx={{ px: 4, backgroundColor: '#4caf50' }}>
+            <Button variant='contained' onClick={handleCloseDialog} sx={{ px: 4, backgroundColor: '#4caf50' }}>
               Đóng
             </Button>
           </Box>
@@ -192,6 +226,20 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrData.qrUrl} alt='Payment QR Code' style={{ width: 250, height: 250, display: 'block' }} />
               </Box>
+              <Typography
+                sx={{
+                  fontSize: '12px',
+                  color: '#f44336',
+                  mt: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 0.5
+                }}
+              >
+                <CircularProgress size={12} sx={{ color: '#f44336' }} />
+                Đang chờ thanh toán...
+              </Typography>
             </Box>
 
             <Divider sx={{ mb: 2 }} />
@@ -268,9 +316,9 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
               </Typography>
             </Box>
 
-            {/* Close button */}
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Button variant='contained' onClick={onClose} sx={{ px: 4, backgroundColor: PRIMARY_COLOR }}>
+            {/* Button */}
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+              <Button variant='outlined' onClick={handleCloseDialog} sx={{ px: 4 }}>
                 Đóng
               </Button>
             </Box>

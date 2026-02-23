@@ -256,8 +256,9 @@ export default function CheckoutPage() {
 
       // Redirect to order list or order detail
       const orders = result?.data?.data || []
+      const isBankTransfer = selectedPaymentCode === 'BANK_TRANSFER'
       if (orders.length === 1 && orders[0]?.id) {
-        router.push(`/my-orders/${orders[0].id}`)
+        router.push(`/my-orders/${orders[0].id}${isBankTransfer ? '?pay=true' : ''}`)
       } else {
         router.push('/my-orders')
       }

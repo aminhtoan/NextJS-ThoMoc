@@ -81,6 +81,15 @@ export default function OrderDetailPage() {
     }
   }, [id, user, dispatch])
 
+  // Auto-open PaymentQRDialog when redirected from checkout with ?pay=true
+  useEffect(() => {
+    if (router.query.pay === 'true' && orderDetail?.status === ORDER_STATUS.PENDING_PAYMENT) {
+      setPaymentDialogOpen(true)
+      // Remove ?pay from URL without reload
+      router.replace(`/my-orders/${id}`, undefined, { shallow: true })
+    }
+  }, [router.query.pay, orderDetail?.status, id, router])
+
   const getActiveStep = (status: string) => {
     if (status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.RETURNED) return -1
     const index = ORDER_STEPS.findIndex(step => step.status === status)
@@ -489,6 +498,11 @@ export default function OrderDetailPage() {
           dispatch(fetchOrderDetailAsync(Number(id)))
         }}
         orderId={orderDetail.id}
+        onPaymentSuccess={() => {
+          setTimeout(() => {
+            dispatch(fetchOrderDetailAsync(Number(id)))
+          }, 1500)
+        }}
       />
     </>
   )
