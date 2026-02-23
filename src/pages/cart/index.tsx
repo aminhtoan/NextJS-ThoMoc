@@ -173,7 +173,6 @@ export default function CartPage() {
     )
   }
 
-  console.log('Cart items:', items)
   return (
     <>
       <Head>

@@ -2,23 +2,22 @@ import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlin
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import {
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Typography
+    Box,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    IconButton,
+    Typography
 } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useTranslation } from 'react-i18next'
-import { getPaymentQR } from 'src/service/order'
-import { getAccessToken } from 'src/service/token'
 import { io, Socket } from 'socket.io-client'
 import { useAuth } from 'src/hooks/useAuth'
+import { getPaymentQR } from 'src/service/order'
+import { getAccessToken } from 'src/service/token'
 
 const PRIMARY_COLOR = '#1677ff'
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8888'
@@ -45,7 +44,6 @@ interface PaymentQRDialogProps {
 }
 
 export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSuccess }: PaymentQRDialogProps) {
-  const { t } = useTranslation()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [qrData, setQrData] = useState<PaymentQRData | null>(null)
@@ -83,6 +81,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
 
     socket.on('connect', () => {
       console.log('[PaymentQR] WebSocket connected')
+
       // Join the user's room
       socket.emit('join', `room-${user.id}`)
     })
