@@ -77,8 +77,8 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     const socket = io(`${wsUrl}/payment`, {
       transports: ['websocket', 'polling'],
       extraHeaders: {
-        authorization: `Bearer ${accessToken}`,
-      },
+        authorization: `Bearer ${accessToken}`
+      }
     })
 
     socket.on('connect', () => {
@@ -96,7 +96,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       }
     })
 
-    socket.on('connect_error', (err) => {
+    socket.on('connect_error', err => {
       console.warn('[PaymentQR] WebSocket connection error:', err.message)
     })
 
