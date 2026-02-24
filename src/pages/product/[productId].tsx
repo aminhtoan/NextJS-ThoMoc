@@ -30,7 +30,6 @@ const ProductDetailPage = ({ product, defaultLanguage }: ProductDetailPageProps)
 }
 export const getServerSideProps: GetServerSideProps<ProductDetailPageProps> = async context => {
   const { productId } = context.params as { productId: string }
-
   const cookieLang = context.req.cookies['i18nextLng']
   const browserLang = (context.req.headers['accept-language'] || 'vi').split('-')[0].split(',')[0].toLowerCase()
   const baseLang = cookieLang || browserLang

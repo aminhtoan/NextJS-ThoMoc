@@ -52,36 +52,60 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const socketRef = useRef<Socket | null>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSuccessOrderIdRef = useRef<number | null>(null) // Track which orderId already succeeded
 
+  // Fetch QR data when dialog opens
   useEffect(() => {
-    if (open && orderId) {
-      fetchQRData()
-      setPaymentSuccess(false)
-      startPolling()
+    if (!open || !orderId) return
+
+    // If this orderId already succeeded, just show success UI
+    if (lastSuccessOrderIdRef.current === orderId) {
+      setPaymentSuccess(true)
+
+      return
     }
 
-    return () => {
-      setQrData(null)
-      setError(null)
-      setPaymentSuccess(false)
-      stopPolling()
-    }
+    // Otherwise, fetch QR data for new payment
+    fetchQRData()
+    setPaymentSuccess(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, orderId])
 
+  // Start/stop polling when dialog opens/closes
+  useEffect(() => {
+    if (open && orderId && !paymentSuccess) {
+      startPolling()
+    } else {
+      stopPolling()
+    }
+
+    return () => {
+      stopPolling()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, orderId, paymentSuccess])
+
   // Start polling for payment status
   const startPolling = () => {
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+    // Don't start if already succeeded
+    if (pollIntervalRef.current || lastSuccessOrderIdRef.current === orderId) return
 
     pollIntervalRef.current = setInterval(async () => {
       try {
         const res = await getOrderDetail(orderId)
         if (res?.data?.payment?.status === 'SUCCESS') {
+          lastSuccessOrderIdRef.current = orderId // Mark this orderId as succeeded
           setPaymentSuccess(true)
           stopPolling()
           onPaymentSuccess?.()
         }
+
+        if (res?.data?.status !== 'PENDING_PAYMENT') {
+          stopPolling()
+          socketRef.current?.disconnect()
+        }
       } catch (err) {
+        toast.error('Lỗi khi kiểm tra trạng thái thanh toán. Vui lòng thử lại.')
         console.warn('[PaymentQR] Polling error (will retry):', err)
       }
     }, POLL_INTERVAL)
@@ -96,7 +120,8 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
 
   // WebSocket connection for real-time payment notification (backup)
   useEffect(() => {
-    if (!open || !user?.id) return
+    // Don't connect if already succeeded or dialog closed
+    if (!open || !user?.id || lastSuccessOrderIdRef.current === orderId) return
 
     const wsUrl = API_BASE_URL.replace('/api', '')
     const accessToken = JSON.parse(getAccessToken() || 'null')
@@ -113,8 +138,8 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     })
 
     socket.on('payment', (data: { status: string }) => {
-      console.log('[PaymentQR] WebSocket payment event:', data)
       if (data.status === 'success') {
+        lastSuccessOrderIdRef.current = orderId // Mark as succeeded
         stopPolling()
         socket.disconnect()
         setPaymentSuccess(true)
@@ -133,8 +158,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       socket.disconnect()
       socketRef.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, user?.id])
+  }, [open, user?.id, orderId])
 
   const fetchQRData = async () => {
     setLoading(true)

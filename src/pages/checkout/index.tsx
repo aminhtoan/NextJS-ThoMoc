@@ -169,7 +169,7 @@ export default function CheckoutPage() {
     let qty = 0
     selectedShopGroups.forEach(group => {
       group.cartItems.forEach(item => {
-        const price = item.sku?.price ?? 0
+        const price = item.sku?.price || item.sku?.product?.basePrice || 0
         total += price * (item.quantity || 0)
         qty += item.quantity || 0
       })
@@ -256,9 +256,8 @@ export default function CheckoutPage() {
 
       // Redirect to order list or order detail
       const orders = result?.data?.data || []
-      const isBankTransfer = selectedPaymentCode === 'BANK_TRANSFER'
       if (orders.length === 1 && orders[0]?.id) {
-        router.push(`/my-orders/${orders[0].id}${isBankTransfer ? '?pay=true' : ''}`)
+        router.push(`/my-orders/${orders[0].id}`)
       } else {
         router.push('/my-orders')
       }
@@ -382,7 +381,7 @@ export default function CheckoutPage() {
 
               {/* Items */}
               {group.cartItems.map(item => {
-                const price = item.sku?.price ?? 0
+                const price = item.sku?.price || item.sku?.product?.basePrice || 0
                 const total = price * (item.quantity || 0)
 
                 return (

@@ -83,6 +83,9 @@ interface ProductDetail {
   createdAt: string
   updatedAt: string
   publishedAt: string | null
+  totalSold: number
+  reviewCount: number
+  avgRating: number
 }
 
 interface ProductDetailViewProps {
@@ -476,18 +479,22 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                 <Typography
                   sx={{ fontSize: '16px', fontWeight: 500, color: PRIMARY, borderBottom: `1px solid ${PRIMARY}` }}
                 >
-                  4.7
+                  {product.avgRating}
                 </Typography>
-                <Rating value={4.7} readOnly precision={0.1} size='small' sx={{ color: PRIMARY }} />
+                <Rating value={product.avgRating} readOnly precision={0.1} size='small' sx={{ color: PRIMARY }} />
               </Box>
               <Divider orientation='vertical' flexItem />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Typography sx={{ fontSize: '16px', fontWeight: 500, borderBottom: '1px solid #555' }}>735</Typography>
+                <Typography sx={{ fontSize: '16px', fontWeight: 500, borderBottom: '1px solid #555' }}>
+                  {product.reviewCount}
+                </Typography>
                 <Typography sx={{ fontSize: '14px', color: '#767676' }}>{t('Reviews')}</Typography>
               </Box>
               <Divider orientation='vertical' flexItem />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>3k+</Typography>
+                <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>
+                  {product.totalSold >= 1000 ? `${(product.totalSold / 1000).toFixed(1)}k+` : product.totalSold}
+                </Typography>
                 <Typography sx={{ fontSize: '14px', color: '#767676' }}>{t('Sold')}</Typography>
               </Box>
             </Box>

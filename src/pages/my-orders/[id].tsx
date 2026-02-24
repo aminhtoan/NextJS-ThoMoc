@@ -85,9 +85,19 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (router.query.pay === 'true' && orderDetail?.status === ORDER_STATUS.PENDING_PAYMENT) {
       setPaymentDialogOpen(true)
+
+      // Remove ?pay query param immediately to prevent re-open
       router.replace(`/my-orders/${id}`, undefined, { shallow: true })
     }
-  }, [router.query.pay, orderDetail?.status, id, router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.pay, orderDetail?.status, id])
+
+  // Auto-close dialog when payment is no longer pending
+  useEffect(() => {
+    if (orderDetail?.status && orderDetail.status !== ORDER_STATUS.PENDING_PAYMENT && paymentDialogOpen) {
+      setPaymentDialogOpen(false)
+    }
+  }, [orderDetail?.status, paymentDialogOpen])
 
   const getActiveStep = (status: string) => {
     if (status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.RETURNED) return -1
@@ -255,7 +265,7 @@ export default function OrderDetailPage() {
               <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('quantity')}</Typography>
             </Grid>
             <Grid item md={2} sx={{ textAlign: 'right' }}>
-              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('total_price')}</Typography>
+              <Typography sx={{ color: '#888', fontSize: '13px' }}>{t('total_amount')}</Typography>
             </Grid>
           </Grid>
 
