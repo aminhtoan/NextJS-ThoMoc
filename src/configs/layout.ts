@@ -15,25 +15,25 @@ export const VerticalItems = [
         icon: 'ic:baseline-list',
         text: 'All Orders',
         path: '/admin/orders'
-      },
-      {
-        title: 'Pending Orders',
-        icon: 'ic:baseline-hourglass-empty',
-        text: 'Pending Orders',
-        path: '/admin/orders?status=pending'
-      },
-      {
-        title: 'Completed Orders',
-        icon: 'ic:baseline-check-circle',
-        text: 'Completed Orders',
-        path: '/admin/orders?status=completed'
-      },
-      {
-        title: 'Cancelled Orders',
-        icon: 'ic:baseline-cancel',
-        text: 'Cancelled Orders',
-        path: '/admin/orders?status=cancelled'
       }
+      // {
+      //   title: 'Pending Orders',
+      //   icon: 'ic:baseline-hourglass-empty',
+      //   text: 'Pending Orders',
+      //   path: '/admin/orders?status=pending'
+      // },
+      // {
+      //   title: 'Completed Orders',
+      //   icon: 'ic:baseline-check-circle',
+      //   text: 'Completed Orders',
+      //   path: '/admin/orders?status=DELIVERED'
+      // },
+      // {
+      //   title: 'Cancelled Orders',
+      //   icon: 'ic:baseline-cancel',
+      //   text: 'Cancelled Orders',
+      //   path: '/admin/orders?status=cancelled'
+      // }
     ]
   },
   {

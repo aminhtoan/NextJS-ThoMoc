@@ -2,11 +2,11 @@ import handleAPI from 'src/apis/handleAPI'
 import { API_CONFIG } from 'src/configs/api'
 import { CreateCategoryBodyType, GetAllCategoriesQueryType, UpdateCategoryBodyType } from 'src/types/category'
 
-export const GetCategory = async (query: GetAllCategoriesQueryType) => {
+export const GetCategory = async (query?: GetAllCategoriesQueryType) => {
   const queryParams = new URLSearchParams()
-  if (query.parentCategoryId) queryParams.append('parentCategoryId', query.parentCategoryId.toString())
+  if (query?.parentCategoryId) queryParams.append('parentCategoryId', query.parentCategoryId.toString())
 
-  return await handleAPI(`${API_CONFIG.CATEGORY.CATEGORY}?${queryParams.toString()}`)
+  return await handleAPI(`${API_CONFIG.CATEGORY.CATEGORY}? ${queryParams.toString()}`)
 }
 
 export const GetCategoryDetail = async (categoryId: number) => {
@@ -26,6 +26,6 @@ export const UpdateCategory = async (
   return await handleAPI(`${API_CONFIG.CATEGORY.CATEGORY}/${categoryId}`, data, 'put')
 }
 
-export const DeleteCategory = async (categoryId: number) => {
+export const deleteCategory = async (categoryId: number) => {
   return await handleAPI(`${API_CONFIG.CATEGORY.CATEGORY}/${categoryId}`, {}, 'delete')
 }

@@ -39,6 +39,7 @@ import { ADMIN_ROUTES } from 'src/configs/route'
 import { BrandType } from 'src/types/brand'
 import { CategoryType } from 'src/types/category'
 import { CreateProductBodyType, ProductFormFields, ProductFormSchema, SKUItem } from 'src/types/product'
+import { useAuth } from 'src/hooks/useAuth'
 
 // const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), {
 //   ssr: false
@@ -108,8 +109,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
   const [variants, setVariants] = useState<VariantOption[]>([])
   const [skus, setSKUs] = useState<SKUItem[]>([])
   const [pendingSKUImages, setPendingSKUImages] = useState<PendingSKUImage[]>([])
-
-  // Options
+  const { user } = useAuth()
   const [brandOptions, setBrandOptions] = useState<Array<{ id: string; name: string }>>([])
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([])
 
@@ -125,7 +125,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
     const fetchOptions = async () => {
       try {
         const [brandsRes, categoriesRes] = await Promise.all([
-          GetBrand({ page: 1, limit: 100, search: '' }),
+          GetBrand({ page: 1, limit: 100, search: '', createdById: user?.id }),
           GetCategory({})
         ])
         const brands = brandsRes.data?.data || []

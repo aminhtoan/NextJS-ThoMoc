@@ -35,7 +35,7 @@ export const GetAllCategoriesResSchema = yup.object({
 })
 
 export const GetAllCategoriesQuerySchema = yup.object({
-  parentCategoryId: yup.number().positive().integer().optional(),
+  parentCategoryId: yup.number().positive().integer().optional()
 })
 
 export const GetCategoryParamsSchema = yup.object({
@@ -49,6 +49,12 @@ export const CreateCategoryBodySchema = CategorySchema.pick(['name', 'logo', 'pa
     parentCategoryId: yup.number().positive().integer().optional()
   })
   .strict()
+
+export type UpdateCategoryFormValues = {
+  name?: string | undefined
+  logo?: string | null | undefined
+  parentCategoryId?: number | undefined
+}
 
 export const UpdateCategoryBodySchema = CreateCategoryBodySchema.partial()
 

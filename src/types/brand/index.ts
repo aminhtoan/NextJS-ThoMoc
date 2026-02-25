@@ -27,7 +27,8 @@ export const BrandTranslationSchema = yup.object({
 export const GetBrandsQuerySchema = yup.object({
   page: yup.number().positive().integer().required(),
   limit: yup.number().positive().integer().required(),
-  search: yup.string().max(255).optional()
+  search: yup.string().max(255).optional(),
+  createdById: yup.number().positive().integer().optional()
 })
 
 export const GetBrandDetailParamsSchema = yup.object({

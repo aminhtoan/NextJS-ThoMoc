@@ -6,7 +6,7 @@ export const GetBrand = async (query: GetBrandsQueryType) => {
   return await handleAPI(
     `${API_CONFIG.BRAND.BRAND}?${query.page ? `page=${query.page}&` : ''}${query.limit ? `limit=${query.limit}&` : ''}${
       query.search ? `search=${query.search}&` : ''
-    }`
+    }${query.createdById ? `createdById=${query.createdById}&` : ''}`
   )
 }
 
