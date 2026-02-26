@@ -45,6 +45,7 @@ type ProductRow = {
   publishedAt: string | null
   createdAt: string
   variants: VariantsType
+  createdById: number // THÊM FIELD NÀY
 }
 
 const ProductsPage: NextPage = () => {
@@ -84,54 +85,78 @@ const ProductsPage: NextPage = () => {
       flex: 1,
       maxWidth: 250,
       sortable: false,
-      renderCell: params => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: 1,
-              overflow: 'hidden',
-              border: '1px solid',
-              borderColor: 'divider',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            {params.row.image ? (
-              <img
-                src={params.row.image}
-                alt={params.row.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <IconifyIcon icon='tabler:photo' />
-            )}
-          </Box>
-          <Box
-            sx={{
-              flex: 1,
-              minWidth: 0
-            }}
-          >
-            <Typography
-              variant='body2'
-              fontWeight={500}
-              noWrap
-              title={params.value}
+      renderCell: params => {
+        const isMyProduct = params.row.createdById === user?.id
+
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+            <Box
               sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 1,
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
+                border: '1px solid',
+                borderColor: isMyProduct ? 'primary.main' : 'divider',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                ...(isMyProduct && {
+                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.12)'
+                })
               }}
             >
-              {params.value}
-            </Typography>
+              {params.row.image ? (
+                <img
+                  src={params.row.image}
+                  alt={params.row.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <IconifyIcon icon='tabler:photo' />
+              )}
+            </Box>
+            <Box
+              sx={{
+                flex: 1,
+                minWidth: 0
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography
+                  variant='body2'
+                  fontWeight={isMyProduct ? 600 : 500}
+                  noWrap
+                  title={params.value}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    color: isMyProduct ? 'primary.main' : 'inherit'
+                  }}
+                >
+                  {params.value}
+                </Typography>
+                {isMyProduct && (
+                  <Chip
+                    label={t('Yours')}
+                    size='small'
+                    sx={{
+                      height: 18,
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                      '& .MuiChip-label': { px: 1 }
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
           </Box>
-        </Box>
-      )
+        )
+      }
     },
     {
       field: 'basePrice',
@@ -277,7 +302,8 @@ const ProductsPage: NextPage = () => {
         brandId: product.brandId,
         publishedAt: product.publishedAt,
         createdAt: product.createdAt,
-        variants: product.variants || []
+        variants: product.variants || [],
+        createdById: product.createdById // THÊM FIELD NÀY
       }))
 
       setProducts(rows)
@@ -475,6 +501,15 @@ const ProductsPage: NextPage = () => {
           disableColumnMenu
           autoHeight
           loading={loading}
+          getRowClassName={params => (params.row.createdById === user?.id ? 'my-product-row' : '')}
+          sx={{
+            '& .my-product-row': {
+              backgroundColor: 'rgba(25, 118, 210, 0.04)',
+              '&:hover': {
+                backgroundColor: 'rgba(25, 118, 210, 0.08)'
+              }
+            }
+          }}
           slots={{
             pagination: () => (
               <CustomPagination

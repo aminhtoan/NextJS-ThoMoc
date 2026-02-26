@@ -16,6 +16,7 @@ export const VerticalItems = [
         text: 'All Orders',
         path: '/admin/orders'
       }
+
       // {
       //   title: 'Pending Orders',
       //   icon: 'ic:baseline-hourglass-empty',

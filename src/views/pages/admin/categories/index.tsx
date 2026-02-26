@@ -123,7 +123,6 @@ const CategoriesPage: NextPage<TProps> = () => {
 
   const handleOpenUpdate = (row: any) => {
     const categoryData = row._original || row
-    console.log('Selected category data:', categoryData)
     setSelectedUser(categoryData)
     setIsOpenUpdateUser(true)
   }

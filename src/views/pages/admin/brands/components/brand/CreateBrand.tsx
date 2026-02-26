@@ -17,32 +17,23 @@ import { useTranslation } from 'react-i18next'
 // ** Custom Modal Import
 import CustomModal from 'src/components/CustomModal'
 import WrapperFileUpload from 'src/components/WrapperFileUpload'
+import { CreateBrand } from 'src/service/brand'
 
 // ** Service Import
-import { UpdateCategory } from 'src/service/category'
 import { uploadMedia } from 'src/service/media'
+import { CreateBrandBodySchema, CreateBrandBodyType } from 'src/types/brand'
 
 // ** Types Import
-import { UpdateCategoryBodySchema, UpdateCategoryBodyType, UpdateCategoryFormValues } from 'src/types/category'
 
-interface Category {
-  id: number
-  name: string
-  logo: string
-  parentCategoryId?: number
-}
-
-interface UpdateCategoryProps {
+interface CreateCategoryProps {
   open: boolean
   onClose: () => void
-  onUpdated?: () => void
-  category: Category | null // Replace with proper Category type
+  onCreated?: () => void
 }
 
-const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateCategoryProps) => {
+const CreateBrands = ({ open, onClose, onCreated }: CreateCategoryProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null)
-  const [previewImage, setPreviewImage] = React.useState<string | null>(null)
   const { t } = useTranslation()
 
   const {
@@ -51,67 +42,33 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
     formState: { errors },
     reset,
     setValue
-  } = useForm<UpdateCategoryFormValues>({
+  } = useForm<CreateBrandBodyType>({
     defaultValues: {
       name: '',
-      logo: '',
-      parentCategoryId: undefined
+      logo: ''
     },
     mode: 'onBlur',
-    resolver: yupResolver(UpdateCategoryBodySchema),
+    resolver: yupResolver(CreateBrandBodySchema),
     shouldUnregister: true
   })
-
-  React.useEffect(() => {
-    if (open && category) {
-      setValue('name', category.name)
-      setValue('logo', category.logo)
-      if (category.parentCategoryId) {
-        setValue('parentCategoryId', category.parentCategoryId)
-      }
-    } else {
-      reset()
-      setUploadedFile(null)
-    }
-  }, [open, category, setValue, reset])
 
   const handleClose = () => {
     reset()
     setUploadedFile(null)
-    setPreviewImage(null)
+    setValue('logo', '')
     onClose()
   }
 
-  const onSubmit = async (data: UpdateCategoryBodyType) => {
-    // Check if no changes
-    if (
-      category &&
-      data.name === category.name &&
-      data.logo === category.logo &&
-      !uploadedFile &&
-      (data.parentCategoryId === category.parentCategoryId || (!data.parentCategoryId && !category.parentCategoryId))
-    ) {
-      toast('No changes detected', {
-        icon: '⚠️'
-      })
-
-      return
-    }
-
+  const onSubmit = async (data: CreateBrandBodyType) => {
     try {
       setIsLoading(true)
+      const uploadedMedia = await uploadMedia(uploadedFile, 'brands')
+      data.logo = uploadedMedia.data.url
+      await CreateBrand(data)
+      toast.success(t('Create brand successfully'))
 
-      // If user uploaded new file, upload it first
-      if (uploadedFile) {
-        const uploadedMedia = await uploadMedia(uploadedFile, 'categories')
-        data.logo = uploadedMedia.data.url
-      }
-
-      await UpdateCategory(category?.id as number, data)
-      toast.success(t('Update category successfully'))
-
-      if (typeof onUpdated === 'function') {
-        onUpdated()
+      if (typeof onCreated === 'function') {
+        onCreated()
       }
 
       handleClose()
@@ -123,27 +80,14 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
         t('An error occurred')
 
       toast.error(errorMessage)
-      console.error('Error updating category:', error)
+      console.error('Error creating brand:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleFileUpload = (file: File) => {
-    setUploadedFile(file)
-
-    // Generate preview URL từ file
-    const reader = new FileReader()
-    console.log('File uploaded:', file)
-    console.log('File type:', reader.result)
-    reader.onloadend = () => {
-      setPreviewImage(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-  }
-
   return (
-    <CustomModal open={open} onClose={handleClose} title={t('Update Category')} maxWidth={450}>
+    <CustomModal open={open} onClose={handleClose} title={t('Create Brand')} maxWidth={450}>
       <Box
         component='form'
         onSubmit={handleSubmit(onSubmit)}
@@ -156,16 +100,18 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
         }}
       >
         {/* Logo Upload Field */}
-
         <Box sx={{ mt: 2 }}>
           <Controller
             control={control}
             name='logo'
-            render={({ field: { value } }) => (
+            render={({}) => (
               <>
-                <FormLabel>{t('Logo')}</FormLabel>
+                <FormLabel required>{t('Logo')}</FormLabel>
                 <WrapperFileUpload
-                  uploadFunc={handleFileUpload}
+                  uploadFunc={file => {
+                    setUploadedFile(file)
+                    setValue('logo', file.name)
+                  }}
                   objectAcceptFile={{
                     'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp']
                   }}
@@ -182,41 +128,27 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      flexDirection: 'column',
-                      gap: 1,
                       '&:hover': {
                         borderColor: 'primary.main',
                         bgcolor: 'action.hover'
                       }
                     }}
                   >
-                    {uploadedFile && previewImage ? (
+                    {uploadedFile ? (
                       <Box sx={{ textAlign: 'center' }}>
-                        <img
-                          src={previewImage || value || '/images/default-product.png'}
-                          alt='New logo preview'
-                          style={{ maxWidth: '100px', maxHeight: '100px', marginBottom: '8px' }}
-                        />
-                        <p style={{ margin: 0, fontWeight: 500, fontSize: '0.875rem' }}>{uploadedFile.name}</p>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#666' }}>
+                        <p style={{ margin: 0, fontWeight: 500 }}>
+                          {t('File')}: {uploadedFile.name}
+                        </p>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#666' }}>
                           {(uploadedFile.size / 1024).toFixed(2)} KB
                         </p>
-                      </Box>
-                    ) : value ? (
-                      <Box sx={{ textAlign: 'center' }}>
-                        <img
-                          src={value}
-                          alt='Current logo'
-                          style={{ maxWidth: '100px', maxHeight: '100px', marginBottom: '8px' }}
-                        />
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#666' }}>{t('Click to change logo')}</p>
                       </Box>
                     ) : (
                       <p style={{ margin: 0 }}>{t('Drag and drop or click to upload image')}</p>
                     )}
                   </Box>
                 </WrapperFileUpload>
-                {errors?.logo && typeof errors.logo.message === 'string' && (
+                {errors?.logo && (
                   <span
                     className='helper-text'
                     style={{
@@ -226,27 +158,13 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
                       display: 'block'
                     }}
                   >
-                    {errors.logo.message}
+                    {errors?.logo?.message}
                   </span>
                 )}
               </>
             )}
           />
         </Box>
-
-        {errors?.logo && typeof errors.logo.message === 'string' && (
-          <span
-            className='helper-text'
-            style={{
-              color: '#d32f2f',
-              fontSize: '0.75rem',
-              marginTop: '4px',
-              display: 'block'
-            }}
-          >
-            {errors.logo.message}
-          </span>
-        )}
 
         {/* Name Field */}
         <Box>
@@ -260,7 +178,7 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
                   id='name'
                   type='text'
                   name='name'
-                  placeholder={t('Category name')}
+                  placeholder={t('Enter category name')}
                   autoComplete='off'
                   required
                   fullWidth
@@ -268,9 +186,7 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
                   onChange={onChange}
                   value={value}
                   error={Boolean(errors?.name)}
-                  helperText={
-                    errors?.name?.message && typeof errors.name.message === 'string' ? errors.name.message : ''
-                  }
+                  helperText={errors?.name?.message}
                   FormHelperTextProps={{
                     className: 'helper-text'
                   }}
@@ -288,7 +204,7 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
           </Button>
 
           <Button type='submit' variant='contained' disabled={isLoading}>
-            {isLoading ? t('Updating...') : t('Update')}
+            {isLoading ? t('Creating...') : t('Create')}
           </Button>
         </Box>
       </Box>
@@ -296,4 +212,4 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
   )
 }
 
-export default UpdateCategoryComponent
+export default CreateBrands

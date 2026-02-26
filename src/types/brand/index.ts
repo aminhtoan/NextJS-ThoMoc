@@ -2,7 +2,7 @@ import * as yup from 'yup'
 
 export const BrandSchema = yup.object({
   id: yup.number().required(),
-  logo: yup.string().url().max(1000).required(),
+  logo: yup.string().max(1000).required(),
   name: yup.string().max(500).required(),
   createdById: yup.number().nullable(),
   updatedById: yup.number().nullable(),
@@ -48,7 +48,10 @@ export const GetBrandQueryResSchema = yup.object({
 })
 
 export const CreateBrandBodySchema = BrandSchema.pick(['logo', 'name'])
-export const UpdateBrandBodySchema = BrandSchema.partial().pick(['logo', 'name'])
+export const UpdateBrandBodySchema = yup.object({
+  logo: yup.string().max(1000).optional(),
+  name: yup.string().max(500).optional()
+})
 
 export type BrandType = yup.InferType<typeof BrandSchema>
 export type GetBrandsQueryType = yup.InferType<typeof GetBrandsQuerySchema>

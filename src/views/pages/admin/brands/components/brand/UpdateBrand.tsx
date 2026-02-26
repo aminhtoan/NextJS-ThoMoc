@@ -17,19 +17,18 @@ import { useTranslation } from 'react-i18next'
 // ** Custom Modal Import
 import CustomModal from 'src/components/CustomModal'
 import WrapperFileUpload from 'src/components/WrapperFileUpload'
+import { UpdateBrand } from 'src/service/brand'
 
 // ** Service Import
-import { UpdateCategory } from 'src/service/category'
 import { uploadMedia } from 'src/service/media'
+import { UpdateBrandBodySchema, UpdateBrandBodyType } from 'src/types/brand'
 
 // ** Types Import
-import { UpdateCategoryBodySchema, UpdateCategoryBodyType, UpdateCategoryFormValues } from 'src/types/category'
 
 interface Category {
   id: number
   name: string
   logo: string
-  parentCategoryId?: number
 }
 
 interface UpdateCategoryProps {
@@ -39,7 +38,7 @@ interface UpdateCategoryProps {
   category: Category | null // Replace with proper Category type
 }
 
-const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateCategoryProps) => {
+const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null)
   const [previewImage, setPreviewImage] = React.useState<string | null>(null)
@@ -51,14 +50,13 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
     formState: { errors },
     reset,
     setValue
-  } = useForm<UpdateCategoryFormValues>({
+  } = useForm<UpdateBrandBodyType>({
     defaultValues: {
       name: '',
-      logo: '',
-      parentCategoryId: undefined
+      logo: ''
     },
     mode: 'onBlur',
-    resolver: yupResolver(UpdateCategoryBodySchema),
+    resolver: yupResolver(UpdateBrandBodySchema),
     shouldUnregister: true
   })
 
@@ -66,9 +64,6 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
     if (open && category) {
       setValue('name', category.name)
       setValue('logo', category.logo)
-      if (category.parentCategoryId) {
-        setValue('parentCategoryId', category.parentCategoryId)
-      }
     } else {
       reset()
       setUploadedFile(null)
@@ -82,15 +77,9 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
     onClose()
   }
 
-  const onSubmit = async (data: UpdateCategoryBodyType) => {
+  const onSubmit = async (data: UpdateBrandBodyType) => {
     // Check if no changes
-    if (
-      category &&
-      data.name === category.name &&
-      data.logo === category.logo &&
-      !uploadedFile &&
-      (data.parentCategoryId === category.parentCategoryId || (!data.parentCategoryId && !category.parentCategoryId))
-    ) {
+    if (category && data.name === category.name && data.logo === category.logo && !uploadedFile) {
       toast('No changes detected', {
         icon: '⚠️'
       })
@@ -107,8 +96,8 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
         data.logo = uploadedMedia.data.url
       }
 
-      await UpdateCategory(category?.id as number, data)
-      toast.success(t('Update category successfully'))
+      await UpdateBrand(category?.id as number, data)
+      toast.success(t('Update brand successfully'))
 
       if (typeof onUpdated === 'function') {
         onUpdated()
@@ -296,4 +285,4 @@ const UpdateCategoryComponent = ({ open, onClose, category, onUpdated }: UpdateC
   )
 }
 
-export default UpdateCategoryComponent
+export default UpdateBrands

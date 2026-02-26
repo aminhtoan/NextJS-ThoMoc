@@ -208,26 +208,23 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       [variantName]: isDeselecting ? '' : option
     }))
 
-    // Chỉ xử lý chuyển ảnh với variant màu sắc
-    const isColorVariant = variantName === 'Màu Sắc' || variantName === 'Color'
-    if (isColorVariant) {
-      if (isDeselecting) {
-        // Bỏ chọn → reset về ảnh đầu gallery
-        setOverrideImage(null)
-        setSelectedImageIndex(0)
-      } else {
-        // Chọn màu → tìm ảnh SKU tương ứng
-        const matchingSku = product.skus?.find(sku => sku.value.includes(option))
-        if (matchingSku?.image) {
-          const imgIndex = images.findIndex(img => img === matchingSku.image)
-          if (imgIndex !== -1) {
-            // Ảnh có trong gallery → dùng index
-            setOverrideImage(null)
-            setSelectedImageIndex(imgIndex)
-          } else {
-            // Ảnh không trong gallery → override trực tiếp
-            setOverrideImage(matchingSku.image)
-          }
+    // Xử lý chuyển ảnh cho BẤT KỲ variant nào có SKU với ảnh
+    if (isDeselecting) {
+      // Bỏ chọn → reset về ảnh đầu gallery
+      setOverrideImage(null)
+      setSelectedImageIndex(0)
+    } else {
+      // Chọn option → tìm ảnh SKU tương ứng
+      const matchingSku = product.skus?.find(sku => sku.value.includes(option))
+      if (matchingSku?.image) {
+        const imgIndex = images.findIndex(img => img === matchingSku.image)
+        if (imgIndex !== -1) {
+          // Ảnh có trong gallery → dùng index
+          setOverrideImage(null)
+          setSelectedImageIndex(imgIndex)
+        } else {
+          // Ảnh không trong gallery → override trực tiếp
+          setOverrideImage(matchingSku.image)
         }
       }
     }
@@ -558,8 +555,8 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
             {/* Variants */}
             {product.variants?.length > 0 &&
-              product.variants.map((variant, index) => (
-                <Box key={index} sx={{ mb: 6 }}>
+              product.variants.map((variant, variantIndex) => (
+                <Box key={variantIndex} sx={{ mb: 6 }}>
                   <Grid container spacing={1} alignItems='flex-start'>
                     <Grid item xs={3} sm={2}>
                       <Typography sx={{ fontSize: '14px', color: '#757575', pt: 1.5 }}>{t(variant.value)}</Typography>
@@ -568,8 +565,11 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                       <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                         {variant.options.map((option, optIndex) => {
                           const isSelected = selectedVariantOptions[variant.value] === option
-                          const showImage = variant.value === 'Màu Sắc' || variant.value === 'Color'
-                          const matchingSku = showImage ? product.skus?.find(sku => sku.value.includes(option)) : null
+                          const isFirstVariant = variantIndex === 0
+                          const matchingSku = isFirstVariant
+                            ? product.skus?.find(sku => sku.value.includes(option))
+                            : null
+                          const showImage = isFirstVariant && !!matchingSku?.image
 
                           return (
                             <Button
@@ -595,7 +595,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                                 }
                               }}
                             >
-                              {matchingSku?.image && (
+                              {showImage && (
                                 <Box
                                   component='img'
                                   src={matchingSku.image}
