@@ -32,7 +32,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
             totalPages: 1
           }
 
-        console.log('Fetched reviews:', data)
         setReviews(data.data || [])
         setTotalPages(data.totalPages || 1)
         setTotalItems(data.totalItems || 0)

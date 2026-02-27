@@ -28,8 +28,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import ChatListWidget from 'src/components/ChatWidget'
 import ProductReviews from 'src/components/ProductReviews'
 import { useAuth } from 'src/hooks/useAuth'
+import { getAccessToken } from 'src/service/token'
 import { AppDispatch } from 'src/stores'
 import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
 
@@ -126,21 +128,23 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
   const [selectedVariantOptions, setSelectedVariantOptions] = useState<Record<string, string>>({})
   const [currentLanguageId, setCurrentLanguageId] = useState<string | null>(null)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
-
   const { i18n } = useTranslation()
   const { t } = useTranslation()
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useAuth()
+  const authToken = JSON.parse(getAccessToken() || 'null')
+  const [isOpenChat, setIsOpenChat] = useState(false)
 
+  const toggleChat = () => {
+    setIsOpenChat(prev => !prev)
+  }
   useEffect(() => {
     const lang = i18n.language || defaultLanguage
     setCurrentLanguageId(mapLanguageToId(lang))
   }, [i18n.language, defaultLanguage])
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
-
-  // Ưu tiên overrideImage nếu có, không thì dùng gallery bình thường
   const currentImage = overrideImage ?? images[selectedImageIndex] ?? images[0]
 
   const hasDiscount = product.virtualPrice > product.basePrice
@@ -735,6 +739,23 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
               <Typography sx={{ fontSize: '13px', color: '#757575', mt: 0.5 }}>Online vài phút trước</Typography>
             </Box>
+
+            <Button
+              variant='outlined'
+              size='small'
+              sx={{
+                textTransform: 'none',
+                fontSize: '13px',
+                borderColor: PRIMARY,
+                color: PRIMARY,
+                borderRadius: '2px',
+                '&:hover': { borderColor: PRIMARY_HOVER, backgroundColor: PRIMARY_LIGHT }
+              }}
+              onClick={toggleChat}
+            >
+              Chat Ngay
+            </Button>
+
             <Button
               variant='outlined'
               startIcon={<StorefrontOutlined />}
@@ -853,8 +874,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
         </Box>
       </Paper>
 
-      {/* Product Reviews */}
       <ProductReviews productId={product.id} />
+
+      <ChatListWidget currentUserId={user?.id} isOpen={isOpenChat} toggleChat={toggleChat} authToken={authToken!} />
     </Box>
   )
 }
