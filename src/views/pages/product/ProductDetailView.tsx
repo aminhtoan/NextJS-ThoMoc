@@ -194,7 +194,6 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       return selectedValues.every(val => sku.value.includes(val))
     })
 
-    console.log('Found SKU:', found)
     return found
   }, [product.skus, selectedVariantOptions])
 
