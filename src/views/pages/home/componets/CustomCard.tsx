@@ -1,12 +1,12 @@
-import { LocalOffer, ShoppingCart } from '@mui/icons-material'
-import { Box, Button, Card, CardContent, Chip, Paper, Typography } from '@mui/material'
+import { LocalOffer } from '@mui/icons-material'
+import { Box, Card, CardContent, Chip, Paper, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { PLACEHOLDER_IMAGE } from 'src/configs/place_holder'
 import { ProductType } from 'src/types/product'
 
 // ============ Styled Components ============
-
 const StyledCard = styled(Card)(() => ({
   borderRadius: 5,
   border: '1px solid #e0e0e0',
@@ -76,41 +76,16 @@ const ThumbnailImage = styled('img')({
   padding: '2px'
 })
 
-const AddToCartButton = styled(Button)(() => ({
-  width: '100%',
-  padding: '10px 16px',
-  background: 'linear-gradient(135deg, #2c3e50 0%, #1a252f 100%)',
-  color: 'white',
-  borderRadius: 10,
-  textTransform: 'uppercase',
-  fontWeight: 600,
-  letterSpacing: '0.5px',
-  fontSize: '13px',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-1px)',
-    boxShadow: '0 6px 16px rgba(44, 62, 80, 0.3)',
-    backgroundColor: '#1a252f'
-  }
-}))
-
 const PriceTypography = styled(Typography)({
   fontWeight: 700
 })
 
-// ============ Placeholder image ============
-
-const PLACEHOLDER_IMAGE =
-  "data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='100' y='100' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='14' fill='%23aaa'%3ENo Image%3C/text%3E%3C/svg%3E"
-
 // ============ Props ============
-
 interface ProductCardProps {
   product: ProductType
 }
 
 // ============ Component ============
-
 const ProductCard = ({ product }: ProductCardProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const router = useRouter()
@@ -124,12 +99,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0
 
   const handleCardClick = () => {
-    router.push(`/product/${product.id}`)
-  }
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent card click
-    // Navigate to product detail page to select variants
     router.push(`/product/${product.id}`)
   }
 
@@ -275,11 +244,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
         {/* Spacer */}
         <Box sx={{ flexGrow: 1 }} />
-
-        {/* Add to Cart Button */}
-        <AddToCartButton variant='contained' startIcon={<ShoppingCart />} fullWidth onClick={handleAddToCart}>
-          Add to Cart
-        </AddToCartButton>
       </CardContent>
     </StyledCard>
   )

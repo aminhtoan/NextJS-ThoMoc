@@ -34,6 +34,9 @@ import { useAuth } from 'src/hooks/useAuth'
 import { getAccessToken } from 'src/service/token'
 import { AppDispatch } from 'src/stores'
 import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
+import ShopOtherProducts from './components/ShopOtherProducts'
+import { PLACEHOLDER_IMAGE } from 'src/configs/place_holder'
+import RelatedProducts from './components/RelatedProducts'
 
 // ========== Types ==========
 interface SKU {
@@ -94,10 +97,6 @@ interface ProductDetailViewProps {
   product: ProductDetail
   defaultLanguage?: string
 }
-
-// ========== Constants ==========
-const PLACEHOLDER_IMAGE =
-  "data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='400' height='400' fill='%23f5f5f5'/%3E%3Ctext x='200' y='200' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='18' fill='%23bbb'%3ENo Image%3C/text%3E%3C/svg%3E"
 
 // ========== Theme Color ==========
 const PRIMARY = '#1565c0' // xanh header
@@ -186,14 +185,17 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
   const selectedSku = useMemo(() => {
     if (!product.skus || product.skus.length === 0) return null
-    const selectedValues = Object.values(selectedVariantOptions)
+    const selectedValues = Object.values(selectedVariantOptions).filter(v => v) // Lọc bỏ giá trị rỗng
+
     if (selectedValues.length === 0) return null
 
-    return product.skus.find(sku => {
-      const skuParts = sku.value.split('-')
-
-      return selectedValues.every(val => skuParts.includes(val))
+    const found = product.skus.find(sku => {
+      // Kiểm tra xem tất cả selected values có trong sku.value không
+      return selectedValues.every(val => sku.value.includes(val))
     })
+
+    console.log('Found SKU:', found)
+    return found
   }, [product.skus, selectedVariantOptions])
 
   const displayPrice = selectedSku ? selectedSku.price : product.basePrice
@@ -218,16 +220,16 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       setOverrideImage(null)
       setSelectedImageIndex(0)
     } else {
-      // Chọn option → tìm ảnh SKU tương ứng
+      // Chọn option => tìm ảnh SKU tương ứng
       const matchingSku = product.skus?.find(sku => sku.value.includes(option))
       if (matchingSku?.image) {
         const imgIndex = images.findIndex(img => img === matchingSku.image)
         if (imgIndex !== -1) {
-          // Ảnh có trong gallery → dùng index
+          // Ảnh có trong galler => dùng index
           setOverrideImage(null)
           setSelectedImageIndex(imgIndex)
         } else {
-          // Ảnh không trong gallery → override trực tiếp
+          // Ảnh không trong gallery => override trực tiếp
           setOverrideImage(matchingSku.image)
         }
       }
@@ -875,6 +877,10 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       </Paper>
 
       <ProductReviews productId={product.id} />
+
+      <ShopOtherProducts shopId={product.brandId} />
+
+      <RelatedProducts category={product.categories?.[0]?.id || 0} />
 
       <ChatListWidget currentUserId={user?.id} isOpen={isOpenChat} toggleChat={toggleChat} authToken={authToken!} />
     </Box>

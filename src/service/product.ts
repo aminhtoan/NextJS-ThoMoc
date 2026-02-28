@@ -10,13 +10,21 @@ export const getPublicProducts = async (query: GetProductsQueryType) => {
   if (query.name) params.append('name', query.name)
 
   // Xử lý brandIds array
-  if (query.brandIds && Array.isArray(query.brandIds) && query.brandIds.length > 0) {
-    query.brandIds.forEach(id => params.append('brandIds', id.toString()))
+  if (query.brandIds) {
+    if (Array.isArray(query.brandIds)) {
+      query.brandIds.forEach(id => params.append('brandIds', id.toString()))
+    } else {
+      // Nếu là number thì chuyển thành array hoặc append trực tiếp
+      params.append('brandIds', query.brandIds.toString())
+    }
   }
 
-  // Xử lý categories array
-  if (query.categories && Array.isArray(query.categories) && query.categories.length > 0) {
-    query.categories.forEach(id => params.append('categories', id.toString()))
+  if (query.categories) {
+    if (Array.isArray(query.categories)) {
+      query.categories.forEach(id => params.append('categories', id.toString()))
+    } else {
+      params.append('categories', query.categories.toString())
+    }
   }
 
   if (query.minPrice) params.append('minPrice', query.minPrice.toString())
