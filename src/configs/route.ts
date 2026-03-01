@@ -55,13 +55,42 @@ export const ADMIN_ROUTES = {
 }
 
 // ==================== SELLER ROUTES ====================
+// ==================== SELLER ROUTES ====================
 export const SELLER_ROUTES = {
   DASHBOARD: '/seller',
-  PRODUCTS: '/seller/products',
-  ORDERS: '/seller/orders',
-  ANALYTICS: '/seller/analytics'
-}
 
+  // Orders
+  ORDERS: '/seller/orders',
+  ORDERS_ALL: '/seller/orders?status=all',
+  ORDERS_PENDING: '/seller/orders?status=pending',
+  ORDERS_COMPLETED: '/seller/orders?status=completed',
+  ORDERS_CANCELLED: '/seller/orders?status=cancelled',
+
+  // Brands
+  BRANDS: '/seller/brands',
+  BRANDS_ALL: '/seller/brands',
+  BRANDS_ADD: '/seller/brands/add',
+  BRAND_CATEGORIES: '/seller/brands/categories',
+
+  // Categories
+  CATEGORIES: '/seller/categories',
+  CATEGORIES_ALL: '/seller/categories',
+  CATEGORIES_ADD: '/seller/categories/add',
+
+  // Products
+  PRODUCTS: '/seller/products',
+  PRODUCTS_ALL: '/seller/products',
+  PRODUCTS_ADD: '/seller/products/add',
+  PRODUCT_REVIEWS: '/seller/products/reviews',
+  PRODUCT_TAGS: '/seller/products/tags',
+  PRODUCT_TRANSLATIONS: '/seller/products/translations',
+
+  // Users
+  USERS: '/seller/users',
+  USERS_ALL: '/seller/users',
+  USERS_ADD: '/seller/users/add',
+  USER_ROLES: '/seller/users/roles'
+}
 // ==================== OAUTH ROUTES ====================
 export const OAUTH_ROUTES = {
   GOOGLE_CALLBACK: '/oauth-google-callback',

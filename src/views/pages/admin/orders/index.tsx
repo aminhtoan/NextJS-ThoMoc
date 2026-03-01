@@ -423,7 +423,6 @@ const OrderDetailDialog = ({
   )
 }
 
-// ==================== MAIN PAGE ====================
 type TProps = {}
 
 const OrdersPage: NextPage<TProps> = () => {

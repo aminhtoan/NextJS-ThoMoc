@@ -47,16 +47,6 @@ export const VerticalItems = [
         icon: 'ic:baseline-list',
         text: 'All Brands',
         path: '/admin/brands'
-      },
-      {
-        title: 'Add New Brand',
-        icon: 'ic:baseline-add-box',
-        text: 'Add New Brand'
-      },
-      {
-        title: 'Brand Categories',
-        icon: 'ic:baseline-category',
-        text: 'Brand Categories'
       }
     ]
   },
@@ -70,11 +60,6 @@ export const VerticalItems = [
         icon: 'ic:baseline-list',
         path: '/admin/categories',
         text: 'All Categories'
-      },
-      {
-        title: 'Add New Category',
-        icon: 'ic:baseline-add-box',
-        text: 'Add New Category'
       }
     ]
   },
@@ -147,5 +132,85 @@ export const VerticalItems = [
         path: '/admin/settings/delivery-methods'
       }
     ]
+  }
+]
+
+export const VerticalItemsSeller = [
+  {
+    title: 'Dashboard',
+    icon: 'ic:baseline-dashboard',
+    text: 'Dashboard',
+    path: '/seller'
+  },
+  {
+    title: 'Orders',
+    icon: 'ic:baseline-shopping-cart',
+    text: 'Orders',
+    children: [
+      {
+        title: 'All Orders',
+        icon: 'ic:baseline-list',
+        text: 'All Orders',
+        path: '/seller/orders'
+      }
+    ]
+  },
+  {
+    title: 'Brands',
+    icon: 'ic:baseline-label',
+    text: 'Brands',
+    children: [
+      {
+        title: 'All Brands',
+        icon: 'ic:baseline-list',
+        text: 'All Brands',
+        path: '/seller/brands'
+      }
+    ]
+  },
+  {
+    title: 'Categories',
+    icon: 'ic:baseline-category',
+    text: 'Categories',
+    children: [
+      {
+        title: 'All Categories',
+        icon: 'ic:baseline-list',
+        path: '/seller/categories',
+        text: 'All Categories'
+      }
+    ]
+  },
+  {
+    title: 'Products',
+    icon: 'ic:baseline-inventory',
+    text: 'Products',
+    children: [
+      {
+        title: 'All Products',
+        icon: 'ic:baseline-list',
+        text: 'All Products',
+        path: '/seller/products'
+      },
+      {
+        title: 'Add New Product',
+        icon: 'ic:baseline-add-box',
+        text: 'Add New Product',
+        path: '/seller/products/add'
+      },
+      {
+        title: 'Product Translations',
+        icon: 'ic:baseline-translate',
+        text: 'Product Translations',
+        path: '/seller/products/translations'
+      },
+      { title: 'Product Reviews', icon: 'ic:baseline-rate-review', text: 'Product Reviews' }
+    ]
+  },
+  {
+    title: 'All Reviews',
+    icon: 'ic:baseline-rate-review',
+    text: 'All Reviews',
+    path: '/seller/reviews'
   }
 ]
