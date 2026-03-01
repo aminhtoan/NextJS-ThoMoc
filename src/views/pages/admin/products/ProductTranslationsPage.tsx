@@ -54,9 +54,6 @@ import { GetManagerProductsQueryType, ProductType } from 'src/types/product'
 import DeleteTranslationDialog from './components/DeleteTranslationDialog'
 import TranslationFormDialog from './components/TranslationFormDialog'
 
-// ==============================
-// Translation sub-row per product
-// ==============================
 interface TranslationPanelProps {
   productId: number
   productName: string

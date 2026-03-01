@@ -32,7 +32,7 @@ import { createProduct, getProductDetail, updateProduct } from 'src/service/mana
 import { UploadManyMedia } from 'src/service/media'
 
 // ** Config
-import { ADMIN_ROUTES } from 'src/configs/route'
+import { ADMIN_ROUTES, SELLER_ROUTES } from 'src/configs/route'
 
 // ** Rich Text Editor (react-draft-wysiwyg)
 
@@ -100,9 +100,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
   })
 
   const watchedValues = watch()
-
-  // Local state for complex data
-  // const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const [images, setImages] = useState<string[]>([])
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
@@ -505,7 +502,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton onClick={() => router.push(ADMIN_ROUTES.PRODUCTS)} disabled={submitting}>
+          <IconButton
+            onClick={() =>
+              user?.role.name === 'ADMIN' ? router.push(ADMIN_ROUTES.PRODUCTS) : router.push(SELLER_ROUTES.PRODUCTS)
+            }
+            disabled={submitting}
+          >
             <IconifyIcon icon='tabler:arrow-left' />
           </IconButton>
           <Typography variant='h5' fontWeight={600}>
