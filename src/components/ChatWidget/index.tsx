@@ -58,6 +58,10 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout>()
 
+  // Theme color - Màu xanh biển
+  const primaryColor = '#1976d2'
+  const primaryColorHover = '#1565c0'
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -211,7 +215,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
             gap: 2
           }}
         >
-          <CircularProgress sx={{ color: '#ee4d2d' }} />
+          <CircularProgress sx={{ color: primaryColor }} />
           <Typography>Đang tải thông tin người dùng...</Typography>
         </Paper>
       </Box>
@@ -227,10 +231,10 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
           sx={{
             width: 60,
             height: 60,
-            backgroundColor: '#ee4d2d',
+            backgroundColor: primaryColor,
             color: 'white',
-            boxShadow: '0 4px 12px rgba(238,77,45,0.4)',
-            '&:hover': { backgroundColor: '#d73211', transform: 'scale(1.05)' }
+            boxShadow: `0 4px 12px ${primaryColor}66`,
+            '&:hover': { backgroundColor: primaryColorHover, transform: 'scale(1.05)' }
           }}
         >
           <ChatBubbleOutlineIcon sx={{ fontSize: 28 }} />
@@ -243,7 +247,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
             position: 'fixed',
             bottom: 100,
             right: 24,
-            width: 350,
+            width: 300,
             height: 400,
             zIndex: 1001,
             display: 'flex',
@@ -257,7 +261,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
           <Box
             sx={{
               p: 2,
-              backgroundColor: '#ee4d2d',
+              backgroundColor: primaryColor,
               color: 'white',
               display: 'flex',
               alignItems: 'center',
@@ -281,9 +285,13 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
                 </IconButton>
               </>
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <ChatBubbleOutlineIcon />
-                <Typography sx={{ fontWeight: 600 }}>Chat</Typography>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%', justifyContent: 'space-between' }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <ChatBubbleOutlineIcon />
+                  <Typography sx={{ fontWeight: 600 }}>Chat</Typography>
+                </Box>
                 <IconButton size='small' onClick={toggleChat} sx={{ color: 'white' }}>
                   <CloseIcon />
                 </IconButton>
@@ -307,11 +315,11 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
               >
                 {isLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <CircularProgress size={40} sx={{ color: '#ee4d2d' }} />
+                    <CircularProgress size={40} sx={{ color: primaryColor }} />
                   </Box>
                 ) : (
                   messages.map(msg => {
-                    const isFromMe = Number(msg.fromUserId) === Number(currentUserId) // ← SỬA CHÍNH Ở ĐÂY
+                    const isFromMe = Number(msg.fromUserId) === Number(currentUserId)
 
                     return (
                       <Box key={msg.id} sx={{ alignSelf: isFromMe ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
@@ -319,7 +327,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
                           sx={{
                             p: 1.5,
                             borderRadius: 2,
-                            backgroundColor: isFromMe ? '#ee4d2d' : 'white',
+                            backgroundColor: isFromMe ? primaryColor : 'white',
                             color: isFromMe ? 'white' : '#333',
                             boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                             borderTopRightRadius: isFromMe ? 0 : 8,
@@ -358,7 +366,11 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
                 <IconButton
                   onClick={handleSendMessage}
                   disabled={!message.trim()}
-                  sx={{ backgroundColor: '#ee4d2d', color: 'white', '&:hover': { backgroundColor: '#d73211' } }}
+                  sx={{
+                    backgroundColor: primaryColor,
+                    color: 'white',
+                    '&:hover': { backgroundColor: primaryColorHover }
+                  }}
                 >
                   <SendIcon />
                 </IconButton>

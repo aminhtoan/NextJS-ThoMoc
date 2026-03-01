@@ -74,22 +74,25 @@ const ReviewsPage: NextPage = () => {
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const fetchReviews = useCallback(async (pageNum: number) => {
-    setIsLoading(true)
-    try {
-      const res = await handleAPI(`${API_CONFIG.REVIEW.REVIEW}/admin/all?page=${pageNum}&limit=10`)
-      const data = res?.data?.data || res?.data
-      setReviews(data || [])
-      setTotalPages(res.data.totalPages || 1)
-      setTotalItems(res.data.totalItems || 0)
-      setPage(data?.page || pageNum)
-    } catch (error) {
-      console.error('Failed to load reviews:', error)
-      toast.error(t('load_reviews_failed'))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+  const fetchReviews = useCallback(
+    async (pageNum: number) => {
+      setIsLoading(true)
+      try {
+        const res = await handleAPI(`${API_CONFIG.REVIEW.REVIEW}/admin/all?page=${pageNum}&limit=10`)
+        const data = res?.data?.data || res?.data
+        setReviews(data || [])
+        setTotalPages(res.data.totalPages || 1)
+        setTotalItems(res.data.totalItems || 0)
+        setPage(data?.page || pageNum)
+      } catch (error) {
+        console.error('Failed to load reviews:', error)
+        toast.error(t('load_reviews_failed'))
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [t]
+  )
 
   useEffect(() => {
     fetchReviews(1)

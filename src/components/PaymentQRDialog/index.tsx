@@ -65,10 +65,8 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       return
     }
 
-    // Otherwise, fetch QR data for new payment
     fetchQRData()
     setPaymentSuccess(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, orderId])
 
   // Start/stop polling when dialog opens/closes
@@ -82,12 +80,10 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     return () => {
       stopPolling()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, orderId, paymentSuccess])
 
   // Start polling for payment status
   const startPolling = () => {
-    // Don't start if already succeeded
     if (pollIntervalRef.current || lastSuccessOrderIdRef.current === orderId) return
 
     pollIntervalRef.current = setInterval(async () => {

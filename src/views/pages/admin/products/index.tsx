@@ -14,7 +14,7 @@ import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon,
 
 // ** Configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
-import { ADMIN_ROUTES } from 'src/configs/route'
+import { ADMIN_ROUTES, SELLER_ROUTES } from 'src/configs/route'
 
 // ** Services
 import { GetBrand } from 'src/service/brand'
@@ -138,7 +138,7 @@ const ProductsPage: NextPage = () => {
                 >
                   {params.value}
                 </Typography>
-                {isMyProduct && (
+                {isMyProduct && user?.role?.name === 'ADMIN' && (
                   <Chip
                     label={t('Yours')}
                     size='small'
@@ -248,7 +248,13 @@ const ProductsPage: NextPage = () => {
           <Tooltip title={t('Translations')}>
             <IconButton
               size='small'
-              onClick={() => router.push(`${ADMIN_ROUTES.PRODUCTS}/translations?productId=${params.row.id}`)}
+              onClick={() => {
+                if (user?.role.name === 'ADMIN') {
+                  router.push(`${ADMIN_ROUTES.PRODUCTS}/translations?productId=${params.row.id}`)
+                } else {
+                  router.push(`${SELLER_ROUTES.PRODUCTS}/translations?productId=${params.row.id}`)
+                }
+              }}
               sx={{ color: 'info.main' }}
             >
               <IconifyIcon icon='ic:baseline-translate' />
@@ -303,7 +309,7 @@ const ProductsPage: NextPage = () => {
         publishedAt: product.publishedAt,
         createdAt: product.createdAt,
         variants: product.variants || [],
-        createdById: product.createdById // THÊM FIELD NÀY
+        createdById: product.createdById
       }))
 
       setProducts(rows)
@@ -350,7 +356,11 @@ const ProductsPage: NextPage = () => {
   }, [])
 
   const handleEdit = (id: number) => {
-    router.push(`${ADMIN_ROUTES.PRODUCTS}/${id}`)
+    if (user?.role.name === 'ADMIN') {
+      router.push(`${ADMIN_ROUTES.PRODUCTS}/${id}`)
+    } else {
+      router.push(`${SELLER_ROUTES.PRODUCTS}/${id}`)
+    }
   }
 
   const handleOpenDelete = (id: number, name: string) => {
@@ -388,7 +398,11 @@ const ProductsPage: NextPage = () => {
         <Button
           variant='contained'
           startIcon={<IconifyIcon icon='tabler:plus' />}
-          onClick={() => router.push(ADMIN_ROUTES.PRODUCTS_ADD)}
+          onClick={() =>
+            user?.role.name === 'ADMIN'
+              ? router.push(ADMIN_ROUTES.PRODUCTS_ADD)
+              : router.push(SELLER_ROUTES.PRODUCTS_ADD)
+          }
         >
           {t('Add product')}
         </Button>
