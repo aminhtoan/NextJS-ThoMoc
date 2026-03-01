@@ -34,6 +34,8 @@ import { useAuth } from 'src/hooks/useAuth'
 import { getAccessToken } from 'src/service/token'
 import { AppDispatch } from 'src/stores'
 import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
+import ShopOtherProducts from './components/ShopOtherProducts'
+import RelatedProducts from './components/RelatedProducts'
 
 // ========== Types ==========
 interface SKU {
@@ -875,6 +877,10 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       </Paper>
 
       <ProductReviews productId={product.id} />
+
+      <ShopOtherProducts shopId={product.brandId} />
+
+      <RelatedProducts category={product.categories?.[0]?.id || 0} />
 
       <ChatListWidget currentUserId={user?.id} isOpen={isOpenChat} toggleChat={toggleChat} authToken={authToken!} />
     </Box>
