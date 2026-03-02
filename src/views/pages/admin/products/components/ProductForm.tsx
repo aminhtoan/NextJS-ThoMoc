@@ -41,10 +41,6 @@ import { CategoryType } from 'src/types/category'
 import { CreateProductBodyType, ProductFormFields, ProductFormSchema, SKUItem } from 'src/types/product'
 import { useAuth } from 'src/hooks/useAuth'
 
-// const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), {
-//   ssr: false
-// })
-
 interface ProductFormProps {
   productId?: number
 }
@@ -135,7 +131,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       }
     }
     fetchOptions()
-  }, [])
+  }, [user?.id])
 
   // Fetch product detail in edit mode
   useEffect(() => {
@@ -550,50 +546,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
               )}
             />
           </Paper>
-
-          {/* Description */}
-          {/* <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant='body2' fontWeight={500} sx={{ mb: 1 }}>
-              {t('Description')}
-            </Typography>
-            <Box
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                minHeight: 200,
-                opacity: submitting ? 0.5 : 1,
-                pointerEvents: submitting ? 'none' : 'auto',
-                '& .rdw-editor-main': {
-                  px: 2,
-                  minHeight: 150
-                },
-                '& .rdw-editor-toolbar': {
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'grey.50'
-                }
-              }}
-            >
-              <Editor
-                editorState={editorState}
-                onEditorStateChange={setEditorState}
-                toolbar={{
-                  options: [
-                    'inline',
-                    'blockType',
-                    'fontSize',
-                    'fontFamily',
-                    'list',
-                    'textAlign',
-                    'link',
-                    'image',
-                    'history'
-                  ]
-                }}
-              />
-            </Box>
-          </Paper> */}
 
           {/* Images */}
           <Paper sx={{ p: 3, mb: 3 }}>

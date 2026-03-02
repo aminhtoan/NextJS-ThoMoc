@@ -45,7 +45,7 @@ type ProductRow = {
   publishedAt: string | null
   createdAt: string
   variants: VariantsType
-  createdById: number // THÊM FIELD NÀY
+  createdById: number
 }
 
 const ProductsPage: NextPage = () => {

@@ -16,25 +16,6 @@ export const VerticalItems = [
         text: 'All Orders',
         path: '/admin/orders'
       }
-
-      // {
-      //   title: 'Pending Orders',
-      //   icon: 'ic:baseline-hourglass-empty',
-      //   text: 'Pending Orders',
-      //   path: '/admin/orders?status=pending'
-      // },
-      // {
-      //   title: 'Completed Orders',
-      //   icon: 'ic:baseline-check-circle',
-      //   text: 'Completed Orders',
-      //   path: '/admin/orders?status=DELIVERED'
-      // },
-      // {
-      //   title: 'Cancelled Orders',
-      //   icon: 'ic:baseline-cancel',
-      //   text: 'Cancelled Orders',
-      //   path: '/admin/orders?status=cancelled'
-      // }
     ]
   },
   {
@@ -86,7 +67,12 @@ export const VerticalItems = [
         text: 'Product Translations',
         path: '/admin/products/translations'
       },
-      { title: 'Product Reviews', icon: 'ic:baseline-rate-review', text: 'Product Reviews' }
+      {
+        title: 'Product Reviews',
+        icon: 'ic:baseline-rate-review',
+        text: 'Product Reviews',
+        path: '/admin/products/reviews'
+      }
     ]
   },
   {
@@ -204,7 +190,12 @@ export const VerticalItemsSeller = [
         text: 'Product Translations',
         path: '/seller/products/translations'
       },
-      { title: 'Product Reviews', icon: 'ic:baseline-rate-review', text: 'Product Reviews' }
+      {
+        title: 'Product Reviews',
+        icon: 'ic:baseline-rate-review',
+        text: 'Product Reviews',
+        path: '/seller/products/reviews'
+      }
     ]
   },
   {

@@ -364,5 +364,19 @@
   "no_permission_delete_review": "You do not have permission to delete this review.",
   "review_deleted_successfully": "Review deleted successfully",
   "failed_to_delete_review": "Failed to delete review",
-  "manage_product_reviews": "Manage Product Reviews"
+  "manage_product_reviews": "Manage Product Reviews",
+  "delete_account_warning": "Deleting your account will permanently remove all your data and cannot be undone. Are you sure you want to proceed?",
+  "account_blocked_success": "Your account has been deleted successfully.",
+  "confirm_delete_account": "Confirm Delete Account",
+  "search_reviews_placeholder": "Search reviews by product name, content, or ID",
+  "rating": "Rating",
+  "reviewer": "Reviewer",
+  "rating_distribution": "Rating Distribution",
+  "average_rating": "Average Rating",
+   "no_reviews_for_product": "This product has no reviews yet",
+  "edited":"Edited",
+"delete_review_label": "Delete Review",
+"confirm_delete_review": "Confirm Delete Review",
+"delete_review_confirm_message": "Are you sure you want to delete review #{{id}}?",
+"Failed to load reviews": "Failed to load reviews"
 }

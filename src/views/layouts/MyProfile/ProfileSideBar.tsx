@@ -15,16 +15,13 @@ import { useTranslation } from 'react-i18next'
 
 // Icons
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
-import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined'
 
 // Hooks
@@ -75,13 +72,6 @@ const ProfileSideBar = () => {
           icon: <LockOutlinedIcon fontSize='small' />,
           path: '/my-profile/change-password'
         },
-
-        // {
-        //   key: 'notification-settings',
-        //   label: t('Notification Settings'),
-        //   icon: <NotificationsActiveOutlinedIcon fontSize='small' />,
-        //   path: '/my-profile/notification-settings'
-        // },
         {
           key: 'privacy-settings',
           label: t('Privacy Settings'),
@@ -89,24 +79,6 @@ const ProfileSideBar = () => {
           path: '/my-profile/privacy-settings'
         }
       ]
-    },
-    {
-      key: 'orders',
-      label: t('Orders'),
-      icon: <ReceiptLongIcon />,
-      path: '/my-profile/orders'
-    },
-    {
-      key: 'vouchers',
-      label: t('Vouchers'),
-      icon: <ConfirmationNumberOutlinedIcon />,
-      path: '/my-profile/vouchers'
-    },
-    {
-      key: 'coins',
-      label: t('Coins'),
-      icon: <MonetizationOnOutlinedIcon />,
-      path: '/my-profile/coins'
     }
   ]
 

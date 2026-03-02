@@ -356,5 +356,19 @@
   "review_deleted_successfully": "Đánh giá đã được xóa thành công",
   "failed_to_delete_review": "Xóa đánh giá thất bại",
   "manage_product_reviews": "Quản lý đánh giá sản phẩm",
-  "confirm_delete": "Xác nhận xóa"
+  "confirm_delete": "Xác nhận xóa",
+  "delete_account_warning": "Xóa tài khoản của bạn sẽ vĩnh viễn xóa tất cả dữ liệu của bạn và không thể hoàn tác. Bạn có chắc chắn muốn tiếp tục không?",
+  "delete_account_success": "Tài khoản của bạn đã được xóa thành công.",
+  "confirm_delete_account": "Xác nhận xóa tài khoản",
+  "search_reviews_placeholder": "Tìm kiếm đánh giá theo tên sản phẩm, nội dung hoặc ID",
+  "rating": "Đánh giá",
+  "reviewer": "Người đánh giá",
+  "rating_distribution": "Phân bố đánh giá",
+  "average_rating": "Đánh giá trung bình",
+  "no_reviews_for_product": "Sản phẩm này chưa có đánh giá nào từ khách hàng",
+  "edited":"Đã chỉnh sửa",
+"delete_review_label": "Xóa đánh giá",
+"confirm_delete_review": "Xác nhận xóa đánh giá",
+"delete_review_confirm_message": "Bạn có chắc chắn muốn xóa đánh giá #{{id}} không?",
+"Failed to load reviews": "Không thể tải đánh giá"
 }

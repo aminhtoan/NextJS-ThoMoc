@@ -23,6 +23,10 @@ interface TopProduct {
   name: string
   totalSales: number
   totalRevenue: number
+  pendingSales: number
+  pendingRevenue: number
+  cancelledSales: number
+  cancelledRevenue: number
   image: string
 }
 
@@ -216,9 +220,23 @@ const PageAdmin: NextPage<TProps> = () => {
                   <tr style={{ backgroundColor: '#f5f5f5' }}>
                     <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Product</th>
                     <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                      Total Sales
+                      {t('Delivered')}
                     </th>
-                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #ddd' }}>Revenue</th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #ddd' }}>
+                      {t('Revenue')}
+                    </th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                      {t('Pending')}
+                    </th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #ddd' }}>
+                      {t('Pending Revenue')}
+                    </th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                      {t('Cancelled/Returned')}
+                    </th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #ddd' }}>
+                      {t('Lost Revenue')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -238,11 +256,41 @@ const PageAdmin: NextPage<TProps> = () => {
                         )}
                         <Typography variant='body2'>{product.name}</Typography>
                       </td>
-                      <td style={{ padding: '12px', textAlign: 'center' }}>{product.totalSales}</td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <Typography variant='body2' sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                          {product.totalSales}
+                        </Typography>
+                      </td>
                       <td style={{ padding: '12px', textAlign: 'right' }}>
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                          product.totalRevenue
-                        )}
+                        <Typography variant='body2' sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                            product.totalRevenue
+                          )}
+                        </Typography>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <Typography variant='body2' sx={{ color: 'warning.main', fontWeight: 'bold' }}>
+                          {product.pendingSales}
+                        </Typography>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        <Typography variant='body2' sx={{ color: 'warning.main' }}>
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                            product.pendingRevenue
+                          )}
+                        </Typography>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <Typography variant='body2' sx={{ color: 'error.main', fontWeight: 'bold' }}>
+                          {product.cancelledSales}
+                        </Typography>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        <Typography variant='body2' sx={{ color: 'error.main' }}>
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                            product.cancelledRevenue
+                          )}
+                        </Typography>
                       </td>
                     </tr>
                   ))}

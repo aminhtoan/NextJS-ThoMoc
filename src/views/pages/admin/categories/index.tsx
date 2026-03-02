@@ -11,14 +11,8 @@ import React, { useCallback, useEffect } from 'react'
 // ** Components Imports
 import { CustomDataGrid, IconifyIcon, SearchBar } from 'src/components'
 
-// ** Configs Imports
-
-// ** Service Imports
-
 // ** Types Imports
 import { UserTableRow } from 'src/types/user'
-
-// ** Components User Imports
 
 // ** Translation Import
 import { useTranslation } from 'react-i18next'
