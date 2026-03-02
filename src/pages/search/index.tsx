@@ -1,19 +1,13 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
 import {
   Box,
   Button,
-  Collapse,
   Divider,
   FormControl,
   Grid,
   IconButton,
   InputAdornment,
-  List,
-  ListItemButton,
-  ListItemText,
   MenuItem,
   OutlinedInput,
   Pagination,
@@ -28,16 +22,14 @@ import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { CategoryWithTranslationsType } from 'src/types/category'
 import { ProductType } from 'src/types/product'
 import ProductCard from 'src/views/pages/home/componets/CustomCard'
 
-interface CategoryPageProps {
+interface SearchPageProps {
+  query: string
   products: ProductType[]
   totalPages: number
   currentPage: number
-  category: CategoryWithTranslationsType | null
-  allCategories: CategoryWithTranslationsType[]
   sortBy: string
   orderBy: string
   minPrice: number | null
@@ -47,57 +39,34 @@ interface CategoryPageProps {
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 const LIMIT = 12
 
-export default function CategoryPage({
+export default function SearchPage({
+  query,
   products,
   totalPages,
   currentPage,
-  category,
-  allCategories,
   sortBy,
   orderBy,
   minPrice,
   maxPrice
-}: CategoryPageProps) {
+}: SearchPageProps) {
   const router = useRouter()
-  const { categoryId } = router.query
-  const [openCategories, setOpenCategories] = useState<Record<number, boolean>>({})
   const [localMin, setLocalMin] = useState<string>(minPrice ? String(minPrice) : '')
   const [localMax, setLocalMax] = useState<string>(maxPrice ? String(maxPrice) : '')
 
-  // Lấy tên category từ translation
-  const categoryName =
-    category?.categoryTranslations && category.categoryTranslations.length > 0
-      ? category.categoryTranslations[0].name
-      : category?.name || 'Danh mục'
-
-  // Lọc parent categories
-  const parentCategories = allCategories.filter(cat => !cat.parentCategoryId)
-
-  // Lấy subcategories cho một parent
-  const getSubCategories = (parentId: number) => allCategories.filter(cat => cat.parentCategoryId === parentId)
-
-  const handleToggleCategory = (catId: number) => {
-    setOpenCategories(prev => ({ ...prev, [catId]: !prev[catId] }))
-  }
-
   const handlePageChange = (page: number) => {
-    router.push({ pathname: `/category/${categoryId}`, query: { ...router.query, page } }, undefined, { scroll: true })
-  }
-
-  const handleCategoryClick = (catId: number) => {
-    router.push(`/category/${catId}`)
+    router.push({ pathname: '/search', query: { ...router.query, page } }, undefined, { scroll: true })
   }
 
   const handleSortChange = (newSortBy: string) => {
     router.push({
-      pathname: `/category/${categoryId}`,
+      pathname: '/search',
       query: { ...router.query, sortBy: newSortBy, page: 1 }
     })
   }
 
   const handleOrderChange = (newOrderBy: string) => {
     router.push({
-      pathname: `/category/${categoryId}`,
+      pathname: '/search',
       query: { ...router.query, orderBy: newOrderBy, page: 1 }
     })
   }
@@ -108,118 +77,30 @@ export default function CategoryPage({
     else delete q.minPrice
     if (localMax !== '') q.maxPrice = localMax
     else delete q.maxPrice
-    router.push({ pathname: `/category/${categoryId}`, query: q })
-  }
-
-  const getCategoryName = (cat: CategoryWithTranslationsType) => {
-    return cat.categoryTranslations && cat.categoryTranslations.length > 0 ? cat.categoryTranslations[0].name : cat.name
+    router.push({ pathname: '/search', query: q })
   }
 
   return (
     <>
       <Head>
-        <title>{categoryName} - Thổ mộc</title>
-        <meta name='description' content={`Sản phẩm thuộc danh mục ${categoryName}`} />
+        <title>Tìm kiếm: {query} - Thổ Mộc</title>
+        <meta name='description' content={`Kết quả tìm kiếm cho "${query}"`} />
       </Head>
 
       <Box sx={{ mx: { xs: 2, md: 6 }, py: 4 }}>
+        {/* Search result header */}
+        <Box sx={{ mb: 3 }}>
+          <Typography sx={{ fontSize: '15px', color: '#555' }}>
+            🔍 Kết quả tìm kiếm cho từ khoá{' '}
+            <Typography component='span' sx={{ fontWeight: 600, color: '#ee4d2d', fontSize: '15px' }}>
+              &apos;{query}&apos;
+            </Typography>
+          </Typography>
+        </Box>
+
         <Grid container spacing={3}>
-          {/* Sidebar */}
+          {/* Sidebar filters */}
           <Grid item xs={12} md={3}>
-            {/* Category list */}
-            <Paper sx={{ p: 2, mb: 2 }}>
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  mb: 2,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1
-                }}
-              >
-                ☰ Tất Cả Danh Mục
-              </Typography>
-
-              <List component='nav' dense disablePadding>
-                {parentCategories.map(cat => {
-                  const subCategories = getSubCategories(cat.id)
-                  const isOpen = openCategories[cat.id]
-                  const isActive = Number(categoryId) === cat.id
-
-                  return (
-                    <Box key={cat.id}>
-                      <ListItemButton
-                        onClick={() => {
-                          if (subCategories.length > 0) {
-                            handleToggleCategory(cat.id)
-                          } else {
-                            handleCategoryClick(cat.id)
-                          }
-                        }}
-                        sx={{
-                          py: 1,
-                          borderRadius: 1,
-                          backgroundColor: isActive ? 'rgba(238, 77, 45, 0.08)' : 'transparent',
-                          '&:hover': {
-                            backgroundColor: 'rgba(238, 77, 45, 0.05)'
-                          }
-                        }}
-                      >
-                        <ListItemText
-                          primary={
-                            <Typography
-                              sx={{
-                                fontSize: '13px',
-                                fontWeight: isActive ? 600 : 400,
-                                color: isActive ? '#ee4d2d' : '#333'
-                              }}
-                            >
-                              {getCategoryName(cat)}
-                            </Typography>
-                          }
-                        />
-                        {subCategories.length > 0 && (isOpen ? <ExpandLess /> : <ExpandMore />)}
-                      </ListItemButton>
-
-                      {subCategories.length > 0 && (
-                        <Collapse in={isOpen} timeout='auto' unmountOnExit>
-                          <List component='div' disablePadding>
-                            {subCategories.map(subCat => {
-                              const isSubActive = Number(categoryId) === subCat.id
-
-                              return (
-                                <ListItemButton
-                                  key={subCat.id}
-                                  sx={{ pl: 4, py: 0.5 }}
-                                  onClick={() => handleCategoryClick(subCat.id)}
-                                >
-                                  <ListItemText
-                                    primary={
-                                      <Typography
-                                        sx={{
-                                          fontSize: '12px',
-                                          fontWeight: isSubActive ? 600 : 400,
-                                          color: isSubActive ? '#ee4d2d' : '#666'
-                                        }}
-                                      >
-                                        {getCategoryName(subCat)}
-                                      </Typography>
-                                    }
-                                  />
-                                </ListItemButton>
-                              )
-                            })}
-                          </List>
-                        </Collapse>
-                      )}
-                    </Box>
-                  )
-                })}
-              </List>
-            </Paper>
-
-            {/* Filter section */}
             <Paper sx={{ p: 2 }}>
               <Typography sx={{ fontWeight: 600, fontSize: '14px', mb: 2 }}>BỘ LỌC TÌM KIẾM</Typography>
 
@@ -300,7 +181,7 @@ export default function CategoryPage({
 
           {/* Main content */}
           <Grid item xs={12} md={9}>
-            {/* Header */}
+            {/* Sort bar */}
             <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Typography sx={{ fontSize: '14px' }}>Sắp xếp theo</Typography>
@@ -328,7 +209,7 @@ export default function CategoryPage({
                     Mới Nhất
                   </ToggleButton>
                   <ToggleButton value='price' sx={{ px: 2, fontSize: '13px' }}>
-                    Bán Chạy
+                    Giá
                   </ToggleButton>
                 </ToggleButtonGroup>
 
@@ -365,10 +246,14 @@ export default function CategoryPage({
               </Box>
             </Paper>
 
-            {/* Product list */}
+            {/* Product grid */}
             {products.length === 0 ? (
               <Paper sx={{ p: 8, textAlign: 'center' }}>
-                <Typography sx={{ color: '#999' }}>Không có sản phẩm nào trong danh mục này.</Typography>
+                <Typography sx={{ fontSize: '48px', mb: 2 }}>🔍</Typography>
+                <Typography sx={{ color: '#999', fontSize: '16px', mb: 1 }}>
+                  Không tìm thấy sản phẩm nào cho &quot;{query}&quot;
+                </Typography>
+                <Typography sx={{ color: '#bbb', fontSize: '13px' }}>Hãy thử tìm kiếm với từ khoá khác</Typography>
               </Paper>
             ) : (
               <>
@@ -381,26 +266,28 @@ export default function CategoryPage({
                 </Grid>
 
                 {/* Pagination */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(_, page) => handlePageChange(page)}
-                    color='primary'
-                    shape='rounded'
-                    showFirstButton
-                    showLastButton
-                    sx={{
-                      '& .MuiPaginationItem-root': {
-                        fontSize: '14px'
-                      },
-                      '& .MuiPaginationItem-root.Mui-selected': {
-                        backgroundColor: '#ee4d2d',
-                        color: '#fff'
-                      }
-                    }}
-                  />
-                </Box>
+                {totalPages > 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={(_, page) => handlePageChange(page)}
+                      color='primary'
+                      shape='rounded'
+                      showFirstButton
+                      showLastButton
+                      sx={{
+                        '& .MuiPaginationItem-root': {
+                          fontSize: '14px'
+                        },
+                        '& .MuiPaginationItem-root.Mui-selected': {
+                          backgroundColor: '#ee4d2d',
+                          color: '#fff'
+                        }
+                      }}
+                    />
+                  </Box>
+                )}
               </>
             )}
           </Grid>
@@ -410,58 +297,58 @@ export default function CategoryPage({
   )
 }
 
-export const getServerSideProps: GetServerSideProps<CategoryPageProps> = async context => {
+export const getServerSideProps: GetServerSideProps<SearchPageProps> = async context => {
   const acceptLanguage = context.req.headers['accept-language'] || 'en'
   const baseLang = acceptLanguage.split('-')[0].split(',')[0].toLowerCase()
 
-  const categoryId = Number(context.params?.categoryId) || 0
+  const query = (context.query.q as string) || ''
   const page = Number(context.query.page) || 1
   const sortBy = (context.query.sortBy as string) || 'createdAt'
   const orderBy = (context.query.orderBy as string) || 'desc'
   const minPrice = context.query.minPrice ? Number(context.query.minPrice) : null
   const maxPrice = context.query.maxPrice ? Number(context.query.maxPrice) : null
 
-  try {
-    const [productResponse, categoryResponse, allCategoriesResponse] = await Promise.all([
-      axios.get(`${API_URL}/product`, {
-        params: {
-          page,
-          limit: LIMIT,
-          categories: categoryId,
-          sortBy,
-          orderBy,
-          ...(minPrice !== null && { minPrice }),
-          ...(maxPrice !== null && { maxPrice })
-        },
+  if (!query) {
+    return {
+      props: {
+        query: '',
+        products: [],
+        totalPages: 1,
+        currentPage: 1,
+        sortBy,
+        orderBy,
+        minPrice: null,
+        maxPrice: null
+      }
+    }
+  }
 
-        headers: {
-          'Accept-Language': baseLang
-        }
-      }),
-      axios.get(`${API_URL}/category/${categoryId}`, {
-        headers: {
-          'Accept-Language': baseLang
-        }
-      }),
-      axios.get(`${API_URL}/category`, {
-        headers: {
-          'Accept-Language': baseLang
-        }
-      })
-    ])
+  try {
+    const productResponse = await axios.get(`${API_URL}/product`, {
+      params: {
+        page,
+        limit: LIMIT,
+        name: query,
+        sortBy,
+        orderBy,
+        ...(minPrice !== null && { minPrice }),
+        ...(maxPrice !== null && { maxPrice })
+      },
+
+      headers: {
+        'Accept-Language': baseLang
+      }
+    })
 
     const products: ProductType[] = productResponse.data?.data ?? []
     const totalPages: number = productResponse.data?.totalPages ?? 1
-    const category: CategoryWithTranslationsType | null = categoryResponse.data ?? null
-    const allCategories: CategoryWithTranslationsType[] = allCategoriesResponse.data?.data ?? []
 
     return {
       props: {
+        query,
         products: JSON.parse(JSON.stringify(products)),
         totalPages,
         currentPage: page,
-        category: JSON.parse(JSON.stringify(category)),
-        allCategories: JSON.parse(JSON.stringify(allCategories)),
         sortBy,
         orderBy,
         minPrice,
@@ -469,17 +356,16 @@ export const getServerSideProps: GetServerSideProps<CategoryPageProps> = async c
       }
     }
   } catch (error) {
-    console.error('Failed to fetch data:', error)
+    console.error('Search failed:', error)
 
     return {
       props: {
+        query,
         products: [],
         totalPages: 1,
         currentPage: 1,
-        category: null,
-        allCategories: [],
-        sortBy: 'createdAt',
-        orderBy: 'desc',
+        sortBy,
+        orderBy,
         minPrice: null,
         maxPrice: null
       }
@@ -487,5 +373,5 @@ export const getServerSideProps: GetServerSideProps<CategoryPageProps> = async c
   }
 }
 
-CategoryPage.guestGuard = false
-CategoryPage.authGuard = false
+SearchPage.guestGuard = false
+SearchPage.authGuard = false

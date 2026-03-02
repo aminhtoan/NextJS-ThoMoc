@@ -1,22 +1,11 @@
-import { Box, Grid, Paper, Typography, Card, CardContent, CircularProgress } from '@mui/material'
+import { Box, Card, CardContent, CircularProgress, Grid, Paper, Typography } from '@mui/material'
 import { NextPage } from 'next/types'
-import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts'
-import { IconifyIcon } from 'src/components'
+import { useTranslation } from 'react-i18next'
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import handleAPI from 'src/apis/handleAPI'
+import { IconifyIcon } from 'src/components'
 
 interface DashboardStats {
   totalProducts: number

@@ -18,7 +18,7 @@ import { AUTH_LOG } from 'src/configs/auth'
 
 // Hooks
 import { useAuth } from 'src/hooks/useAuth'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
@@ -32,6 +32,27 @@ const HeaderLayout = () => {
   const { totalItems } = useSelector((state: RootState) => state.cart)
   const TOP_BAR_HEIGHT = 25
   const MAIN_BAR_HEIGHT = 80
+  const [searchValue, setSearchValue] = useState('')
+
+  // Sync search input with URL query when on search page
+  useEffect(() => {
+    if (router.pathname === '/search' && router.query.q) {
+      setSearchValue(router.query.q as string)
+    }
+  }, [router.pathname, router.query.q])
+
+  const handleSearch = () => {
+    const trimmed = searchValue.trim()
+    if (trimmed) {
+      router.push({ pathname: '/search', query: { q: trimmed } })
+    }
+  }
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
 
   // Fetch cart data when user is logged in
   useEffect(() => {
@@ -162,6 +183,9 @@ const HeaderLayout = () => {
                   >
                     <SearchIcon sx={{ color: '#666', mr: 1.5, fontSize: '1.3rem' }} />
                     <InputBase
+                      value={searchValue}
+                      onChange={e => setSearchValue(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
                       placeholder='Tìm kiếm sản phẩm...'
                       sx={{
                         flex: 1,
@@ -170,6 +194,18 @@ const HeaderLayout = () => {
                         '& .MuiInputBase-input::placeholder': { color: '#999', opacity: 0.8 }
                       }}
                     />
+                    <IconButton
+                      onClick={handleSearch}
+                      sx={{
+                        bgcolor: '#1976d2',
+                        color: '#fff',
+                        borderRadius: '8px',
+                        px: 2,
+                        '&:hover': { bgcolor: '#1565c0' }
+                      }}
+                    >
+                      <SearchIcon sx={{ fontSize: '1.2rem' }} />
+                    </IconButton>
                   </Paper>
                 </Box>
 
