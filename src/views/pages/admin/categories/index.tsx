@@ -55,6 +55,7 @@ const CategoriesPage: NextPage<TProps> = () => {
 
   const ability = useMemo(() => {
     if (!auth.user) return null
+
     return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth])
 

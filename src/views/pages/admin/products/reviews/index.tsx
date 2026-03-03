@@ -36,40 +36,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { buildAbilityFor } from 'src/configs/acl'
 import { METHOD_MAP } from 'src/configs/method'
 import { MODULES } from 'src/configs/module'
-
-interface ProductItem {
-  id: number
-  name: string
-  images: string[]
-  basePrice: number
-  reviewCount: number
-  avgRating: number
-}
-
-interface ReviewMedia {
-  id: number
-  url: string
-}
-
-interface ReviewUser {
-  id: number
-  name: string
-  avatar: string
-}
-
-interface ReviewItem {
-  id: number
-  content: string
-  rating: number
-  orderId: number
-  productId: number
-  userId: number
-  updateCount: number
-  createdAt: string
-  updatedAt: string
-  medias: ReviewMedia[]
-  user: ReviewUser
-}
+import { ProductItem, ReviewItem } from 'src/types/review'
 
 const ProductReviewsPage: NextPage = () => {
   const { t } = useTranslation()
@@ -77,6 +44,7 @@ const ProductReviewsPage: NextPage = () => {
 
   const ability = useMemo(() => {
     if (!auth.user) return null
+
     return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth])
 

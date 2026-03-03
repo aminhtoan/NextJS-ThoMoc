@@ -16,8 +16,6 @@ import { buildAbilityFor } from 'src/configs/acl'
 import { METHOD_MAP } from 'src/configs/method'
 import { MODULES } from 'src/configs/module'
 
-// ** Service Imports
-
 // ** Types Imports
 import { UserTableRow } from 'src/types/user'
 
@@ -61,6 +59,7 @@ const BrandsPage: NextPage<TProps> = () => {
 
   const ability = useMemo(() => {
     if (!auth.user) return null
+
     return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth])
 

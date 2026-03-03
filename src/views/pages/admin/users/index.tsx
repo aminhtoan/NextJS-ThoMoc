@@ -12,28 +12,28 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon, SearchBar } from 'src/components'
 
 // ** Configs Imports
-import { PAGINATION_CONFIG } from 'src/configs/pagination'
-import { STATCARD_USER } from 'src/configs/user'
+import { buildAbilityFor } from 'src/configs/acl'
 import { METHOD_MAP } from 'src/configs/method'
 import { MODULES } from 'src/configs/module'
-import { buildAbilityFor } from 'src/configs/acl'
+import { PAGINATION_CONFIG } from 'src/configs/pagination'
+import { STATCARD_USER } from 'src/configs/user'
 
 // ** Service Imports
 import { fetchUsers } from 'src/service/user'
 
 // ** Types Imports
-import { User, UserTableRow } from 'src/types/user'
 import { getAllRoles } from 'src/service/role'
+import { User, UserTableRow } from 'src/types/user'
 
 // ** Components User Imports
-import { CreateUser, StatCard, DeleteUser, UpdateUser } from './components/users'
+import { CreateUser, DeleteUser, StatCard, UpdateUser } from './components/users'
 
 // ** Translation Import
 import { useTranslation } from 'react-i18next'
 
 // ** Hooks
-import useDebounce from 'src/hooks/useDebounce'
 import { useAuth } from 'src/hooks/useAuth'
+import useDebounce from 'src/hooks/useDebounce'
 
 type TProps = {}
 
@@ -59,6 +59,7 @@ const UsersPage: NextPage<TProps> = () => {
 
   const ability = useMemo(() => {
     if (!auth.user) return null
+    
     return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
   }, [auth])
 

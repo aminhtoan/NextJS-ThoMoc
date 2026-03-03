@@ -285,6 +285,7 @@ const ProductTranslationsPage: NextPage = () => {
 
   const ability = useMemo(() => {
     if (!user) return null
+    
     return buildAbilityFor(user.role.name, user.role.permissions)
   }, [user])
 

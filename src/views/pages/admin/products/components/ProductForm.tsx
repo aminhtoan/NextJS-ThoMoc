@@ -37,8 +37,6 @@ import { buildAbilityFor } from 'src/configs/acl'
 import { METHOD_MAP } from 'src/configs/method'
 import { MODULES } from 'src/configs/module'
 
-// ** Rich Text Editor (react-draft-wysiwyg)
-
 import { BrandType } from 'src/types/brand'
 import { CategoryType } from 'src/types/category'
 import { CreateProductBodyType, ProductFormFields, ProductFormSchema, SKUItem } from 'src/types/product'
@@ -109,6 +107,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
 
   const ability = useMemo(() => {
     if (!user) return null
+    
     return buildAbilityFor(user.role.name, user.role.permissions)
   }, [user])
 
