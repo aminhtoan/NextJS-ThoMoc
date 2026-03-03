@@ -85,6 +85,7 @@ interface ProductDetail {
   skus: SKU[]
   categories: Category[]
   brand: Brand
+  createdById: number
   createdAt: string
   updatedAt: string
   publishedAt: string | null
@@ -769,6 +770,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
                 borderRadius: '2px',
                 '&:hover': { borderColor: PRIMARY_HOVER, backgroundColor: PRIMARY_LIGHT }
               }}
+              onClick={() => router.push(`/shop/${product.brandId}`)}
             >
               Xem Shop
             </Button>
@@ -881,7 +883,13 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
       <RelatedProducts category={product.categories?.[0]?.id || 0} />
 
-      <ChatListWidget currentUserId={user?.id} isOpen={isOpenChat} toggleChat={toggleChat} authToken={authToken!} />
+      <ChatListWidget
+        currentUserId={user?.id}
+        isOpen={isOpenChat}
+        toggleChat={toggleChat}
+        authToken={authToken!}
+        targetUserId={product.createdById}
+      />
     </Box>
   )
 }

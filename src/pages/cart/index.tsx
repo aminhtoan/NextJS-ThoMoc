@@ -1,19 +1,40 @@
+// **  MUI icon
 import AddIcon from '@mui/icons-material/Add'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
 import RemoveIcon from '@mui/icons-material/Remove'
+
+// ** MUI components
 import { Box, Button, Checkbox, CircularProgress, Grid, IconButton, Paper, TextField, Typography } from '@mui/material'
+
+// ** Next
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+
+// ** React
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
+// ** Custom components
+import ChatListWidget from 'src/components/ChatWidget'
+
+// ** Configs
 import { PLACEHOLDER_IMAGE } from 'src/configs/place_holder'
+
+// ** Hooks
 import { useAuth } from 'src/hooks/useAuth'
+
+// ** Services
+import { getAccessToken } from 'src/service/token'
+
+// ** Stores
 import { AppDispatch, RootState } from 'src/stores'
 import { deselectAllItems, selectAllItems, setSelectedItems, toggleSelectItem } from 'src/stores/apps/cart'
 import { fetchCartAsync, removeCartItemAsync, updateCartItemAsync } from 'src/stores/apps/cart/actions'
+
+// ** Types
 import { CartItemDetailType, ShopCartType } from 'src/types/cart'
 
 export default function CartPage() {
@@ -21,6 +42,9 @@ export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useAuth()
   const { items, isLoading, selectedItems } = useSelector((state: RootState) => state.cart)
+  const [isOpenChat, setIsOpenChat] = useState(false)
+  const [selectedShopForChat, setSelectedShopForChat] = useState<number | undefined>(undefined)
+  const authToken = JSON.parse(getAccessToken() || 'null')
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set())
   const PRIMARY_COLOR = '#1677ff'
   const { t } = useTranslation()
@@ -30,6 +54,8 @@ export default function CartPage() {
       dispatch(fetchCartAsync({ page: 1, limit: 100 }))
     }
   }, [dispatch, user])
+
+  const toggleChat = () => setIsOpenChat(prev => !prev)
 
   // Get all cart item IDs
   const allCartItemIds = useMemo(() => {
@@ -201,19 +227,19 @@ export default function CartPage() {
               <Checkbox checked={isAllSelected} onChange={handleSelectAll} sx={{ mr: 2 }} />
               <Grid container alignItems='center'>
                 <Grid item xs={12} md={5}>
-                  <Typography sx={{ fontWeight: 500 }}>Sản Phẩm</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>{t('products')}</Typography>
                 </Grid>
                 <Grid item xs={12} md={2} sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
-                  <Typography sx={{ color: '#888' }}>Đơn Giá</Typography>
+                  <Typography sx={{ color: '#888' }}>{t('unit_price')}</Typography>
                 </Grid>
                 <Grid item xs={12} md={2} sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
-                  <Typography sx={{ color: '#888' }}>Số Lượng</Typography>
+                  <Typography sx={{ color: '#888' }}>{t('quantity')}</Typography>
                 </Grid>
                 <Grid item xs={12} md={2} sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
-                  <Typography sx={{ color: '#888' }}>Số Tiền</Typography>
+                  <Typography sx={{ color: '#888' }}>{t('Total')}</Typography>
                 </Grid>
                 <Grid item xs={12} md={1} sx={{ textAlign: 'center', display: { xs: 'none', md: 'block' } }}>
-                  <Typography sx={{ color: '#888' }}>Thao Tác</Typography>
+                  <Typography sx={{ color: '#888' }}>{t('actions')}</Typography>
                 </Grid>
               </Grid>
             </Paper>
@@ -242,10 +268,16 @@ export default function CartPage() {
                         mr: 1
                       }}
                     >
-                      Yêu thích
+                      {t('Favorite')}
                     </Box>
                     <Typography sx={{ fontWeight: 600, mr: 1 }}>{shop.shop?.name || 'Shop'}</Typography>
-                    <IconButton size='small'>
+                    <IconButton
+                      size='small'
+                      onClick={() => {
+                        setSelectedShopForChat(shop.shop?.id)
+                        setIsOpenChat(true)
+                      }}
+                    >
                       <ChatBubbleOutlineIcon sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Box>
@@ -458,6 +490,14 @@ export default function CartPage() {
             </Paper>
           </>
         )}
+
+        <ChatListWidget
+          currentUserId={user?.id}
+          isOpen={isOpenChat}
+          toggleChat={toggleChat}
+          authToken={authToken}
+          targetUserId={selectedShopForChat}
+        />
       </Box>
     </>
   )

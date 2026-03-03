@@ -186,7 +186,7 @@ const HeaderLayout = () => {
                       value={searchValue}
                       onChange={e => setSearchValue(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
-                      placeholder='Tìm kiếm sản phẩm...'
+                      placeholder={t('search_products')}
                       sx={{
                         flex: 1,
                         color: '#333',

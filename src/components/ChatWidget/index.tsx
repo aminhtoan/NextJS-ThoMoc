@@ -18,6 +18,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { getConversation, listMessage } from 'src/service/message'
+import { getUserById } from 'src/service/user'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8888/api'
 
@@ -36,6 +37,8 @@ interface Shop {
   createdAt: Date
   readAt: Date | null
   isFromMe: boolean
+  name?: string
+  avatar?: string | null
 }
 
 interface ChatListWidgetProps {
@@ -43,9 +46,16 @@ interface ChatListWidgetProps {
   authToken?: string
   isOpen?: boolean
   toggleChat?: () => void
+  targetUserId?: number
 }
 
-const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToken, isOpen, toggleChat }) => {
+const ChatListWidget: React.FC<ChatListWidgetProps> = ({
+  currentUserId,
+  authToken,
+  isOpen,
+  toggleChat,
+  targetUserId
+}) => {
   const [currentView, setCurrentView] = useState<'list' | 'chat'>('list')
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null)
   const [message, setMessage] = useState('')
@@ -53,6 +63,8 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
   const [shopss, setShops] = useState<Shop[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
+  const [userInfo, setUserInfo] = useState<{ name: string; avatar: string | null } | null>(null)
+  const [userInfoMap, setUserInfoMap] = useState<Record<number, { name: string; avatar: string | null }>>({})
 
   const socketRef = useRef<Socket | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -121,15 +133,95 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
     }
   }, [authToken, currentUserId, selectedShop])
 
+  // Auto-open chat with target user when widget opens
   useEffect(() => {
-    if (isOpen && currentUserId) fetchMessage()
-  }, [isOpen, currentUserId])
+    if (isOpen && currentUserId) {
+      fetchMessage()
+      if (targetUserId && targetUserId !== currentUserId) {
+        const existingShop = shopss.find(s => s.partnerId === targetUserId)
+        if (existingShop) {
+          handleSelectShop(existingShop)
+        } else {
+          // No existing conversation — open a new chat view directly
+          // Fetch user info
+          const cachedUserInfo = userInfoMap[targetUserId]
+          if (cachedUserInfo) {
+            setUserInfo(cachedUserInfo)
+          } else {
+            getUserById(targetUserId)
+              .then(response => {
+                const userData = response?.data
+                if (userData) {
+                  const newUserInfo = { name: userData.name || userData.email, avatar: userData.avatar || null }
+                  setUserInfo(newUserInfo)
+                  setUserInfoMap(prev => ({ ...prev, [targetUserId]: newUserInfo }))
+                }
+              })
+              .catch(() => setUserInfo(null))
+          }
+
+          const newShop: Shop = {
+            partnerId: targetUserId,
+            content: '',
+            createdAt: new Date(),
+            readAt: null,
+            isFromMe: false
+          }
+          setSelectedShop(newShop)
+          setCurrentView('chat')
+          setMessages([])
+          getConversation(targetUserId)
+            .then(response => {
+              let msgs: Message[] = []
+              if (response?.data) {
+                if (Array.isArray(response.data)) msgs = response.data
+                else if (Array.isArray(response.data.data)) msgs = response.data.data
+                else if (Array.isArray(response.data.messages)) msgs = response.data.messages
+              }
+              setMessages(msgs)
+            })
+            .catch(() => setMessages([]))
+        }
+      }
+    }
+  }, [isOpen, currentUserId, targetUserId])
 
   const fetchMessage = async () => {
     try {
       const response = await listMessage()
       const data = response?.data?.data || response?.data || []
-      setShops(Array.isArray(data) ? data : [])
+      const conversations = Array.isArray(data) ? data : []
+      setShops(conversations)
+
+      // Fetch user info for all conversation partners
+      const userIds = conversations.map(shop => shop.partnerId).filter(id => !userInfoMap[id])
+      if (userIds.length > 0) {
+        const userInfoPromises = userIds.map(async userId => {
+          try {
+            const userResponse = await getUserById(userId)
+            const userData = userResponse?.data
+            if (userData) {
+              return {
+                id: userId,
+                info: { name: userData.name || userData.email, avatar: userData.avatar || null }
+              }
+            }
+          } catch (e) {
+            console.error(`Failed to fetch user ${userId}:`, e)
+          }
+
+          return null
+        })
+
+        const userInfoResults = await Promise.all(userInfoPromises)
+        const newUserInfoMap = { ...userInfoMap }
+        userInfoResults.forEach(result => {
+          if (result) {
+            newUserInfoMap[result.id] = result.info
+          }
+        })
+        setUserInfoMap(newUserInfoMap)
+      }
     } catch (e) {
       console.error(e)
       setShops([])
@@ -141,6 +233,25 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
     setCurrentView('chat')
     setIsLoading(true)
     setMessages([])
+
+    // Set user info from map or fetch if not available
+    const cachedUserInfo = userInfoMap[shop.partnerId]
+    if (cachedUserInfo) {
+      setUserInfo(cachedUserInfo)
+    } else {
+      // Fetch user info if not in cache
+      try {
+        const userResponse = await getUserById(shop.partnerId)
+        const userData = userResponse?.data
+        if (userData) {
+          const newUserInfo = { name: userData.name || userData.email, avatar: userData.avatar || null }
+          setUserInfo(newUserInfo)
+          setUserInfoMap(prev => ({ ...prev, [shop.partnerId]: newUserInfo }))
+        }
+      } catch (e) {
+        console.error('Failed to fetch user info:', e)
+      }
+    }
 
     try {
       const response = await getConversation(shop.partnerId)
@@ -163,6 +274,8 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
     setSelectedShop(null)
     setMessages([])
     setIsTyping(false)
+    setUserInfo(null)
+    fetchMessage()
   }
 
   const handleSendMessage = () => {
@@ -184,6 +297,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
 
     setMessages(prev => [...prev, optimisticMessage])
     setMessage('')
+    fetchMessage()
   }
 
   const handleTypingStart = () => {
@@ -274,9 +388,15 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
                   <IconButton size='small' onClick={handleBackToList} sx={{ color: 'white' }}>
                     <ArrowBackIcon />
                   </IconButton>
-                  <Avatar sx={{ width: 36, height: 36 }} />
+                  <Avatar
+                    sx={{ width: 36, height: 36 }}
+                    src={userInfo?.avatar || selectedShop.avatar || undefined}
+                    alt={userInfo?.name || selectedShop.name || 'User'}
+                  />
                   <Box>
-                    <Typography sx={{ fontWeight: 600 }}>User #{selectedShop.partnerId}</Typography>
+                    <Typography sx={{ fontWeight: 600 }}>
+                      {userInfo?.name || selectedShop.name || `User #${selectedShop.partnerId}`}
+                    </Typography>
                     {isTyping && <Typography sx={{ fontSize: '12px', opacity: 0.9 }}>Đang nhập...</Typography>}
                   </Box>
                 </Box>
@@ -394,21 +514,28 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({ currentUserId, authToke
                 </Box>
               ) : (
                 <List sx={{ p: 0 }}>
-                  {shopss.map(shop => (
-                    <ListItem
-                      key={shop.partnerId}
-                      onClick={() => handleSelectShop(shop)}
-                      sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f9f9f9' } }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={`User #${shop.partnerId}`}
-                        secondary={`${shop.isFromMe ? 'Bạn: ' : ''}${shop.content}`}
-                      />
-                    </ListItem>
-                  ))}
+                  {shopss.map(shop => {
+                    const userInfo = userInfoMap[shop.partnerId]
+
+                    return (
+                      <ListItem
+                        key={shop.partnerId}
+                        onClick={() => handleSelectShop(shop)}
+                        sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f9f9f9' } }}
+                      >
+                        <ListItemAvatar>
+                          <Avatar
+                            src={userInfo?.avatar || shop.avatar || undefined}
+                            alt={userInfo?.name || shop.name || 'User'}
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={userInfo?.name || shop.name || `User #${shop.partnerId}`}
+                          secondary={`${shop.isFromMe ? 'Bạn: ' : ''}${shop.content}`}
+                        />
+                      </ListItem>
+                    )
+                  })}
                 </List>
               )}
             </Box>
