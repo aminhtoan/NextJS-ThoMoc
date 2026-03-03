@@ -32,7 +32,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { NextPage } from 'next/types'
 
 // ** React Imports
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 // ** Components Imports
 import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon, SearchBar } from 'src/components'
@@ -68,6 +68,10 @@ import { useTranslation } from 'react-i18next'
 // ** Hooks
 import toast from 'react-hot-toast'
 import useDebounce from 'src/hooks/useDebounce'
+import { useAuth } from 'src/hooks/useAuth'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 // ==================== STATUS STEPPER CONFIG ====================
 const ORDER_STEPS = [
@@ -132,13 +136,15 @@ const OrderDetailDialog = ({
   onClose,
   order,
   onUpdateStatus,
-  isUpdating
+  isUpdating,
+  canUpdate
 }: {
   open: boolean
   onClose: () => void
   order: AdminOrderType | null
   onUpdateStatus: (orderId: number, status: OrderStatusType) => void
   isUpdating: boolean
+  canUpdate: boolean
 }) => {
   const { t } = useTranslation()
 
@@ -387,7 +393,7 @@ const OrderDetailDialog = ({
         </Box>
 
         {/* Update Status Section */}
-        {allowedTransitions.length > 0 && (
+        {allowedTransitions.length > 0 && canUpdate && (
           <Box sx={{ mt: 3, p: 2, bgcolor: '#f9f9f9', borderRadius: 1 }}>
             <Typography variant='subtitle2' fontWeight={700} gutterBottom>
               {t('update_order_status')}
@@ -435,6 +441,14 @@ const OrdersPage: NextPage<TProps> = () => {
 
   const debouncedSearch = useDebounce(searchTerm, 300)
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
+  }, [auth])
+
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.ORDER)
 
   const dispatch = useDispatch<AppDispatch>()
   const { orders, isLoading, isUpdating, totalPages, totalItems, statistics, orderDetail } = useSelector(
@@ -661,8 +675,9 @@ const OrdersPage: NextPage<TProps> = () => {
                 <IconButton
                   size='small'
                   color='warning'
+                  disabled={!canUpdate}
                   onClick={() => {
-                    handleViewDetail(params.row.id) // mở dialog rồi cập nhật trong đó
+                    canUpdate && handleViewDetail(params.row.id) // mở dialog rồi cập nhật trong đó
                   }}
                 >
                   <IconifyIcon icon='mdi:pencil-outline' />
@@ -831,6 +846,7 @@ const OrdersPage: NextPage<TProps> = () => {
         order={orderDetail}
         onUpdateStatus={handleUpdateStatus}
         isUpdating={isUpdating}
+        canUpdate={!!canUpdate}
       />
     </Box>
   )

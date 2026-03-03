@@ -35,12 +35,16 @@ import {
   Typography
 } from '@mui/material'
 import { NextPage } from 'next/types'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import handleAPI from 'src/apis/handleAPI'
 import { API_CONFIG } from 'src/configs/api'
 import useDebounce from 'src/hooks/useDebounce'
+import { useAuth } from 'src/hooks/useAuth'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 interface ReviewMedia {
   id: number
@@ -96,6 +100,15 @@ const RATING_COLORS: Record<number, string> = {
 
 const ReviewsPage: NextPage = () => {
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
+  }, [auth])
+
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.REVIEW)
+
   const [reviews, setReviews] = useState<ReviewItem[]>([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -440,7 +453,12 @@ const ReviewsPage: NextPage = () => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t('delete_review')}>
-                        <IconButton size='small' onClick={() => handleDeleteClick(review.id)} color='error'>
+                        <IconButton
+                          size='small'
+                          onClick={() => canDelete && handleDeleteClick(review.id)}
+                          color='error'
+                          disabled={!canDelete}
+                        >
                           <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
@@ -594,8 +612,9 @@ const ReviewsPage: NextPage = () => {
           <Button
             variant='contained'
             color='error'
+            disabled={!canDelete}
             onClick={() => {
-              if (selectedReview) {
+              if (selectedReview && canDelete) {
                 setDetailOpen(false)
                 handleDeleteClick(selectedReview.id)
               }

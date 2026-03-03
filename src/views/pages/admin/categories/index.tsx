@@ -6,7 +6,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { NextPage } from 'next/types'
 
 // ** React Imports
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 // ** Components Imports
 import { CustomDataGrid, IconifyIcon, SearchBar } from 'src/components'
@@ -20,7 +20,11 @@ import { useTranslation } from 'react-i18next'
 // ** Hooks
 import { formatDate } from 'src/helpers/time'
 import useDebounce from 'src/hooks/useDebounce'
+import { useAuth } from 'src/hooks/useAuth'
 import { GetCategory } from 'src/service/category'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 import CreateCategories from './components/category/CreateCategory'
 import DeleteCategory from './components/category/DeleteCategory'
 import UpdateCategoryComponent from './components/category/UpdateCategory'
@@ -47,6 +51,16 @@ const CategoriesPage: NextPage<TProps> = () => {
   const [filterStatus, setFilterStatus] = React.useState<string>('')
   const debouncedSearch = useDebounce(searchTerm, 300)
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
+  }, [auth])
+
+  const canCreate = ability?.can(METHOD_MAP.POST, MODULES.CATEGORY)
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.CATEGORY)
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.CATEGORY)
 
   const userColumns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -72,10 +86,16 @@ const CategoriesPage: NextPage<TProps> = () => {
       width: 140,
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Box sx={{ cursor: 'pointer' }} onClick={() => handleOpenUpdate(params.row)}>
+          <Box
+            sx={{ cursor: canUpdate ? 'pointer' : 'not-allowed', opacity: canUpdate ? 1 : 0.5 }}
+            onClick={() => canUpdate && handleOpenUpdate(params.row)}
+          >
             <IconifyIcon icon='tabler:pencil' />
           </Box>
-          <Box sx={{ cursor: 'pointer' }} onClick={() => handleOpenDelete(params.row.id, params.row.name)}>
+          <Box
+            sx={{ cursor: canDelete ? 'pointer' : 'not-allowed', opacity: canDelete ? 1 : 0.5 }}
+            onClick={() => canDelete && handleOpenDelete(params.row.id, params.row.name)}
+          >
             <IconifyIcon icon='tabler:trash' />
           </Box>
           <Box sx={{ cursor: 'pointer' }}>
@@ -155,7 +175,7 @@ const CategoriesPage: NextPage<TProps> = () => {
                 />
               </Box>
 
-              <Box onClick={handleOpenCreate}>
+              <Box onClick={() => canCreate && handleOpenCreate()}>
                 <Box
                   component='button'
                   sx={{
@@ -166,10 +186,12 @@ const CategoriesPage: NextPage<TProps> = () => {
                     borderRadius: 0.5,
                     px: 2,
                     py: 1.25,
-                    cursor: 'pointer',
+                    cursor: canCreate ? 'pointer' : 'not-allowed',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1,
+                    pointerEvents: canCreate ? 'auto' : 'none',
+                    opacity: canCreate ? 1 : 0.5,
                     '&:hover': {
                       bgcolor: 'primary.dark'
                     }

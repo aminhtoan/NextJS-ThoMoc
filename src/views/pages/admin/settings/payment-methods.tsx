@@ -3,7 +3,7 @@ import { Box, IconButton, Paper } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid/models/colDef/gridColDef'
 
 // ** React Imports
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ** Components Imports
@@ -12,6 +12,12 @@ import { CreatePaymentMethod, DeletePaymentMethod, UpdatePaymentMethod } from '.
 
 // ** configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
+
+// ** Hooks
+import { useAuth } from 'src/hooks/useAuth'
 
 // ** Service Import
 import { getPaymentMethods, restorePaymentMethod, togglePaymentMethodStatus } from 'src/service/payment-methods'
@@ -34,6 +40,16 @@ const PagePaymentMethods = () => {
     name: ''
   })
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
+  }, [auth])
+
+  const canCreate = ability?.can(METHOD_MAP.POST, MODULES.PAYMENT_METHODS)
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.PAYMENT_METHODS)
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.PAYMENT_METHODS)
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
@@ -53,7 +69,10 @@ const PagePaymentMethods = () => {
       type: 'boolean',
       width: 150,
       renderCell: params => (
-        <Box onClick={() => handleToggleStatus(params.row.id)} sx={{ cursor: 'pointer' }}>
+        <Box
+          onClick={() => canUpdate && handleToggleStatus(params.row.id)}
+          sx={{ cursor: canUpdate ? 'pointer' : 'not-allowed', opacity: canUpdate ? 1 : 0.5 }}
+        >
           <CustomTag
             bgcolor={params.value ? 'rgba(28, 187, 140, .15)' : 'rgba(220, 53, 69, .15)'}
             color={params.value ? '#1cbb8c' : '#dc3545'}
@@ -74,14 +93,18 @@ const PagePaymentMethods = () => {
 
         return (
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton size='small' disabled={isDeleted} onClick={() => handleOpenUpdate(params.row)}>
+            <IconButton
+              size='small'
+              disabled={isDeleted || !canUpdate}
+              onClick={() => canUpdate && handleOpenUpdate(params.row)}
+            >
               <IconifyIcon icon='tabler:pencil' />
             </IconButton>
 
             <IconButton
               size='small'
-              disabled={isDeleted}
-              onClick={() => handleOpenDelete(params.row.id, params.row.name)}
+              disabled={isDeleted || !canDelete}
+              onClick={() => canDelete && handleOpenDelete(params.row.id, params.row.name)}
             >
               <IconifyIcon icon='tabler:trash' />
             </IconButton>
@@ -169,7 +192,7 @@ const PagePaymentMethods = () => {
             <SearchBar value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onReset={handleResetSearch} />
           </Box>
 
-          <Box onClick={handleOpenCreate}>
+          <Box onClick={() => canCreate && handleOpenCreate()}>
             <Box
               component='button'
               sx={{
@@ -180,10 +203,12 @@ const PagePaymentMethods = () => {
                 borderRadius: 0.5,
                 px: 2,
                 py: 1.25,
-                cursor: 'pointer',
+                cursor: canCreate ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
+                pointerEvents: canCreate ? 'auto' : 'none',
+                opacity: canCreate ? 1 : 0.5,
                 '&:hover': {
                   bgcolor: 'primary.dark'
                 }

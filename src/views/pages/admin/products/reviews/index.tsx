@@ -26,12 +26,16 @@ import {
   Typography
 } from '@mui/material'
 import { NextPage } from 'next/types'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import handleAPI from 'src/apis/handleAPI'
 import { API_CONFIG } from 'src/configs/api'
 import useDebounce from 'src/hooks/useDebounce'
+import { useAuth } from 'src/hooks/useAuth'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 interface ProductItem {
   id: number
@@ -69,6 +73,14 @@ interface ReviewItem {
 
 const ProductReviewsPage: NextPage = () => {
   const { t } = useTranslation()
+  const auth = useAuth()
+
+  const ability = useMemo(() => {
+    if (!auth.user) return null
+    return buildAbilityFor(auth.user.role.name, auth.user.role.permissions)
+  }, [auth])
+
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.REVIEW)
 
   // Product list state
   const [products, setProducts] = useState<ProductItem[]>([])
@@ -377,7 +389,12 @@ const ProductReviewsPage: NextPage = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Chip label={`#${review.id}`} size='small' variant='outlined' sx={{ fontSize: '11px' }} />
                     <Tooltip title={t('delete_review_label')}>
-                      <IconButton size='small' color='error' onClick={() => handleDeleteClick(review.id)}>
+                      <IconButton
+                        size='small'
+                        color='error'
+                        onClick={() => canDelete && handleDeleteClick(review.id)}
+                        disabled={!canDelete}
+                      >
                         <DeleteIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>

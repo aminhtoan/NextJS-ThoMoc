@@ -14,7 +14,7 @@ import {
   Typography
 } from '@mui/material'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -33,6 +33,9 @@ import { UploadManyMedia } from 'src/service/media'
 
 // ** Config
 import { ADMIN_ROUTES, SELLER_ROUTES } from 'src/configs/route'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 // ** Rich Text Editor (react-draft-wysiwyg)
 
@@ -103,6 +106,16 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
   const [skus, setSKUs] = useState<SKUItem[]>([])
   const [pendingSKUImages, setPendingSKUImages] = useState<PendingSKUImage[]>([])
   const { user } = useAuth()
+
+  const ability = useMemo(() => {
+    if (!user) return null
+    return buildAbilityFor(user.role.name, user.role.permissions)
+  }, [user])
+
+  const canSave = isEdit
+    ? ability?.can(METHOD_MAP.PUT, MODULES.MANAGE_PRODUCT)
+    : ability?.can(METHOD_MAP.POST, MODULES.MANAGE_PRODUCT)
+
   const [brandOptions, setBrandOptions] = useState<Array<{ id: string; name: string }>>([])
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([])
 
@@ -514,8 +527,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
           <Button
             variant='contained'
             onClick={handleRHFSubmit(onSubmit)}
-            disabled={submitting}
+            disabled={submitting || !canSave}
             startIcon={submitting ? <CircularProgress size={18} sx={{ color: 'white' }} /> : null}
+            sx={{
+              pointerEvents: canSave ? 'auto' : 'none',
+              opacity: canSave ? 1 : 0.5
+            }}
           >
             {submitting ? t('Saving...') : isEdit ? t('Update') : t('Save')}
           </Button>

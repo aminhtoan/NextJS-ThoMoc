@@ -38,6 +38,10 @@ const UsersRolePage: NextPage<TProps> = () => {
   }, [auth])
 
   const canCreate = ability?.can(METHOD_MAP.POST, MODULES.ROLE)
+  const canRead = ability?.can(METHOD_MAP.GET, MODULES.ROLE)
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.ROLE)
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.ROLE)
+
 
   // Debounce value (chỉ dùng cho Table / API)
   const debouncedSearch = useDebounce(searchValue, 300)

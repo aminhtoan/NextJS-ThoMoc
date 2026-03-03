@@ -24,13 +24,16 @@ import { useRouter } from 'next/router'
 import { NextPage } from 'next/types'
 
 // ** React Imports
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 // ** Components Imports
 import { CustomDataGrid, CustomPagination, IconifyIcon, SearchBar } from 'src/components'
 
 // ** Configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 // ** Services
 import { GetLanguage } from 'src/service/language'
@@ -59,9 +62,20 @@ interface TranslationPanelProps {
   productName: string
   languageMap: Record<string, string>
   expanded: boolean
+  canCreate?: boolean
+  canUpdate?: boolean
+  canDelete?: boolean
 }
 
-const TranslationPanel: React.FC<TranslationPanelProps> = ({ productId, productName, languageMap, expanded }) => {
+const TranslationPanel: React.FC<TranslationPanelProps> = ({
+  productId,
+  productName,
+  languageMap,
+  expanded,
+  canCreate,
+  canUpdate,
+  canDelete
+}) => {
   const { t } = useTranslation()
   const [translations, setTranslations] = useState<ProductTranslationType[]>([])
   const [loading, setLoading] = useState(false)
@@ -115,6 +129,11 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ productId, productN
             onClick={() => {
               setEditId(null)
               setFormOpen(true)
+            }}
+            disabled={!canCreate}
+            sx={{
+              pointerEvents: canCreate ? 'auto' : 'none',
+              opacity: canCreate ? 1 : 0.5
             }}
           >
             {t('Add Translation')}
@@ -178,6 +197,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ productId, productN
                         <Tooltip title={t('Edit')}>
                           <IconButton
                             size='small'
+                            disabled={!canUpdate}
                             onClick={() => {
                               setEditId(item.id)
                               setFormOpen(true)
@@ -189,10 +209,11 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ productId, productN
                         <Tooltip title={t('Delete')}>
                           <IconButton
                             size='small'
-                            sx={{ color: 'error.main' }}
+                            disabled={!canDelete}
+                            sx={{ color: canDelete ? 'error.main' : undefined }}
                             onClick={() => {
-                              setDeleteTarget({ id: item.id, name: item.name })
-                              setDeleteOpen(true)
+                              canDelete && setDeleteTarget({ id: item.id, name: item.name })
+                              canDelete && setDeleteOpen(true)
                             }}
                           >
                             <IconifyIcon icon='tabler:trash' fontSize={18} />
@@ -261,6 +282,15 @@ const ProductTranslationsPage: NextPage = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const { user } = useAuth()
+
+  const ability = useMemo(() => {
+    if (!user) return null
+    return buildAbilityFor(user.role.name, user.role.permissions)
+  }, [user])
+
+  const canCreate = ability?.can(METHOD_MAP.POST, MODULES.MANAGE_PRODUCT)
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.MANAGE_PRODUCT)
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.MANAGE_PRODUCT)
 
   // Auto-expand if productId is passed in query
   useEffect(() => {
@@ -512,6 +542,9 @@ const ProductTranslationsPage: NextPage = () => {
             productName={product.name}
             languageMap={languageMap}
             expanded={expandedProductId === product.id}
+            canCreate={!!canCreate}
+            canUpdate={!!canUpdate}
+            canDelete={!!canDelete}
           />
         ))}
       </Paper>

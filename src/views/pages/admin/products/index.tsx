@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { NextPage } from 'next/types'
 
 // ** React Imports
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 // ** Components Imports
 import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon, SearchBar } from 'src/components'
@@ -15,6 +15,9 @@ import { CustomDataGrid, CustomPagination, CustomSelect, CustomTag, IconifyIcon,
 // ** Configs
 import { PAGINATION_CONFIG } from 'src/configs/pagination'
 import { ADMIN_ROUTES, SELLER_ROUTES } from 'src/configs/route'
+import { buildAbilityFor } from 'src/configs/acl'
+import { METHOD_MAP } from 'src/configs/method'
+import { MODULES } from 'src/configs/module'
 
 // ** Services
 import { GetBrand } from 'src/service/brand'
@@ -70,7 +73,17 @@ const ProductsPage: NextPage = () => {
   const debouncedSearch = useDebounce(searchTerm, 300)
   const { t } = useTranslation()
   const router = useRouter()
-  const { user } = useAuth()
+  const auth = useAuth()
+  const user = auth.user
+
+  const ability = useMemo(() => {
+    if (!user) return null
+    return buildAbilityFor(user.role.name, user.role.permissions)
+  }, [user])
+
+  const canCreate = ability?.can(METHOD_MAP.POST, MODULES.MANAGE_PRODUCT)
+  const canUpdate = ability?.can(METHOD_MAP.PUT, MODULES.MANAGE_PRODUCT)
+  const canDelete = ability?.can(METHOD_MAP.DELETE, MODULES.MANAGE_PRODUCT)
 
   const columns: GridColDef<ProductRow>[] = [
     {
@@ -262,7 +275,7 @@ const ProductsPage: NextPage = () => {
           </Tooltip>
 
           <Tooltip title={t('Edit')}>
-            <IconButton size='small' onClick={() => handleEdit(params.row.id)}>
+            <IconButton size='small' onClick={() => canUpdate && handleEdit(params.row.id)} disabled={!canUpdate}>
               <IconifyIcon icon='tabler:pencil' />
             </IconButton>
           </Tooltip>
@@ -270,8 +283,9 @@ const ProductsPage: NextPage = () => {
           <Tooltip title={t('Delete')}>
             <IconButton
               size='small'
-              onClick={() => handleOpenDelete(params.row.id, params.row.name)}
-              sx={{ color: 'error.main' }}
+              onClick={() => canDelete && handleOpenDelete(params.row.id, params.row.name)}
+              disabled={!canDelete}
+              sx={{ color: canDelete ? 'error.main' : undefined }}
             >
               <IconifyIcon icon='tabler:trash' />
             </IconButton>
@@ -403,6 +417,11 @@ const ProductsPage: NextPage = () => {
               ? router.push(ADMIN_ROUTES.PRODUCTS_ADD)
               : router.push(SELLER_ROUTES.PRODUCTS_ADD)
           }
+          disabled={!canCreate}
+          sx={{
+            pointerEvents: canCreate ? 'auto' : 'none',
+            opacity: canCreate ? 1 : 0.5
+          }}
         >
           {t('Add product')}
         </Button>
