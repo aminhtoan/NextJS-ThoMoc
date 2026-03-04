@@ -83,7 +83,42 @@ export type OrderType = yup.InferType<typeof OrderSchema>
 
 // Order with items (list)
 export const OrderWithItemsSchema = OrderSchema.omit(['receiver', 'deletedAt']).shape({
-  items: yup.array().of(ProductSKUSnapshotSchema).default([])
+  items: yup.array().of(ProductSKUSnapshotSchema).default([]),
+  reviews: yup
+    .array()
+    .of(
+      yup.object({
+        id: yup.number().required(),
+        content: yup.string().required(),
+        rating: yup.number().required(),
+        orderId: yup.number().required(),
+        productId: yup.number().required(),
+        userId: yup.number().required(),
+        updateCount: yup.number().required(),
+        createdAt: yup.string().required(),
+        updatedAt: yup.string().required(),
+        medias: yup
+          .array()
+          .of(
+            yup.object({
+              id: yup.number().required(),
+              url: yup.string().required(),
+              type: yup.mixed<'IMAGE' | 'VIDEO'>().oneOf(['IMAGE', 'VIDEO']).required(),
+              reviewId: yup.number().required(),
+              createdAt: yup.string().required()
+            })
+          )
+          .default([]),
+        user: yup
+          .object({
+            id: yup.number().required(),
+            name: yup.string().required(),
+            avatar: yup.string().required()
+          })
+          .required()
+      })
+    )
+    .default([])
 })
 
 export type OrderWithItemsType = yup.InferType<typeof OrderWithItemsSchema>

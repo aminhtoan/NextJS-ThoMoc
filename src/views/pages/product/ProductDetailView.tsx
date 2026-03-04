@@ -882,14 +882,15 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       <ShopOtherProducts shopId={product.brandId} />
 
       <RelatedProducts category={product.categories?.[0]?.id || 0} />
-
-      <ChatListWidget
-        currentUserId={user?.id}
-        isOpen={isOpenChat}
-        toggleChat={toggleChat}
-        authToken={authToken!}
-        targetUserId={product.createdById}
-      />
+      {user && (
+        <ChatListWidget
+          currentUserId={user?.id}
+          isOpen={isOpenChat}
+          toggleChat={toggleChat}
+          authToken={authToken!}
+          targetUserId={product.createdById}
+        />
+      )}
     </Box>
   )
 }

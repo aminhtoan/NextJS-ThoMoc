@@ -365,7 +365,12 @@ export default function MyOrdersPage() {
                           startIcon={<RateReviewOutlinedIcon />}
                           onClick={() => {
                             if (items.length > 0) {
-                              handleOpenReview(order.id, items[0])
+                              // Tìm đánh giá hiện có cho sản phẩm này trong đơn hàng này
+                              const existingReview =
+                                order.reviews?.find(
+                                  review => review.orderId === order.id && review.productId === items[0].productId
+                                ) || null
+                              handleOpenReview(order.id, items[0], existingReview)
                             }
                           }}
                           sx={{
@@ -378,7 +383,12 @@ export default function MyOrdersPage() {
                             }
                           }}
                         >
-                          Đánh giá
+                          {/* Hiển thị text khác nhau tùy vào có đánh giá hay không */}
+                          {order.reviews?.find(
+                            review => review.orderId === order.id && review.productId === items[0].productId
+                          )
+                            ? 'Chỉnh sửa đánh giá'
+                            : t('review')}
                         </Button>
                       )}
                     </Box>

@@ -490,14 +490,15 @@ export default function CartPage() {
             </Paper>
           </>
         )}
-
-        <ChatListWidget
-          currentUserId={user?.id}
-          isOpen={isOpenChat}
-          toggleChat={toggleChat}
-          authToken={authToken}
-          targetUserId={selectedShopForChat}
-        />
+        {user && (
+          <ChatListWidget
+            currentUserId={user?.id}
+            isOpen={isOpenChat}
+            toggleChat={toggleChat}
+            authToken={authToken}
+            targetUserId={selectedShopForChat}
+          />
+        )}
       </Box>
     </>
   )
