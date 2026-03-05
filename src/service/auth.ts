@@ -47,3 +47,11 @@ export const verifyEmailAuth = async (email: string) => {
 export const changePasswordAuth = async (oldPassword: string, newPassword: string) => {
   return await handleAPI(API_CONFIG.AUTH_API.CHANGE_PASSWORD, { oldPassword, newPassword }, 'put')
 }
+
+export const getDevices = async () => {
+  return await handleAPI(API_CONFIG.AUTH_API.DEVICES)
+}
+
+export const removeDevice = async (deviceId: number) => {
+  return await handleAPI(`${API_CONFIG.AUTH_API.DEVICES}/${deviceId}`, undefined, 'delete')
+}

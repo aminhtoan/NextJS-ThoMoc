@@ -13,7 +13,8 @@ export const API_CONFIG = {
     REFRESH_TOKEN: `/auth/refresh-token`,
     LOGOUT: `/auth/logout`,
     VERIFY_EMAIL: `/auth/verify-email`,
-    CHANGE_PASSWORD: `/auth/change-password`
+    CHANGE_PASSWORD: `/auth/change-password`,
+    DEVICES: `/auth/devices`
   },
   MEDIA_API: {
     UPLOAD_IMAGE_CLOUDINARY: `/media/image/cloudinary`,

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 
 // Icons
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
+import DevicesOutlinedIcon from '@mui/icons-material/DevicesOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -77,6 +78,12 @@ const ProfileSideBar = () => {
           label: t('Privacy Settings'),
           icon: <SecurityOutlinedIcon fontSize='small' />,
           path: '/my-profile/privacy-settings'
+        },
+        {
+          key: 'devices',
+          label: t('Login Devices'),
+          icon: <DevicesOutlinedIcon fontSize='small' />,
+          path: '/my-profile/devices'
         }
       ]
     }

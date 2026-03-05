@@ -14,7 +14,8 @@ export const AUTH_ROUTES = {
   PROFILE_ADDRESS: '/my-profile/address',
   PROFILE_EMAIL: '/my-profile/email',
   PROFILE_CHANGE_PASSWORD: '/my-profile/change-password',
-  PROFILE_PRIVACY_SETTINGS: '/my-profile/privacy-settings'
+  PROFILE_PRIVACY_SETTINGS: '/my-profile/privacy-settings',
+  PROFILE_DEVICES: '/my-profile/devices'
 }
 
 // ==================== ADMIN ROUTES ====================

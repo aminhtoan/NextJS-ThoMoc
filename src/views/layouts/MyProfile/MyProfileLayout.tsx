@@ -45,7 +45,7 @@ const MyProfileLayout: NextPage<Props> = ({ children }) => {
                 sx={{
                   p: 4,
                   mt: 3,
-                  height: 436
+                  minHeight: 436
                 }}
               >
                 {children}
