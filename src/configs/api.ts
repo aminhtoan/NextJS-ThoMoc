@@ -66,5 +66,8 @@ export const API_CONFIG = {
     REVIEW: `/review`,
     PRODUCT_REVIEWS: `/review/product`,
     DETAIL: `/review/detail/review`
+  },
+  AI_CHAT: {
+    CHAT: `/ai-chat`
   }
 }

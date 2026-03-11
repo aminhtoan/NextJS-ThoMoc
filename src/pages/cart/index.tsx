@@ -421,9 +421,6 @@ export default function CartPage() {
                               >
                                 Xóa
                               </Typography>
-                              <Typography sx={{ fontSize: '12px', color: PRIMARY_COLOR, cursor: 'pointer' }}>
-                                Tìm sản phẩm tương tự
-                              </Typography>
                             </Box>
                           </Grid>
                         </Grid>

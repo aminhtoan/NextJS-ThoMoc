@@ -1,6 +1,7 @@
 import { Box, Container, CssBaseline } from '@mui/material'
 import { NextPage } from 'next'
 import * as React from 'react'
+import GeminiChatBot from 'src/components/GeminiChatBot'
 import FooterLayout from './FooterLayout'
 import HeaderLayout from './HeaderLayout'
 
@@ -31,6 +32,7 @@ const UserLayout: NextPage<Props> = ({ children }) => {
       </Box>
 
       <FooterLayout />
+      <GeminiChatBot />
     </Box>
   )
 }
