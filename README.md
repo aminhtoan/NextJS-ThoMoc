@@ -1,40 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Shopping App Client (Next.js)
 
-## Getting Started
+Frontend cho hệ thống thương mại điện tử, xây dựng bằng Next.js + TypeScript.
+Ứng dụng cung cấp giao diện cho khách hàng và quản trị, kết nối API backend NestJS.
 
-First, run the development server:
+## Cấu trúc thư mục
+
+```text
+client/
+├─ public/                     # Tài nguyên tĩnh (images, locales, svgs)
+├─ src/
+│  ├─ apis/                    # Cấu hình axios và hàm gọi API
+│  ├─ components/              # Component dùng chung (UI, Auth, Modal, Table...)
+│  ├─ configs/                 # Cấu hình app (api, auth, i18n, route, acl...)
+│  ├─ contexts/                # React Context (Auth, Settings)
+│  ├─ hooks/                   # Custom hooks
+│  ├─ pages/                   # Các trang theo chuẩn Next.js Pages Router
+│  ├─ service/                 # Service nghiệp vụ
+│  ├─ stores/                  # Redux Toolkit store và slices
+│  ├─ styles/                  # SCSS/CSS global
+│  ├─ theme/                   # Theme và tùy biến giao diện
+│  ├─ types/                   # TypeScript types/interfaces
+│  ├─ utils/                   # Hàm tiện ích
+│  └─ views/                   # UI theo màn hình/feature
+├─ next.config.js              # Cấu hình Next.js
+├─ tsconfig.json               # Cấu hình TypeScript
+└─ package.json                # Scripts và dependencies
+```
+
+## Chức năng chính
+
+- Đăng ký, đăng nhập, social login (Google/Facebook)
+- Quản lý tài khoản người dùng, phiên đăng nhập, bảo mật OTP/verify
+- Hiển thị sản phẩm, danh mục, tìm kiếm, giỏ hàng, checkout
+- Quản lý đơn hàng và theo dõi trạng thái đơn
+- Đánh giá sản phẩm
+- Phân quyền và khu vực quản trị (ACL + role/permission)
+- Đa ngôn ngữ (i18n)
+- Tích hợp chat AI và realtime qua socket
+
+## Cách sử dụng
+
+1. Cài đặt dependencies:
+
+```bash
+cd client
+npm install
+```
+
+2. Tạo file `.env` trong thư mục `client`:
+
+```env
+URL_API=http://localhost:8888/api
+```
+
+3. Chạy môi trường development:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Build production:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+5. Chạy bản production local:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+npm run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+6. Kiểm tra lint/format:
 
-## Learn More
+```bash
+npm run lint
+npm run lint:fix
+npm run format
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Ghi chú
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Frontend mặc định chạy tại `http://localhost:3000`
+- Cần chạy backend trước để các chức năng API hoạt động đúng

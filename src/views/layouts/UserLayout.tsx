@@ -1,5 +1,6 @@
 import { Box, Container, CssBaseline } from '@mui/material'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import * as React from 'react'
 import GeminiChatBot from 'src/components/GeminiChatBot'
 import FooterLayout from './FooterLayout'
@@ -10,6 +11,8 @@ type Props = {
 }
 
 const UserLayout: NextPage<Props> = ({ children }) => {
+  const router = useRouter()
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <CssBaseline />
@@ -32,7 +35,7 @@ const UserLayout: NextPage<Props> = ({ children }) => {
       </Box>
 
       <FooterLayout />
-      <GeminiChatBot />
+      {router.pathname === '/' && <GeminiChatBot />}
     </Box>
   )
 }

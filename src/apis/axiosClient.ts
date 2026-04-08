@@ -14,6 +14,37 @@ const api = axios.create({
   }
 })
 
+type TokenPair = {
+  accessToken: string
+  refreshToken: string
+}
+
+let refreshTokenPromise: Promise<TokenPair> | null = null
+
+const getStoredToken = (key: 'accessToken' | 'refreshToken') => {
+  const rawToken = localStorage.getItem(key)
+
+  if (!rawToken) return null
+
+  try {
+    return JSON.parse(rawToken)
+  } catch {
+    return rawToken
+  }
+}
+
+const refreshOnce = async (refreshToken: string): Promise<TokenPair> => {
+  if (!refreshTokenPromise) {
+    refreshTokenPromise = refreshTokenAuth({ refreshToken })
+      .then(response => response.data as TokenPair)
+      .finally(() => {
+        refreshTokenPromise = null
+      })
+  }
+
+  return refreshTokenPromise
+}
+
 // Thêm interceptor nếu cần (ví dụ thêm token)
 api.interceptors.request.use(
   async config => {
@@ -26,8 +57,8 @@ api.interceptors.request.use(
       return config
     }
 
-    const accessToken = JSON.parse(localStorage.getItem('accessToken') || 'null')
-    const refreshToken = JSON.parse(localStorage.getItem('refreshToken') || 'null')
+    const accessToken = getStoredToken('accessToken')
+    const refreshToken = getStoredToken('refreshToken')
 
     if (!accessToken) return config
 
@@ -48,9 +79,7 @@ api.interceptors.request.use(
       // Check if the refresh token is still valid
       if (decodedRefreshToken?.exp && decodedRefreshToken.exp > Date.now() / 1000) {
         try {
-          const response = await refreshTokenAuth({ refreshToken })
-
-          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshOnce(refreshToken)
           localStorage.setItem('accessToken', JSON.stringify(newAccessToken))
           localStorage.setItem('refreshToken', JSON.stringify(newRefreshToken))
 
