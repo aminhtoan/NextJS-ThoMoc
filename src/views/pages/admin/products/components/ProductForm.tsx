@@ -107,7 +107,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
 
   const ability = useMemo(() => {
     if (!user) return null
-    
+
     return buildAbilityFor(user.role.name, user.role.permissions)
   }, [user])
 
@@ -398,7 +398,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
       setPendingImages([])
       setPendingSKUImages([])
 
-      router.push(ADMIN_ROUTES.PRODUCTS)
+      // check nếu là admin thì đi ra route admin/product còn sellers thì đi ra route seller/products
+      if (isEdit && productId) {
+        router.push(ADMIN_ROUTES.PRODUCTS)
+      } else {
+        router.push(SELLER_ROUTES.PRODUCTS)
+      }
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || t('Something went wrong')
       toast.error(message)
@@ -425,14 +430,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
     }))
   ]
 
-  const handleImageSelect = async (file: File) => {
-    const preview = URL.createObjectURL(file)
-    const newPendingImage: PendingImage = {
+  const handleImageSelect = (files: File[]) => {
+    const newPendingImages: PendingImage[] = files.map(file => ({
       id: `${Date.now()}-${Math.random()}`,
       file,
-      preview
-    }
-    setPendingImages(prev => [...prev, newPendingImage])
+      preview: URL.createObjectURL(file)
+    }))
+
+    setPendingImages(prev => [...prev, ...newPendingImages])
 
     // Clear image error nếu đã có ảnh
     if (errors.images) {
@@ -699,6 +704,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId }) => {
               ))}
               <Grid item>
                 <WrapperFileUpload
+                  multiple
                   uploadFunc={handleImageSelect}
                   objectAcceptFile={{ 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] }}
                 >

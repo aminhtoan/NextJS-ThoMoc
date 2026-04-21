@@ -34,6 +34,7 @@ import { PLACEHOLDER_IMAGE } from 'src/configs/place_holder'
 import { useAuth } from 'src/hooks/useAuth'
 import { getAccessToken } from 'src/service/token'
 import { AppDispatch } from 'src/stores'
+import { setSelectedItems } from 'src/stores/apps/cart'
 import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
 import ShopOtherProducts from './components/ShopOtherProducts'
 import RelatedProducts from './components/RelatedProducts'
@@ -337,7 +338,18 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
     setIsAddingToCart(true)
     try {
       await dispatch(addToCartAsync({ skuId, quantity })).unwrap()
-      router.push('/cart')
+
+      const cartResponse = await dispatch(fetchCartAsync({ page: 1, limit: 100 })).unwrap()
+      const cartGroups = cartResponse?.data?.data || []
+      const targetCartItem = cartGroups
+        .flatMap((group: any) => group.cartItems || [])
+        .find((item: any) => item?.skuId === skuId)
+
+      if (targetCartItem?.id) {
+        dispatch(setSelectedItems([targetCartItem.id]))
+      }
+
+      router.push('/checkout')
     } catch (error: any) {
       toast.error(error?.message || t('Failed to add to cart'))
     } finally {

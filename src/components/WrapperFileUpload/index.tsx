@@ -1,17 +1,38 @@
 import React from 'react'
 import { useDropzone } from 'react-dropzone'
 
-interface TProps {
+type TProps = {
   children: React.ReactNode
-  uploadFunc: (file: File) => void
   objectAcceptFile?: Record<string, string[]>
-}
+  maxFiles?: number
+} & (
+  | {
+      multiple?: false
+      uploadFunc: (file: File) => void
+    }
+  | {
+      multiple: true
+      uploadFunc: (files: File[]) => void
+    }
+)
 
-const WrapperFileUpload = ({ children, uploadFunc, objectAcceptFile }: TProps) => {
+const WrapperFileUpload = ({ children, uploadFunc, objectAcceptFile, multiple = false, maxFiles }: TProps) => {
   const { getRootProps, getInputProps } = useDropzone({
+    multiple,
+    maxFiles,
     accept: objectAcceptFile ?? {},
     onDrop: acceptedFiles => {
-      uploadFunc(acceptedFiles[0])
+      if (!acceptedFiles.length) {
+        return
+      }
+
+      if (multiple) {
+        ;(uploadFunc as (files: File[]) => void)(acceptedFiles)
+
+        return
+      }
+
+      ;(uploadFunc as (file: File) => void)(acceptedFiles[0])
     }
   })
 

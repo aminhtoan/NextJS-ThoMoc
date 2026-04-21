@@ -129,7 +129,8 @@ const PageRegister: NextPage<TProps> = () => {
   const handleRegister = async (data: RegisterBodyType) => {
     setLoading(true)
     try {
-      dispatch(
+      // unwrap lỗi nếu có, nếu không sẽ trả về undefined và hiển thị lỗi mặc định  
+      await dispatch(
         registerAuthAsync({
           email: data.email,
           password: data.password,
@@ -138,14 +139,21 @@ const PageRegister: NextPage<TProps> = () => {
           phoneNumber: data.phoneNumber,
           code: otp
         })
-      )
+      ).unwrap()
+
       toast.success(t('Register successfully, redirecting...'))
       setOtp('')
       setDataInit(undefined)
       reset()
       route.push('/login')
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message[0].message || t('Failed to register')
+      const errorMsg =
+        err?.message?.[0]?.message ||
+        err?.message?.[0]?.error ||
+        (Array.isArray(err?.message) ? err.message.join(', ') : err?.message) ||
+        err?.response?.data?.message?.[0]?.message ||
+        err?.response?.data?.message ||
+        t('Failed to register')
       toast.error(errorMsg)
     }
     setLoading(false)

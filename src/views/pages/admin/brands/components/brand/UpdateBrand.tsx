@@ -2,7 +2,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 
 // ** MUI Imports
-import { Box, Button, FormLabel, TextField } from '@mui/material'
+import { Box, Button, FormLabel, MenuItem, TextField } from '@mui/material'
 
 // ** React Imports
 import React from 'react'
@@ -18,10 +18,13 @@ import { useTranslation } from 'react-i18next'
 import CustomModal from 'src/components/CustomModal'
 import WrapperFileUpload from 'src/components/WrapperFileUpload'
 import { UpdateBrand } from 'src/service/brand'
+import { fetchUsers } from 'src/service/user'
 
 // ** Service Import
 import { uploadMedia } from 'src/service/media'
 import { UpdateBrandBodySchema, UpdateBrandBodyType } from 'src/types/brand'
+import { User } from 'src/types/user'
+import { useAuth } from 'src/hooks/useAuth'
 
 // ** Types Import
 
@@ -29,6 +32,7 @@ interface Category {
   id: number
   name: string
   logo: string
+  createdById?: number | null
 }
 
 interface UpdateCategoryProps {
@@ -40,9 +44,13 @@ interface UpdateCategoryProps {
 
 const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoadingOwners, setIsLoadingOwners] = React.useState(false)
+  const [owners, setOwners] = React.useState<User[]>([])
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null)
   const [previewImage, setPreviewImage] = React.useState<string | null>(null)
   const { t } = useTranslation()
+  const auth = useAuth()
+  const isAdmin = auth.user?.role?.name === 'ADMIN'
 
   const {
     handleSubmit,
@@ -53,7 +61,8 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
   } = useForm<UpdateBrandBodyType>({
     defaultValues: {
       name: '',
-      logo: ''
+      logo: '',
+      createdById: undefined
     },
     mode: 'onBlur',
     resolver: yupResolver(UpdateBrandBodySchema),
@@ -64,11 +73,43 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
     if (open && category) {
       setValue('name', category.name)
       setValue('logo', category.logo)
+      setValue('createdById', category.createdById ?? undefined)
     } else {
       reset()
       setUploadedFile(null)
     }
   }, [open, category, setValue, reset])
+
+  React.useEffect(() => {
+    if (!open || !isAdmin) {
+      setOwners([])
+      return
+    }
+
+    let isMounted = true
+
+    const loadOwners = async () => {
+      try {
+        setIsLoadingOwners(true)
+        const response = await fetchUsers(1, 200)
+        if (isMounted) {
+          setOwners(response.data || [])
+        }
+      } catch (error) {
+        console.error('Error fetching owners:', error)
+      } finally {
+        if (isMounted) {
+          setIsLoadingOwners(false)
+        }
+      }
+    }
+
+    loadOwners()
+
+    return () => {
+      isMounted = false
+    }
+  }, [open, isAdmin])
 
   const handleClose = () => {
     reset()
@@ -78,8 +119,16 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
   }
 
   const onSubmit = async (data: UpdateBrandBodyType) => {
+    const isOwnerUnchanged = data.createdById === (category?.createdById ?? undefined)
+
     // Check if no changes
-    if (category && data.name === category.name && data.logo === category.logo && !uploadedFile) {
+    if (
+      category &&
+      data.name === category.name &&
+      data.logo === category.logo &&
+      !uploadedFile &&
+      (!isAdmin || isOwnerUnchanged)
+    ) {
       toast('No changes detected', {
         icon: '⚠️'
       })
@@ -89,14 +138,19 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
 
     try {
       setIsLoading(true)
+      const payload: UpdateBrandBodyType = { ...data }
 
       // If user uploaded new file, upload it first
       if (uploadedFile) {
-        const uploadedMedia = await uploadMedia(uploadedFile, 'categories')
-        data.logo = uploadedMedia.data.url
+        const uploadedMedia = await uploadMedia(uploadedFile, 'brands')
+        payload.logo = uploadedMedia.data.url
       }
 
-      await UpdateBrand(category?.id as number, data)
+      if (!isAdmin) {
+        delete (payload as { createdById?: number }).createdById
+      }
+
+      await UpdateBrand(category?.id as number, payload)
       toast.success(t('Update brand successfully'))
 
       if (typeof onUpdated === 'function') {
@@ -269,6 +323,43 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
             )}
           />
         </Box>
+
+        {isAdmin && (
+          <Box>
+            <Controller
+              control={control}
+              name='createdById'
+              render={({ field: { onChange, value } }) => (
+                <>
+                  <FormLabel>{t('Brand Owner')}</FormLabel>
+                  <TextField
+                    select
+                    fullWidth
+                    value={value ?? ''}
+                    onChange={event => {
+                      const nextValue = event.target.value
+                      onChange(nextValue === '' ? undefined : Number(nextValue))
+                    }}
+                    error={Boolean(errors?.createdById)}
+                    helperText={
+                      errors?.createdById?.message && typeof errors.createdById.message === 'string'
+                        ? errors.createdById.message
+                        : ''
+                    }
+                    disabled={isLoading || isLoadingOwners}
+                  >
+                    <MenuItem value=''>{t('Select owner')}</MenuItem>
+                    {owners.map(owner => (
+                      <MenuItem key={owner.id} value={owner.id}>
+                        {owner.name} ({owner.email})
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </>
+              )}
+            />
+          </Box>
+        )}
 
         {/* Action Buttons */}
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>

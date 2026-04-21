@@ -8,7 +8,7 @@ export const LoginSchema = yup
       .string()
       .required('Vui lòng nhập mật khẩu')
       .matches(PASSWORD_REG, `Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt`)
-      .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
   })
   .required()
 
@@ -30,12 +30,12 @@ export const ResetPasswordSchema = ForgotPasswordSchema.shape({
     .string()
     .required('Vui lòng nhập mật khẩu')
     .matches(PASSWORD_REG, `Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt`)
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
   confirmNewPassword: yup
     .string()
     .required('Vui lòng nhập mật khẩu')
     .matches(PASSWORD_REG, `Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt`)
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
 }).required()
 
 export const RegisterBodySchema = yup
@@ -45,7 +45,7 @@ export const RegisterBodySchema = yup
       .string()
       .required('Vui lòng nhập mật khẩu')
       .matches(PASSWORD_REG, `Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt`)
-      .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
     name: yup.string().required('Vui lòng nhập tên'),
     confirmPassword: yup
       .string()
@@ -132,13 +132,13 @@ export const UpdateMyProfileBodySchema = yup.object({
     .optional()
     .test('password-or-empty', 'Vui lòng nhập mật khẩu', value => {
       if (value && value !== '' && value !== '**********') {
-        return PASSWORD_REG.test(value) && value.length >= 6
+        return PASSWORD_REG.test(value) && value.length >= 8
       }
 
       return true
     })
     .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
 })
 
 export const OtpSchema = yup.object({
@@ -153,13 +153,13 @@ export const ChangePasswordSchema = yup.object({
     .string()
     .required('Vui lòng nhập mật khẩu cũ')
     .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
 
   newPassword: yup
     .string()
     .required('Vui lòng nhập mật khẩu mới')
     .matches(PASSWORD_REG, 'Password phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
     .notOneOf([yup.ref('oldPassword')], 'Mật khẩu mới không được giống mật khẩu cũ'),
 
   confirmNewPassword: yup

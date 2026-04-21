@@ -167,7 +167,7 @@ export default function CheckoutPage() {
     let qty = 0
     selectedShopGroups.forEach(group => {
       group.cartItems.forEach(item => {
-        const price = item.sku?.price || item.sku?.product?.basePrice || 0
+        const price = item.sku?.price ?? 0
         total += price * (item.quantity || 0)
         qty += item.quantity || 0
       })
@@ -379,7 +379,7 @@ export default function CheckoutPage() {
 
               {/* Items */}
               {group.cartItems.map(item => {
-                const price = item.sku?.price || item.sku?.product?.basePrice || 0
+                const price = item.sku?.price ?? 0
                 const total = price * (item.quantity || 0)
 
                 return (

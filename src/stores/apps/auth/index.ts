@@ -25,8 +25,8 @@ export const authSlice = createSlice({
     })
     builder.addCase(registerAuthAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.isSuccess = !!action.payload.data?.email
-      state.isError = !action.payload.data?.email
+      state.isSuccess = !!action.payload?.email
+      state.isError = !action.payload?.email
     })
     builder.addCase(registerAuthAsync.rejected, state => {
       state.isLoading = false

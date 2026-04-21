@@ -50,7 +50,8 @@ export const GetBrandQueryResSchema = yup.object({
 export const CreateBrandBodySchema = BrandSchema.pick(['logo', 'name'])
 export const UpdateBrandBodySchema = yup.object({
   logo: yup.string().max(1000).optional(),
-  name: yup.string().max(500).optional()
+  name: yup.string().max(500).optional(),
+  createdById: yup.number().positive().integer().optional()
 })
 
 export type BrandType = yup.InferType<typeof BrandSchema>
