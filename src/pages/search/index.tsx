@@ -57,6 +57,7 @@ export default function SearchPage({
     router.push({ pathname: '/search', query: { ...router.query, page } }, undefined, { scroll: true })
   }
 
+  // Khi thay đổi sortBy, reset về page 1
   const handleSortChange = (newSortBy: string) => {
     router.push({
       pathname: '/search',
@@ -64,6 +65,7 @@ export default function SearchPage({
     })
   }
 
+  // Khi thay đổi orderBy, reset về page 1
   const handleOrderChange = (newOrderBy: string) => {
     router.push({
       pathname: '/search',
@@ -297,7 +299,9 @@ export default function SearchPage({
   )
 }
 
+// Server-side data fetching
 export const getServerSideProps: GetServerSideProps<SearchPageProps> = async context => {
+  // Lấy ngôn ngữ từ header để gửi đến API để lấy các chọn đúng ngôn ngữ để hiện sản phẩm
   const acceptLanguage = context.req.headers['accept-language'] || 'en'
   const baseLang = acceptLanguage.split('-')[0].split(',')[0].toLowerCase()
 
@@ -335,6 +339,7 @@ export const getServerSideProps: GetServerSideProps<SearchPageProps> = async con
         ...(maxPrice !== null && { maxPrice })
       },
 
+      // dựa vào ngôn ngữ trên header accept-language
       headers: {
         'Accept-Language': baseLang
       }

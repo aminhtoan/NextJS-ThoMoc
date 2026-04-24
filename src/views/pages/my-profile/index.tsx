@@ -196,9 +196,12 @@ const PageMyProfile: NextPage<TProps> = () => {
 
   const maskEmail = (email: string) => {
     if (!email) return ''
+
+    // split email thành phần name và domain
     const [name, domain] = email.split('@')
     if (name.length <= 2) return '*@' + domain
 
+    // giữ lại 2 ký tự đầu của name, phần còn lại thay bằng *, và giữ nguyên domain
     return name.slice(0, 2) + '*'.repeat(name.length - 2) + '@' + domain
   }
 

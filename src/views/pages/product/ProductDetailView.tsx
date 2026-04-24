@@ -39,7 +39,6 @@ import { addToCartAsync, fetchCartAsync } from 'src/stores/apps/cart/actions'
 import ShopOtherProducts from './components/ShopOtherProducts'
 import RelatedProducts from './components/RelatedProducts'
 
-// ========== Types ==========
 interface SKU {
   id: number
   value: string
@@ -121,7 +120,6 @@ const mapLanguageToId = (lang: string): string => {
   return mapping[baseLang] || 'EN'
 }
 
-// ========== Component ==========
 const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultLanguage = 'vi' }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [overrideImage, setOverrideImage] = useState<string | null>(null) // ảnh override từ SKU màu
@@ -140,19 +138,26 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
   const toggleChat = () => {
     setIsOpenChat(prev => !prev)
   }
+
   useEffect(() => {
     const lang = i18n.language || defaultLanguage
     setCurrentLanguageId(mapLanguageToId(lang))
   }, [i18n.language, defaultLanguage])
 
   const images = product.images && product.images.length > 0 ? product.images : [PLACEHOLDER_IMAGE]
+
+  // Nếu có ảnh override (từ việc chọn variant màu), ưu tiên dùng ảnh đó.
+  // Nếu không, dùng ảnh được chọn trong gallery. Nếu gallery trống, dùng placeholder.
   const currentImage = overrideImage ?? images[selectedImageIndex] ?? images[0]
 
   const hasDiscount = product.virtualPrice > product.basePrice
+
+  // Tính % giảm dựa trên virtualPrice (giá gốc) và basePrice (giá hiện tại)
   const discountPercentage = hasDiscount
     ? Math.round(((product.virtualPrice - product.basePrice) / product.virtualPrice) * 100)
     : 0
 
+  // dùng useMemo để tối ưu việc tìm kiếm
   const description = useMemo(() => {
     if (!currentLanguageId || !product.productTranslations) return ''
     const translation =
@@ -201,15 +206,19 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
   const displayPrice = selectedSku ? selectedSku.price : product.basePrice
 
+  // Tính tổng stock của sp đó
   const totalStock = useMemo(() => {
     if (!product.skus || product.skus.length === 0) return 999
 
     return product.skus.reduce((sum, sku) => sum + sku.stock, 0)
   }, [product.skus])
 
+  // Xử lý chọn variant option
   const handleVariantSelect = (variantName: string, option: string) => {
+    // Nếu đang chọn lại option đã chọn → bỏ chọn (set thành '')
     const isDeselecting = selectedVariantOptions[variantName] === option
 
+    // Cập nhật option đã chọn cho variant đó
     setSelectedVariantOptions(prev => ({
       ...prev,
       [variantName]: isDeselecting ? '' : option
@@ -217,7 +226,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
 
     // Xử lý chuyển ảnh cho BẤT KỲ variant nào có SKU với ảnh
     if (isDeselecting) {
-      // Bỏ chọn → reset về ảnh đầu gallery
+      // Bỏ chọn, reset về ảnh đầu gallery
       setOverrideImage(null)
       setSelectedImageIndex(0)
     } else {
@@ -243,6 +252,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
     setSelectedImageIndex(index)
   }
 
+  // Tăng giảm số lượng, đảm bảo không vượt stock và không dưới 1
   const handleQuantityChange = (delta: number) => {
     setQuantity(prev => {
       const next = prev + delta
@@ -309,8 +319,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       return
     }
 
-    // Check if variants are selected
+    //  Check if variants are selected
     if (product.variants && product.variants.length > 0) {
+      // Nếu có variants, bắt buộc phải chọn hết trước khi mua
       const allSelected = product.variants.every(
         variant => selectedVariantOptions[variant.value] && selectedVariantOptions[variant.value] !== ''
       )
@@ -335,16 +346,27 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, defaultL
       return
     }
 
+    // Thêm vào cart trước, sau đó redirect sang checkout page.
+    // Mục đích là để tận dụng luôn trang checkout đã có sẵn,
+    // tránh phải làm thêm 1 flow đặt hàng riêng cho nút Buy Now.
     setIsAddingToCart(true)
+
     try {
+      // Add to cart
       await dispatch(addToCartAsync({ skuId, quantity })).unwrap()
 
+      // Fetch lại cart để lấy ID của item vừa thêm, phục vụ cho việc set selected khi chuyển sang checkout page
       const cartResponse = await dispatch(fetchCartAsync({ page: 1, limit: 100 })).unwrap()
+
+      // Tìm item vừa thêm trong cart để lấy ID
       const cartGroups = cartResponse?.data?.data || []
+
+      // Lưu ý: Nếu có nhiều group trong cart, cần duyệt qua tất cả group để tìm item.
       const targetCartItem = cartGroups
         .flatMap((group: any) => group.cartItems || [])
         .find((item: any) => item?.skuId === skuId)
 
+      // Set selected item trong cart để khi chuyển sang checkout page có thể highlight đúng item vừa thêm
       if (targetCartItem?.id) {
         dispatch(setSelectedItems([targetCartItem.id]))
       }

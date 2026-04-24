@@ -83,6 +83,7 @@ const UpdateBrands = ({ open, onClose, category, onUpdated }: UpdateCategoryProp
   React.useEffect(() => {
     if (!open || !isAdmin) {
       setOwners([])
+
       return
     }
 
