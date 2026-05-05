@@ -56,7 +56,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   }
 
   // Calculate rating statistics
-  const ratingCounts = [0, 0, 0, 0, 0] // index 0 = 1 star, index 4 = 5 star
+  const ratingCounts = [0, 0, 0, 0, 0] 
   reviews.forEach(r => {
     if (r.rating >= 1 && r.rating <= 5) {
       ratingCounts[r.rating - 1]++

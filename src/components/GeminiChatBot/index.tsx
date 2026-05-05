@@ -47,14 +47,18 @@ const GeminiChatBot = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
+  // lướtng xuống cuối mỗi khi có tin nhắn mới hoặc khi mở chat
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Khi người dùng gửi tin nhắn, gửi yêu cầu đến API và xử lý phản hồi
   useEffect(() => {
     scrollToBottom()
   }, [messages])
 
+
+  // Tự động focus vào ô input khi mở chat
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 300)
@@ -63,9 +67,14 @@ const GeminiChatBot = () => {
 
   const handleSend = async () => {
     const trimmed = message.trim()
+
+    // Nếu tin nhắn trống, không làm gì
     if (!trimmed || loading) return
 
+    // Thêm tin nhắn của người dùng vào lịch sử và gọi API
     const userMessage: ChatMessage = { role: 'user', parts: [{ text: trimmed }] }
+
+    // Cập nhật tin nhắn mới vào state trước để hiển thị ngay lập tức
     const newMessages = [...messages, userMessage]
     setMessages(newMessages)
     setMessage('')
@@ -86,6 +95,8 @@ const GeminiChatBot = () => {
         parts: [{ text: res.data.reply }],
         products: res.data.products?.length > 0 ? res.data.products : undefined
       }
+
+      // Cập nhật tin nhắn của bot vào state để hiển thị phản hồi
       setMessages(prev => [...prev, botMessage])
     } catch {
       const errorMessage: ChatMessage = {

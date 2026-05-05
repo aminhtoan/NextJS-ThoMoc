@@ -52,7 +52,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const socketRef = useRef<Socket | null>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const lastSuccessOrderIdRef = useRef<number | null>(null) // Track which orderId already succeeded
+  const lastSuccessOrderIdRef = useRef<number | null>(null)
 
   // Fetch QR data when dialog opens
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     setPaymentSuccess(false)
   }, [open, orderId])
 
-  // Start/stop polling when dialog opens/closes
+  // bắt đầu polling khi mở dialog và có orderId, dừng khi đóng dialog hoặc khi đã thanh toán thành công
   useEffect(() => {
     if (open && orderId && !paymentSuccess) {
       startPolling()
@@ -82,7 +82,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     }
   }, [open, orderId, paymentSuccess])
 
-  // Start polling for payment status
+  // Hàm bắt đầu polling để kiểm tra trạng thái thanh toán
   const startPolling = () => {
     if (pollIntervalRef.current || lastSuccessOrderIdRef.current === orderId) return
 
@@ -90,7 +90,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       try {
         const res = await getOrderDetail(orderId)
         if (res?.data?.payment?.status === 'SUCCESS') {
-          lastSuccessOrderIdRef.current = orderId // Mark this orderId as succeeded
+          lastSuccessOrderIdRef.current = orderId 
           setPaymentSuccess(true)
           stopPolling()
           onPaymentSuccess?.()
@@ -107,6 +107,7 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     }, POLL_INTERVAL)
   }
 
+  // Hàm dừng polling
   const stopPolling = () => {
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current)
@@ -114,9 +115,10 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
     }
   }
 
-  // WebSocket connection for real-time payment notification (backup)
+  // kết nối WebSocket để lắng nghe sự kiện thanh toán thành công từ server, 
+  // chỉ khi dialog mở và chưa thanh toán thành công
   useEffect(() => {
-    // Don't connect if already succeeded or dialog closed
+    // Nếu dialog chưa mở, user chưa đăng nhập hoặc đơn hàng đã được đánh dấu là đã thanh toán thành công, không thiết lập WebSocket
     if (!open || !user?.id || lastSuccessOrderIdRef.current === orderId) return
 
     const wsUrl = API_BASE_URL.replace('/api', '')
@@ -127,10 +129,6 @@ export default function PaymentQRDialog({ open, onClose, orderId, onPaymentSucce
       auth: {
         authorization: `Bearer ${accessToken}`
       }
-    })
-
-    socket.on('connect', () => {
-      console.log('[PaymentQR] WebSocket connected')
     })
 
     socket.on('payment', (data: { status: string }) => {

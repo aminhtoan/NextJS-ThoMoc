@@ -82,7 +82,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     scrollToBottom()
   }, [messages])
 
-  // ==================== WEBSOCKET fdsaf====================
+  // Thiết lập kết nối WebSocket khi component được mở và có thông tin người dùng
   useEffect(() => {
     if (!authToken || !currentUserId) {
       return
@@ -96,22 +96,25 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
 
     socketRef.current = socket
 
-    // socket.on('connect', () => console.log('✅ Socket connected'))
-
+    // xử lý khi nhận được thông tin từ server
     socket.on('message:receive', (newMessage: Message) => {
       if (
         selectedShop &&
         (Number(newMessage.fromUserId) === selectedShop.partnerId ||
           Number(newMessage.toUserId) === selectedShop.partnerId)
       ) {
+        // Cập nhật trạng thái đã đọc nếu tin nhắn đến từ đối tác
         setMessages(prev => [...prev, newMessage])
         if (Number(newMessage.fromUserId) === selectedShop.partnerId) {
           socket.emit('message:read', { fromUserId: selectedShop.partnerId })
         }
       }
+
+      // Cập nhật lại danh sách cuộc trò chuyện để hiển thị tin nhắn mới nhất
       fetchMessage()
     })
 
+    // Cập nhật trạng thái đã đọc khi người dùng xem tin nhắn
     socket.on('message:seen', (data: any) => {
       setMessages(prev =>
         prev.map(msg =>
@@ -122,6 +125,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
       )
     })
 
+    // Xử lý khi người dùng đang nhập
     socket.on('message:typing', (data: { fromUserId: number; isTyping: boolean }) => {
       if (selectedShop && Number(data.fromUserId) === selectedShop.partnerId) {
         setIsTyping(data.isTyping)
@@ -133,7 +137,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     }
   }, [authToken, currentUserId, selectedShop])
 
-  // Auto-open chat with target user when widget opens
+  //  Tự động mở cuộc trò chuyện nếu có targetUserId được truyền vào và không phải là chính mình
   useEffect(() => {
     if (isOpen && currentUserId) {
       fetchMessage()
@@ -186,6 +190,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     }
   }, [isOpen, currentUserId, targetUserId])
 
+  // Fetch thông tin cuộc trò chuyện và danh sách cuộc trò chuyện khi component được mở
   const fetchMessage = async () => {
     try {
       const response = await listMessage()
@@ -269,6 +274,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     }
   }
 
+  // Xử lý khi người dùng nhấn nút quay lại danh sách cuộc trò chuyện
   const handleBackToList = () => {
     setCurrentView('list')
     setSelectedShop(null)
@@ -278,9 +284,11 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     fetchMessage()
   }
 
+  // Xử lý khi người dùng gửi tin nhắn mới
   const handleSendMessage = () => {
     if (!message.trim() || !selectedShop || !socketRef.current || !currentUserId) return
 
+    // Gửi tin nhắn qua WebSocket, message:send sẽ được server lắng nghe và xử lý
     socketRef.current.emit('message:send', {
       toUserId: selectedShop.partnerId,
       content: message.trim()
@@ -300,6 +308,7 @@ const ChatListWidget: React.FC<ChatListWidgetProps> = ({
     fetchMessage()
   }
 
+  // Xử lý khi người dùng bắt đầu nhập để gửi trạng thái đang nhập đến đối tác
   const handleTypingStart = () => {
     if (!selectedShop || !socketRef.current) return
     socketRef.current.emit('message:typing', {

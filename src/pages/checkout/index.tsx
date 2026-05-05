@@ -103,14 +103,6 @@ export default function CheckoutPage() {
     return groups
   }, [items, selectedItems])
 
-  // Redirect if no items selected and not buy-now mode
-  //   useEffect(() => {
-  //     if (!buyNow && selectedItems.length === 0 && !loadingMethods) {
-  //       router.push('/cart')
-  //     }
-  //   }, [selectedItems, buyNow, loadingMethods, router])
-
-  // Fetch delivery and payment methods
   useEffect(() => {
     const fetchMethods = async () => {
       try {
