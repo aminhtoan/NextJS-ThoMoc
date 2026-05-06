@@ -55,7 +55,7 @@ export default function CheckoutPage() {
   const { items, selectedItems } = useSelector((state: RootState) => state.cart)
   const { isCreating } = useSelector((state: RootState) => state.order)
 
-  // Receiver info - load from localStorage if available
+  //  thông tin người nhận
   const [receiver, setReceiver] = useState<ReceiverType>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('checkout_receiver')
@@ -77,9 +77,6 @@ export default function CheckoutPage() {
   const [selectedPaymentCode, setSelectedPaymentCode] = useState<string>('')
   const [loadingMethods, setLoadingMethods] = useState(true)
 
-  // Buy now mode
-  //   const { buyNow, skuId: buyNowSkuId, quantity: buyNowQuantity } = router.query
-
   // Get selected shop groups
   const selectedShopGroups = useMemo(() => {
     const groups: Array<{
@@ -87,12 +84,14 @@ export default function CheckoutPage() {
       cartItems: CartItemDetailType[]
     }> = []
 
+    // lọc những sản phẩm được chọn từ cart, sau đó nhóm theo shop
     items.forEach(shopGroup => {
       const selectedCartItems = (shopGroup.cartItems || []).filter(
         item => item?.id && selectedItems.includes(item.id)
       ) as CartItemDetailType[]
 
       if (selectedCartItems.length > 0) {
+        // Nếu có sản phẩm nào của shop này được chọn, thêm vào nhóm
         groups.push({
           shop: shopGroup.shop,
           cartItems: selectedCartItems
@@ -142,8 +141,7 @@ export default function CheckoutPage() {
     }
   }, [user])
 
-  // Save receiver to localStorage whenever it changesKhông có phương thức thanh toán khả dụng
-
+  // lưu thông tin người nhận vào localStorage để tránh mất khi reload
   useEffect(() => {
     if (receiver.name || receiver.phone || receiver.address) {
       localStorage.setItem('checkout_receiver', JSON.stringify(receiver))
@@ -154,6 +152,7 @@ export default function CheckoutPage() {
   const selectedDeliveryMethod = deliveryMethods.find(d => d.code === selectedDeliveryCode)
   const shippingFee = selectedDeliveryMethod?.price || 0
 
+  // Tính tổng tiền hàng và tổng số lượng
   const { productTotal, totalQuantity } = useMemo(() => {
     let total = 0
     let qty = 0
@@ -168,7 +167,9 @@ export default function CheckoutPage() {
     return { productTotal: total, totalQuantity: qty }
   }, [selectedShopGroups])
 
+  // Tính tổng phí vận chuyển (phí vận chuyển áp dụng cho mỗi shop)
   const totalShippingFee = shippingFee * selectedShopGroups.length
+
   const grandTotal = productTotal + totalShippingFee
 
   // Helpers
@@ -181,6 +182,7 @@ export default function CheckoutPage() {
     return item.sku?.product?.name || 'Sản phẩm'
   }
 
+  // Lấy ảnh sản phẩm ưu tiên theo thứ tự: ảnh SKU , ảnh sản phẩm , placeholder
   const getProductImage = (item: CartItemDetailType) => {
     if (item.sku?.image) return item.sku.image
     const images = item.sku?.product?.images
@@ -240,6 +242,8 @@ export default function CheckoutPage() {
 
       // Clear selected items and refresh cart
       dispatch(deselectAllItems())
+
+      // Làm mới giỏ hàng
       dispatch(fetchCartAsync({ page: 1, limit: 100 }))
 
       toast.success('Đặt hàng thành công!')

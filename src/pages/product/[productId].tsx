@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<ProductDetailPageProps> = as
       headers: { 'Accept-Language': baseLang }
     })
     const product = response.data ?? null
-
+    // console.log('[SSR Product] Fetched product:', product)
     return {
       props: {
         product: JSON.parse(JSON.stringify(product)),
