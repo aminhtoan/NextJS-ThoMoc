@@ -17,7 +17,7 @@ const ForgotPassword = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isShowVerify, setIsShowVerify] = useState(false)
   const [data, setData] = useState<ResetPasswordData | null>(null)
-
+  
   const {
     handleSubmit,
     control,
